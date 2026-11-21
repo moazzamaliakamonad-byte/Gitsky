@@ -133,6 +133,7 @@ button {
   border: 1px solid transparent;
   font-weight: 500;
   white-space: nowrap;
+  text-decoration: none;
   transition:
     background 0.15s,
     border-color 0.15s,

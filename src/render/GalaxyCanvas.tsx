@@ -11,6 +11,7 @@ import { Nebulae } from './Nebulae';
 import { GalaxyHaze } from './GalaxyHaze';
 import { StarChart } from './StarChart';
 import { LabelDriver } from './LabelDriver';
+import { Picker } from './Picker';
 
 const DPR_LEVELS = [1.5, 1.25, 1, 0.75];
 
@@ -76,6 +77,7 @@ export function GalaxyCanvas() {
         )}
         <Controls />
         {quality === 'high' && <Effects />}
+        <Picker />
         <LabelDriver />
         <Governor />
         <CaptureBridge />

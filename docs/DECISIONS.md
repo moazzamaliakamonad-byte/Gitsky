@@ -28,3 +28,6 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 21 | `camera.setViewOffset` shifts the galaxy above the hero text on the landing page. | Keeps the galaxy visible without moving it in 3D; projection and picking stay exact. |
 | 22 | Vite `server.watch.awaitWriteFinish` enabled. | Windows watcher missed rapid writes and served stale modules. `learn/stories/the-galaxy-that-vanished.md`. |
 | 23 | Spectrum (language mix by bytes) stored in the snapshot index; `npm run snapshot:index` rebuilds it with zero API calls. | Chips show each bundled sky's colours before you open it. |
+| 24 | Screen-space nearest-star picking instead of ray casting or GPU colour picking. | Tolerance in pixels feels right at every distance; no extra render pass; ~1 ms for 50k. `learn/concepts/picking-and-camera-animation.md`. |
+| 25 | Search moves to the HUD centre; opening another repo moves into an "Open repo" popover. | While exploring, finding files is the frequent action; switching repos is rare. |
+| 26 | Search pulses up to 2,000 matches and lists the best 8. | The sky shows the spread; the list gives precise targets. |

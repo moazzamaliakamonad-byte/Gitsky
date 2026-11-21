@@ -1,7 +1,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
-import { useStore } from '../state/store';
+import { useStore, type AppState } from '../state/store';
 import type { SkyModel } from '../state/model';
 import { ARRIVE } from './timeline';
 import { starFragment, starVertex } from './shaders';
@@ -67,6 +67,27 @@ export function Starfield({ model }: { model: SkyModel }) {
   );
 
   useEffect(() => () => geometry.dispose(), [geometry]);
+
+  // Highlight and selection → the aHighlight attribute (0 dimmed, 1 normal, 2 emphasised).
+  // One Float32Array rewrite + re-upload per change; nothing per frame.
+  useEffect(() => {
+    const attr = geometry.getAttribute('aHighlight') as THREE.BufferAttribute;
+    const arr = attr.array as Float32Array;
+    const apply = (s: AppState) => {
+      const { highlight, selection } = s;
+      arr.fill(highlight ? 0 : 1);
+      if (highlight) {
+        const v = highlight.reason === 'folder' ? 1 : 2;
+        for (const i of highlight.indices) arr[i] = v;
+      }
+      if (selection?.kind === 'file') arr[selection.index] = 2;
+      attr.needsUpdate = true;
+    };
+    apply(useStore.getState());
+    return useStore.subscribe((s, prev) => {
+      if (s.highlight !== prev.highlight || s.selection !== prev.selection) apply(s);
+    });
+  }, [geometry]);
   useEffect(() => () => material.dispose(), [material]);
 
   // Restart the forming animation for each new repo.

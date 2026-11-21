@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { useStore } from '../state/store';
 import { formClock } from './formClock';
 import { labelEls } from './labels';
+import { anchors } from './anchors';
 
 const v = new THREE.Vector3();
 const LABEL_H = 34;
@@ -17,7 +18,23 @@ export function LabelDriver() {
     const { model, heroOpen } = useStore.getState();
     const els = labelEls.current;
     if (!model) return;
+
+    for (const a of anchors.values()) {
+      const p = a.pos();
+      if (p) v.set(p[0], p[1], p[2]).project(camera);
+      const on = p !== null && v.z < 1 && formClock.value > 0.98;
+      if (on) {
+        const x = (v.x * 0.5 + 0.5) * size.width;
+        const y = (-v.y * 0.5 + 0.5) * size.height;
+        a.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+      }
+      a.el.style.visibility = on ? 'visible' : 'hidden';
+    }
+
     const show = !heroOpen && formClock.value > 0.92;
+    // With a folder selected, labels outside it fade back like their stars.
+    const sel = useStore.getState().selection;
+    const selPath = sel?.kind === 'folder' ? model.layout.tree.folders[sel.index].path : null;
     const placed: [number, number, number, number][] = [];
     const centers = model.layout.folderCenters;
 
@@ -39,7 +56,13 @@ export function LabelDriver() {
         if (visible) placed.push(box);
       }
       item.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-      const want = visible ? '1' : '0';
+      const path = model.layout.tree.folders[f].path;
+      const inside =
+        selPath === null ||
+        path === selPath ||
+        path.startsWith(`${selPath}/`) ||
+        selPath.startsWith(`${path}/`);
+      const want = visible ? (inside ? '1' : '0.3') : '0';
       if (item.el.dataset.on !== want) {
         item.el.dataset.on = want;
         item.el.style.opacity = want;

@@ -1,7 +1,8 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { labelEls, pickLabelFolders } from '../render/labels';
 import { useStore } from '../state/store';
-import { focusFolder } from './focus';
+import { selectFolder } from '../state/selection';
+import { plural } from './format';
 
 /**
  * Star-chart callouts for the main folders. React renders them once per repo; the
@@ -44,8 +45,8 @@ export function FolderLabels() {
             }}
             style={{ opacity: 0 }}
             tabIndex={-1}
-            onClick={() => focusFolder(fi)}
-            aria-label={`${f.path}, ${f.totalFiles.toLocaleString()} files. Fly to this folder.`}
+            onClick={() => selectFolder(fi)}
+            aria-label={`${f.path}, ${plural(f.totalFiles, 'file')}. Select this folder.`}
           >
             <span className="flabel__dot" aria-hidden="true" />
             <span className="flabel__text">
