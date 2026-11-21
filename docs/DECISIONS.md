@@ -34,3 +34,7 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 27 | Comets are a pure function of the playhead, not a pooled particle system. | Scrubbing backwards and jumping are free and always correct. `learn/concepts/comets-and-time.md`. |
 | 28 | Comet colour = author (stable hash into a warm palette). | Shows who works where; warm hues read as events against the cooler language palette. |
 | 29 | Fractional playhead lives outside React (timelineClock); React only sees whole-commit changes. | Avoids 60 re-renders per second. |
+| 30 | Insights summary is generated sentences built from computed facts, always naming the sample size. | The 30-second goal needs words, not just charts; honesty rules require the sample to be stated. |
+| 31 | Language palette fails the dataviz validator's lightness band and one CVD pair (HTML vs Python, ΔE 4.8 deutan); we keep it and guarantee non-colour identity everywhere (labels, tooltip, legend, list view). | Stars are light emitters on black and need high lightness; validator result recorded honestly in `learn/concepts/insights-and-accessible-data.md`. |
+| 32 | List view paginates 200 rows instead of virtualising. | Keeps a real, searchable, screen-reader-friendly table with no extra dependency. |
+| 33 | Quality and token moved into a Settings popover. | HUD stayed on one row at 1280 px. |

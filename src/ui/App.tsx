@@ -15,6 +15,9 @@ import { Reticles } from './Reticles';
 import { TokenDialog } from './TokenDialog';
 import { Timeline } from './Timeline';
 import { Tooltip } from './Tooltip';
+import { InsightsPanel } from './InsightsPanel';
+import { ListView } from './ListView';
+import { HighlightChip } from './HighlightChip';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
@@ -22,9 +25,10 @@ function useEscape() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       const s = useStore.getState();
-      if (s.panel !== 'none' || s.error) return; // dialogs handle their own Escape
+      if (s.panel === 'list' || s.panel === 'token' || s.error) return; // dialogs handle Escape
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
+      else if (s.panel === 'insights') s.set({ panel: 'none' });
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -46,7 +50,9 @@ export function App() {
       <FolderLabels />
       <Reticles />
       {heroOpen ? <Hero /> : <Hud />}
-      {!heroOpen && <Legend />}
+      {!heroOpen && panel !== 'insights' && <Legend />}
+      {!heroOpen && panel === 'insights' && <InsightsPanel />}
+      {!heroOpen && <HighlightChip />}
       {!heroOpen && <Timeline />}
       {!heroOpen && <DetailPanel />}
       <Tooltip />
@@ -54,6 +60,7 @@ export function App() {
       <ErrorCard />
       <Notice />
       {panel === 'token' && <TokenDialog />}
+      {panel === 'list' && <ListView />}
     </div>
   );
 }

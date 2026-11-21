@@ -5,7 +5,7 @@
   left: 50%;
   bottom: var(--gutter);
   transform: translateX(-50%);
-  width: min(600px, calc(100vw - 2 * 260px - 2 * var(--gutter)));
+  width: min(600px, calc(100vw - 2 * 384px - 2 * var(--gutter)));
   min-width: 340px;
   padding: 10px 14px 10px;
   display: grid;
@@ -155,7 +155,7 @@
   color: var(--dim);
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1240px) {
   .timeline {
     left: calc(var(--gutter) + 248px);
     right: var(--gutter);

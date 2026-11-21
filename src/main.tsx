@@ -4,6 +4,7 @@ import { App } from './ui/App';
 import './ui/styles.css';
 import './ui/interaction.css';
 import './ui/timeline.css';
+import './ui/insights.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root element');

@@ -2,10 +2,16 @@ import { folderStats } from '../layout/stats';
 import { focusFile, focusFolder } from '../ui/focus';
 import { useStore, type Highlight } from './store';
 
+/** Selecting closes the list view (you've left it to see the sky) but keeps Insights open. */
+function keepPanel() {
+  const { panel } = useStore.getState();
+  return panel === 'insights' ? 'insights' : 'none';
+}
+
 export function selectFile(index: number, opts: { fly?: boolean } = {}) {
   const { model } = useStore.getState();
   if (!model || index < 0 || index >= model.data.files.length) return;
-  useStore.getState().set({ selection: { kind: 'file', index }, panel: 'none' });
+  useStore.getState().set({ selection: { kind: 'file', index }, panel: keepPanel() });
   if (opts.fly) focusFile(index);
 }
 
@@ -24,7 +30,7 @@ export function selectFolder(index: number, opts: { fly?: boolean } = { fly: tru
       label: model.layout.tree.folders[index].path,
       indices: stats.members,
     },
-    panel: 'none',
+    panel: keepPanel(),
   });
   if (opts.fly) focusFolder(index);
 }
