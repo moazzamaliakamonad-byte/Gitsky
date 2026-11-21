@@ -1,0 +1,178 @@
+/* ---------- timeline ----------------------------------------------------- */
+
+.timeline {
+  position: absolute;
+  left: 50%;
+  bottom: var(--gutter);
+  transform: translateX(-50%);
+  width: min(600px, calc(100vw - 2 * 260px - 2 * var(--gutter)));
+  min-width: 340px;
+  padding: 10px 14px 10px;
+  display: grid;
+  gap: 8px;
+  background: rgba(8, 12, 30, 0.72);
+}
+
+.timeline__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline__play {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 179, 92, 0.5);
+  background: var(--arcturus-soft);
+}
+
+.timeline__play svg {
+  width: 13px;
+  height: 13px;
+  fill: var(--arcturus);
+}
+
+.timeline__play:hover {
+  border-color: var(--arcturus);
+}
+
+.timeline__title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.timeline__note {
+  color: var(--dim);
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+.timeline__pos {
+  margin-left: auto;
+  color: var(--haze);
+  font-size: 11px;
+}
+
+.timeline__track {
+  --p: 0;
+  position: relative;
+  height: 30px;
+}
+
+.timeline__ticks {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.timeline__ticks span {
+  flex: 1;
+  min-width: 1px;
+  border-radius: 1px 1px 0 0;
+  background: rgba(157, 182, 255, 0.18);
+  transition: background 0.3s;
+}
+
+.timeline__ticks span.is-past {
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.timeline__ticks span.is-now {
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* The glowing playhead line, moved by a CSS variable from requestAnimationFrame. */
+.timeline__head-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -3px;
+  left: calc(var(--p) * 100%);
+  width: 1px;
+  background: var(--starlight);
+  box-shadow: 0 0 8px rgba(231, 236, 255, 0.9);
+  pointer-events: none;
+}
+
+.timeline__range {
+  position: absolute;
+  inset: -4px 0;
+  width: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.timeline__track:has(.timeline__range:focus-visible) {
+  outline: 2px solid var(--arcturus);
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+.timeline__card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 20px;
+  min-width: 0;
+  font-size: 12.5px;
+}
+
+.timeline__msg {
+  flex: 1;
+  min-width: 0;
+  color: var(--starlight);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline__msg:hover {
+  color: var(--arcturus);
+}
+
+.timeline__meta {
+  display: flex;
+  gap: 10px;
+  flex: none;
+  color: var(--haze);
+  font-size: 11.5px;
+}
+
+.timeline__waiting {
+  color: var(--dim);
+}
+
+@media (max-width: 1100px) {
+  .timeline {
+    left: calc(var(--gutter) + 248px);
+    right: var(--gutter);
+    transform: none;
+    width: auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .timeline {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+  }
+  .timeline__meta span:nth-child(3),
+  .timeline__note {
+    display: none;
+  }
+}

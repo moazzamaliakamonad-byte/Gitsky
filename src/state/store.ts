@@ -58,8 +58,9 @@ export interface AppState {
   highlight: Highlight | null;
   flyTo: FlyRequest | null;
 
-  /** Fractional index into model.data.commits. */
-  playhead: number;
+  /** The whole commit the timeline is on (-1 before the first). The fractional playhead
+   *  lives in render/timelineClock.ts because it changes every frame. */
+  commitIndex: number;
   playing: boolean;
 
   panel: 'none' | 'insights' | 'list' | 'token';
@@ -96,7 +97,7 @@ export const useStore = create<AppState>((set) => ({
   highlight: null,
   flyTo: null,
 
-  playhead: 0,
+  commitIndex: -1,
   playing: !reduced,
 
   panel: 'none',
@@ -113,7 +114,7 @@ export const useStore = create<AppState>((set) => ({
       selection: null,
       highlight: null,
       hovered: -1,
-      playhead: 0,
+      commitIndex: -1,
       flyTo: null,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),

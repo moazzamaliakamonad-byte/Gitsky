@@ -26,9 +26,12 @@ export function lastTouches(
   return touch;
 }
 
-/** Advance the playhead; loops with a short pause at the end. */
+/** Where playback starts: one slot of calm before the first comet. */
+export const START = -1;
+
+/** Advance the playhead; after the last commit, pause, then loop back to the start. */
 export function advancePlayhead(playhead: number, dtSeconds: number, commitCount: number): number {
-  if (commitCount === 0) return 0;
+  if (commitCount === 0) return START;
   const next = playhead + dtSeconds / SECONDS_PER_COMMIT;
-  return next >= commitCount + LOOP_TAIL ? 0 : next;
+  return next >= commitCount + LOOP_TAIL ? START : next;
 }

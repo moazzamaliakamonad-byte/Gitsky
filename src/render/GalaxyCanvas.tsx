@@ -12,6 +12,8 @@ import { GalaxyHaze } from './GalaxyHaze';
 import { StarChart } from './StarChart';
 import { LabelDriver } from './LabelDriver';
 import { Picker } from './Picker';
+import { Comets } from './Comets';
+import { TimelineDriver } from './TimelineDriver';
 
 const DPR_LEVELS = [1.5, 1.25, 1, 0.75];
 
@@ -53,6 +55,7 @@ export function GalaxyCanvas() {
   const model = useStore((s) => s.model);
   const quality = useStore((s) => s.quality);
   const dpr = useStore((s) => s.dpr);
+  const reducedMotion = useStore((s) => s.reducedMotion);
   const label = model
     ? `3D galaxy of ${model.data.meta.fullName}: ${model.data.files.length.toLocaleString()} files as stars. Use the List view for an accessible table of the same data.`
     : 'A 3D galaxy is loading.';
@@ -73,10 +76,12 @@ export function GalaxyCanvas() {
             <GalaxyHaze model={model} />
             <Nebulae model={model} />
             <Starfield model={model} />
+            {!reducedMotion && <Comets model={model} />}
           </>
         )}
         <Controls />
         {quality === 'high' && <Effects />}
+        <TimelineDriver />
         <Picker />
         <LabelDriver />
         <Governor />

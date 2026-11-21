@@ -31,3 +31,6 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 24 | Screen-space nearest-star picking instead of ray casting or GPU colour picking. | Tolerance in pixels feels right at every distance; no extra render pass; ~1 ms for 50k. `learn/concepts/picking-and-camera-animation.md`. |
 | 25 | Search moves to the HUD centre; opening another repo moves into an "Open repo" popover. | While exploring, finding files is the frequent action; switching repos is rare. |
 | 26 | Search pulses up to 2,000 matches and lists the best 8. | The sky shows the spread; the list gives precise targets. |
+| 27 | Comets are a pure function of the playhead, not a pooled particle system. | Scrubbing backwards and jumping are free and always correct. `learn/concepts/comets-and-time.md`. |
+| 28 | Comet colour = author (stable hash into a warm palette). | Shows who works where; warm hues read as events against the cooler language palette. |
+| 29 | Fractional playhead lives outside React (timelineClock); React only sees whole-commit changes. | Avoids 60 re-renders per second. |

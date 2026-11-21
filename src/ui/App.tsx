@@ -13,6 +13,7 @@ import { LoadingVeil } from './LoadingVeil';
 import { Notice } from './Notice';
 import { Reticles } from './Reticles';
 import { TokenDialog } from './TokenDialog';
+import { Timeline } from './Timeline';
 import { Tooltip } from './Tooltip';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
@@ -46,6 +47,7 @@ export function App() {
       <Reticles />
       {heroOpen ? <Hero /> : <Hud />}
       {!heroOpen && <Legend />}
+      {!heroOpen && <Timeline />}
       {!heroOpen && <DetailPanel />}
       <Tooltip />
       <LoadingVeil />

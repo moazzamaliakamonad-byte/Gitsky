@@ -213,6 +213,47 @@ void main() {
 }
 `;
 
+/** Comet heads, trails (kind 0, soft glow) and impact rings (kind 1). Sizes are in world units. */
+export const cometVertex = /* glsl */ `
+uniform float uScale;
+uniform float uPixelRatio;
+attribute vec3 aColor;
+attribute float aSize;
+attribute float aAlpha;
+attribute float aKind;
+varying vec3 vColor;
+varying float vAlpha;
+varying float vKind;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  vColor = aColor;
+  vAlpha = aAlpha;
+  vKind = aKind;
+  float px = aSize * uScale / max(-mv.z, 0.001);
+  gl_PointSize = clamp(px * uPixelRatio, 1.5 * uPixelRatio, 160.0 * uPixelRatio);
+}
+`;
+
+export const cometFragment = /* glsl */ `
+varying vec3 vColor;
+varying float vAlpha;
+varying float vKind;
+void main() {
+  vec2 q = gl_PointCoord - 0.5;
+  float d = length(q) * 2.0;
+  if (d > 1.0) discard;
+  float a;
+  if (vKind < 0.5) {
+    a = exp(-d * d * 9.0) + exp(-d * d * 40.0) * 0.8;   // glow + hot centre
+  } else {
+    a = exp(-pow((d - 0.72) * 9.0, 2.0)) * 0.9;           // thin ring
+  }
+  vec3 col = mix(vColor, vec3(1.0), (vKind < 0.5 ? 0.45 : 0.15) * exp(-d * d * 30.0));
+  gl_FragColor = vec4(col * a * vAlpha, 1.0);
+}
+`;
+
 /** Star-chart overlay lines (rings, spokes, ticks). */
 export const chartVertex = /* glsl */ `
 attribute float aAlpha;
