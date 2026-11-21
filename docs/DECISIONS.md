@@ -38,3 +38,6 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 31 | Language palette fails the dataviz validator's lightness band and one CVD pair (HTML vs Python, ΔE 4.8 deutan); we keep it and guarantee non-colour identity everywhere (labels, tooltip, legend, list view). | Stars are light emitters on black and need high lightness; validator result recorded honestly in `learn/concepts/insights-and-accessible-data.md`. |
 | 32 | List view paginates 200 rows instead of virtualising. | Keeps a real, searchable, screen-reader-friendly table with no extra dependency. |
 | 33 | Quality and token moved into a Settings popover. | HUD stayed on one row at 1280 px. |
+| 34 | Capture by rendering a frame on demand and copying it in the same task, not preserveDrawingBuffer. | No per-frame cost for an occasional export. `learn/concepts/exporting-images-from-webgl.md`. |
+| 35 | The share card uses the user's current view, not a fixed camera. | It's *their* sky: whatever they found worth sharing. |
+| 36 | Share is the one accent-coloured HUD button. | Spreading is the growth loop; the primary action gets the warm accent. |

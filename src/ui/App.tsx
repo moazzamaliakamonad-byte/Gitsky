@@ -18,6 +18,7 @@ import { Tooltip } from './Tooltip';
 import { InsightsPanel } from './InsightsPanel';
 import { ListView } from './ListView';
 import { HighlightChip } from './HighlightChip';
+import { ShareDialog } from './ShareDialog';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
@@ -25,7 +26,7 @@ function useEscape() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       const s = useStore.getState();
-      if (s.panel === 'list' || s.panel === 'token' || s.error) return; // dialogs handle Escape
+      if (s.panel === 'list' || s.panel === 'token' || s.panel === 'share' || s.error) return; // dialogs handle Escape
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
       else if (s.panel === 'insights') s.set({ panel: 'none' });
@@ -61,6 +62,7 @@ export function App() {
       <Notice />
       {panel === 'token' && <TokenDialog />}
       {panel === 'list' && <ListView />}
+      {panel === 'share' && <ShareDialog />}
     </div>
   );
 }

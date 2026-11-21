@@ -63,7 +63,7 @@ export interface AppState {
   commitIndex: number;
   playing: boolean;
 
-  panel: 'none' | 'insights' | 'list' | 'token';
+  panel: 'none' | 'insights' | 'list' | 'token' | 'share';
   hasToken: boolean;
 
   set: (p: Partial<AppState>) => void;

@@ -228,6 +228,13 @@ export function Hud() {
           List view
         </button>
         <OpenRepo />
+        <button
+          type="button"
+          className="btn btn--accent"
+          onClick={() => useStore.getState().set({ panel: 'share' })}
+        >
+          Share
+        </button>
         <Settings />
       </div>
     </header>
