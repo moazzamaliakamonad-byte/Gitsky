@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { useStore } from '../state/store';
-import { cameraRef, controlsRef } from './sceneRefs';
+import { controlsRef } from './sceneRefs';
 
 const FLY_SECONDS = 1.3;
 const INTRO_SECONDS = 3.6;
@@ -48,7 +48,6 @@ export function Controls() {
     };
     controls.addEventListener('start', onStart);
     controlsRef.current = controls;
-    cameraRef.current = camera as THREE.PerspectiveCamera;
     return () => {
       controls.removeEventListener('start', onStart);
       controls.dispose();

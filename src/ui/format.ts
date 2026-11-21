@@ -19,14 +19,6 @@ export function relativeTime(iso: string, now = Date.now()): string {
   return 'just now';
 }
 
-export function shortDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
 export function plural(n: number, one: string, many = `${one}s`): string {
   return `${n.toLocaleString()} ${n === 1 ? one : many}`;
 }

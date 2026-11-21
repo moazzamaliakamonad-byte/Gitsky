@@ -46,3 +46,5 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 39 | The site's OG image is rendered by the app itself and saved via `scripts/capture-receiver.ts`. | The browser renders the real galaxy far better than an offline rasteriser; no new dependency. |
 | 40 | OG image ships as JPEG (71 KB) rather than PNG (957 KB). | Link previews load on slow connections; galaxy noise compresses badly as PNG. |
 | 41 | `?repo=` keeps / and @ unescaped. | Readable, shareable links (`?repo=owner/name`); both characters are legal in a query string. |
+| 42 | README uses the generated OG card as its image until the hero GIF is recorded. | A real render beats an empty placeholder on the first screen. |
+| 43 | Copyright line uses the git author name from the repo config. | MIT requires a holder; it's the owner's project. |

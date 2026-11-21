@@ -58,6 +58,16 @@ export function ShareDialog() {
     dialogRef.current?.focus();
   }, []);
 
+  // Opening Share copies the link straight away (the click that opened this dialog is
+  // the user gesture the clipboard needs). Only claim success if it actually worked.
+  useEffect(() => {
+    if (!link) return;
+    navigator.clipboard
+      ?.writeText(link)
+      .then(() => setStatus({ kind: 'ok', text: 'Link copied to your clipboard.' }))
+      .catch(() => undefined);
+  }, [link]);
+
   if (!model) return null;
   const fileName = shareFileName(model.data.meta.fullName);
   const canCopyImage = typeof ClipboardItem !== 'undefined' && Boolean(navigator.clipboard?.write);

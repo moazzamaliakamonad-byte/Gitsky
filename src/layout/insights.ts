@@ -115,7 +115,20 @@ export function computeInsights(model: SkyModel): Insights {
   // The plain-language summary.
   const summary: string[] = [];
   const lead = languages.filter((l) => l.id !== OTHER.id);
-  if (lead.length > 0) {
+  // If images, docs or config files outweigh the code, say so, then name the main *code*
+  // language: "mostly Assets" alone would mislead a newcomer about what the code is.
+  const NON_CODE: Record<string, string> = {
+    assets: 'assets such as images and fonts',
+    docs: 'documentation',
+    config: 'configuration and data files',
+  };
+  const leadKind = lead[0] ? NON_CODE[LANGUAGES[lead[0].id].family] : undefined;
+  const code = langs.find((l) => !NON_CODE[LANGUAGES[l.id].family]);
+  if (lead.length > 0 && leadKind && code && totalBytes > 0) {
+    summary.push(
+      `Most of ${meta.fullName}'s bytes (${pct(lead[0].share)}) are ${leadKind}; its main code language is ${LANGUAGES[code.id].name} (${pct(code.bytes / totalBytes)}).`,
+    );
+  } else if (lead.length > 0) {
     const second =
       lead[1] && lead[1].share >= 0.08 ? `, then ${lead[1].name} (${pct(lead[1].share)})` : '';
     summary.push(

@@ -38,12 +38,3 @@ export function searchFiles(paths: string[], query: string, limit = 50): number[
   hits.sort((a, b) => a.score - b.score || a.depth - b.depth || a.len - b.len || a.i - b.i);
   return hits.slice(0, limit).map((h) => h.i);
 }
-
-/** Total matches (for "Showing 50 of 1,204"), without sorting. */
-export function countMatches(paths: string[], query: string): number {
-  const q = query.trim().toLowerCase();
-  if (!q) return 0;
-  let n = 0;
-  for (const p of paths) if (p.includes(q)) n++;
-  return n;
-}

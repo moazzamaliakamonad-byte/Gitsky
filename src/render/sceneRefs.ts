@@ -8,7 +8,6 @@ import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js
  */
 export const starsRef: { current: THREE.Points | null } = { current: null };
 export const controlsRef: { current: OrbitControls | null } = { current: null };
-export const cameraRef: { current: THREE.PerspectiveCamera | null } = { current: null };
 export const composerRef: { current: EffectComposer | null } = { current: null };
 
 /**

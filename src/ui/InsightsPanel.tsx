@@ -50,6 +50,7 @@ export function InsightsPanel() {
     for (let i = 0; i < files.length; i++) if (model.languageIds[i] === id) indices.push(i);
     useStore.getState().set({ selection: null });
     setHighlight({ reason: 'language', label: `${name} files`, indices });
+    flyToSet(model, indices);
   };
   const highlightAuthor = (name: string) => {
     const set = new Set<number>();

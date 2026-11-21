@@ -82,6 +82,18 @@ describe('computeInsights', () => {
   });
 });
 
+describe('summary when assets outweigh code', () => {
+  it('names the main code language, not just the byte leader', () => {
+    const data = repo();
+    data.files.push({ path: 'img/huge.png', size: 10_000_000 });
+    data.files.sort((a, b) => (a.path < b.path ? -1 : 1));
+    data.commits = [];
+    const text = computeInsights(buildModel(data, 'bundled')).summary[0];
+    expect(text).toMatch(/assets/i);
+    expect(text).toMatch(/main code language is JavaScript/);
+  });
+});
+
 describe('list view', () => {
   const model = buildModel(repo(), 'bundled');
 
