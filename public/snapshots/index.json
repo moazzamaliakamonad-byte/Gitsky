@@ -1,0 +1,26 @@
+[
+  {
+    "fullName": "vitejs/vite",
+    "file": "vitejs__vite.json",
+    "blurb": "a monorepo",
+    "fileCount": 3016
+  },
+  {
+    "fullName": "react/react",
+    "file": "react__react.json",
+    "blurb": "a frontend framework",
+    "fileCount": 7282
+  },
+  {
+    "fullName": "golang/go",
+    "file": "golang__go.json",
+    "blurb": "a compiler and runtime",
+    "fileCount": 12000
+  },
+  {
+    "fullName": "pmndrs/zustand",
+    "file": "pmndrs__zustand.json",
+    "blurb": "a tiny library",
+    "fileCount": 144
+  }
+]

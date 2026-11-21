@@ -12,3 +12,10 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 5 | Vite `base` comes from `BASE_PATH`, set in CI to `/<repo-name>/`. | Works whatever you name the GitHub repo; local dev stays at `/`. |
 | 6 | Fonts: Instrument Sans (UI) + Martian Mono (paths, numbers) from Google Fonts, with system fallbacks. | Distinct from the usual Inter/JetBrains pairing; fallbacks keep the UI fine offline. |
 | 7 | No AI attribution lines in commits. | Owner's request. |
+| 8 | Sample the most recent N commits contiguously. | Keeps "last N commits" literally true and the replay continuous. `learn/decisions/0002-sample-recent-commits.md`. |
+| 9 | Compact snapshot format: dirs table + `[dir, name, bytes]` tuples + commit file indices, versioned. | Small, still readable, validated on decode. `learn/decisions/0003-snapshot-format.md`. |
+| 10 | Cache freshness window: 1 hour. A newer cached copy is shown with zero API calls; an older one costs 2 calls to check the head SHA. | Reloads must be free; staleness of an hour is fine for "understand a codebase". |
+| 11 | `/tree/<x>/...` URLs take the first segment as the branch. | A URL can't distinguish branch `feature/x` from branch `feature` + folder `x`; the common case wins. |
+| 12 | Bundled snapshots: vitejs/vite (landing default), react/react, golang/go, pmndrs/zustand. Capped at 12,000 files. | Varied shapes: monorepo, framework, compiler (largest), tiny lib. Vite is the default because it is small (118 KB) and colourful (TS, JS, Vue, CSS, HTML). facebook/react now redirects to react/react, and we store what the API returns. |
+| 13 | On rate-limit or network failure mid-way through commit details, keep the partial sample. | A smaller honest sample beats an error screen. |
+| 14 | Offline/rate-limited with an older cached copy: show it, labelled as saved. | Graceful degradation. |
