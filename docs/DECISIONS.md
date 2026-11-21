@@ -19,3 +19,7 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 12 | Bundled snapshots: vitejs/vite (landing default), react/react, golang/go, pmndrs/zustand. Capped at 12,000 files. | Varied shapes: monorepo, framework, compiler (largest), tiny lib. Vite is the default because it is small (118 KB) and colourful (TS, JS, Vue, CSS, HTML). facebook/react now redirects to react/react, and we store what the API returns. |
 | 13 | On rate-limit or network failure mid-way through commit details, keep the partial sample. | A smaller honest sample beats an error screen. |
 | 14 | Offline/rate-limited with an older cached copy: show it, labelled as saved. | Graceful degradation. |
+| 15 | Closed-form spiral layout instead of force-directed. | O(n), deterministic, and the metaphor is the layout. `learn/decisions/0004-spiral-not-force-layout.md`. |
+| 16 | Top-level folders own a segment of their arm; their sub-folders are strung along it. | Real repos have only 5–10 top-level folders, which would look like blobs; strings of clusters read as arms. |
+| 17 | Stateless `rand(seed, k)` instead of a stateful PRNG. | Adding a file never moves other stars. |
+| 18 | Arm count is 2–4, chosen from the number of top-level folders (ceil(n/6)). | Fewer arms keep each arm populated; overridable via `LayoutOptions.arms`. |
