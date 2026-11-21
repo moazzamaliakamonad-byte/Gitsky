@@ -30,7 +30,7 @@ export function RepoInput({ size, autoFocus }: { size: 'hero' | 'compact'; autoF
         autoCapitalize="off"
         spellCheck={false}
         autoFocus={autoFocus}
-        placeholder={size === 'hero' ? 'Paste a GitHub repo, like facebook/react' : 'owner/repo'}
+        placeholder={size === 'hero' ? 'Paste a GitHub repo' : 'owner/repo or GitHub URL'}
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />

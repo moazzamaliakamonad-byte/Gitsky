@@ -8,6 +8,40 @@ import { SearchBox } from './SearchBox';
 import { Spectrum } from './Spectrum';
 import { Wordmark } from './Wordmark';
 
+const ICONS = {
+  insights: 'M3.5 16.5v-5M8.5 16.5v-9M13.5 16.5V9.5M17 4.5l-4 3-3.5-2.5L3 9',
+  list: 'M7 5h10M7 10h10M7 15h10M3.5 5h.01M3.5 10h.01M3.5 15h.01',
+  open: 'M10 4.5v11M4.5 10h11',
+  share: 'M10 12.5V3.5M6.5 7 10 3.5 13.5 7M4.5 11v4.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11',
+};
+
+/** A HUD button: icon always, text label on wide screens (aria-label keeps it named). */
+function HudButton({
+  icon,
+  label,
+  accent,
+  ...props
+}: {
+  icon: keyof typeof ICONS;
+  label: string;
+  accent?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      className={`btn ${accent ? 'btn--accent' : 'btn--ghost'} btn--hud`}
+      aria-label={label}
+      title={label}
+      {...props}
+    >
+      <svg viewBox="0 0 20 20" aria-hidden="true">
+        <path d={ICONS[icon]} />
+      </svg>
+      <span className="btn__label">{label}</span>
+    </button>
+  );
+}
+
 /** "Open another repo": the paste field and the bundled skies, in a small popover. */
 function OpenRepo() {
   const [open, setOpen] = useState(false);
@@ -34,15 +68,13 @@ function OpenRepo() {
 
   return (
     <div className="open-repo" ref={ref}>
-      <button
-        type="button"
-        className="btn btn--ghost"
+      <HudButton
+        icon="open"
+        label="Open repo"
         aria-expanded={open}
         aria-controls="open-repo-pop"
         onClick={() => setOpen((o) => !o)}
-      >
-        Open repo
-      </button>
+      />
       {open && (
         <div className="open-repo__pop panel" id="open-repo-pop">
           <RepoInput size="compact" autoFocus />
@@ -166,6 +198,7 @@ const SOURCE_LABEL = {
   network: 'Live from GitHub',
   cache: 'Saved copy, under an hour old',
   'stale-cache': 'Saved copy (GitHub unreachable)',
+  synthetic: 'Synthetic stress test, not a real repo',
 } as const;
 
 /** Compact chrome once the hero is dismissed: brand, current repo, search, controls. */
@@ -211,30 +244,25 @@ export function Hud() {
       </div>
 
       <div className="hud__actions">
-        <button
-          type="button"
-          className="btn btn--ghost"
+        <HudButton
+          icon="insights"
+          label="Insights"
           aria-pressed={panel === 'insights'}
           onClick={() => toggle('insights')}
-        >
-          Insights
-        </button>
-        <button
-          type="button"
-          className="btn btn--ghost"
+        />
+        <HudButton
+          icon="list"
+          label="List view"
           aria-pressed={panel === 'list'}
           onClick={() => toggle('list')}
-        >
-          List view
-        </button>
+        />
         <OpenRepo />
-        <button
-          type="button"
-          className="btn btn--accent"
+        <HudButton
+          icon="share"
+          label="Share"
+          accent
           onClick={() => useStore.getState().set({ panel: 'share' })}
-        >
-          Share
-        </button>
+        />
         <Settings />
       </div>
     </header>

@@ -1,4 +1,4 @@
-import { spectrumOf } from '../layout/color';
+import { computeInsights } from '../layout/insights';
 import { captureRef } from '../render/sceneRefs';
 import type { SkyModel } from '../state/model';
 import logoUrl from '../ui/logo.svg';
@@ -44,7 +44,17 @@ function snapshotGalaxy(): HTMLCanvasElement | null {
 }
 
 /** Compose the 1200×630 share card: the live galaxy on the right, the repo's facts on the left. */
-export async function renderShareCard(model: SkyModel, href: string): Promise<Blob> {
+export interface CardOptions {
+  /** Replace the deep-link footer (e.g. for the site's own preview image). */
+  footer?: string;
+  type?: 'image/png' | 'image/jpeg';
+}
+
+export async function renderShareCard(
+  model: SkyModel,
+  href: string,
+  opts: CardOptions = {},
+): Promise<Blob> {
   const galaxy = snapshotGalaxy();
   await Promise.all([
     document.fonts.load(`400 64px ${UI}`),
@@ -150,8 +160,9 @@ export async function renderShareCard(model: SkyModel, href: string): Promise<Bl
     sx += Math.max(vw, ctx.measureText(label).width) + 34;
   }
 
-  // Language spectrum by bytes, with the top three named.
-  const spectrum = spectrumOf(model.data.files, 6);
+  // Language share by bytes, with the top three named: bar and labels from one ranking.
+  const langs = computeInsights(model).languages;
+  const spectrum = langs.map((l) => [l.color, l.share] as const);
   y += 62;
   let bx = X;
   const gap = 3;
@@ -164,7 +175,7 @@ export async function renderShareCard(model: SkyModel, href: string): Promise<Bl
     ctx.fill();
     bx += w + gap;
   }
-  const legend = model.legend.filter((l) => l.name !== 'Other').slice(0, 3);
+  const legend = langs.filter((l) => l.name !== 'Other').slice(0, 3);
   let lx = X;
   ctx.font = `400 14px ${UI}`;
   for (const l of legend) {
@@ -178,7 +189,7 @@ export async function renderShareCard(model: SkyModel, href: string): Promise<Bl
   }
 
   // Footer: where to see it live.
-  const url = shareUrl(href, meta.fullName).replace(/^https?:\/\//, '');
+  const url = opts.footer ?? shareUrl(href, meta.fullName).replace(/^https?:\/\//, '');
   ctx.fillStyle = C.dim;
   ctx.font = `400 13px ${MONO}`;
   ctx.fillText(url.length > 60 ? `${url.slice(0, 59)}…` : url, X, CARD_H - 44);
@@ -188,6 +199,10 @@ export async function renderShareCard(model: SkyModel, href: string): Promise<Bl
   ctx.fill();
 
   return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG export failed'))), 'image/png'),
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error('Image export failed'))),
+      opts.type ?? 'image/png',
+      0.9,
+    ),
   );
 }

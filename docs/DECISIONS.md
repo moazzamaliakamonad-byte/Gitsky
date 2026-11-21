@@ -41,3 +41,8 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 34 | Capture by rendering a frame on demand and copying it in the same task, not preserveDrawingBuffer. | No per-frame cost for an occasional export. `learn/concepts/exporting-images-from-webgl.md`. |
 | 35 | The share card uses the user's current view, not a fixed camera. | It's *their* sky: whatever they found worth sharing. |
 | 36 | Share is the one accent-coloured HUD button. | Spreading is the growth loop; the primary action gets the warm accent. |
+| 37 | Diffraction spikes are assigned by rank in the data layer (`computeSpikes`), not by a size threshold in the shader. | Thresholds spiked hundreds of stars in big repos; ranks keep spikes rare and meaningful. |
+| 38 | `?stress=N` synthetic sky exists for performance testing, labelled as synthetic in the name, description, HUD and a notice. | Measuring 50k on real hardware needs 50k files; honesty rules require it to be unmistakable. |
+| 39 | The site's OG image is rendered by the app itself and saved via `scripts/capture-receiver.ts`. | The browser renders the real galaxy far better than an offline rasteriser; no new dependency. |
+| 40 | OG image ships as JPEG (71 KB) rather than PNG (957 KB). | Link previews load on slow connections; galaxy noise compresses badly as PNG. |
+| 41 | `?repo=` keeps / and @ unescaped. | Readable, shareable links (`?repo=owner/name`); both characters are legal in a query string. |

@@ -695,30 +695,79 @@ button {
 
 .veil__card {
   display: grid;
-  gap: 6px;
-  justify-items: center;
-  text-align: center;
-  min-width: 260px;
+  gap: 8px;
+  min-width: 280px;
+  padding: 22px 24px;
+  background: rgba(6, 10, 26, 0.78);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-m);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
 }
 
 .veil__title {
-  font-size: 22px;
+  font-size: 21px;
   letter-spacing: -0.02em;
 }
 
 .veil__repo {
+  color: var(--arcturus);
+  margin-bottom: 6px;
+}
+
+.veil__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--dim);
+}
+
+.veil__steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.veil__steps li.is-done {
+  color: var(--haze);
+}
+
+.veil__steps li.is-now {
   color: var(--starlight);
 }
 
-.veil__step {
-  color: var(--haze);
-  font-size: 13.5px;
+/* A hollow star for pending steps, filled when done, pulsing while active. */
+.veil__mark {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+}
+
+.is-done .veil__mark {
+  background: var(--haze);
+  border-color: var(--haze);
+}
+
+.is-now .veil__mark {
+  background: var(--arcturus);
+  border-color: var(--arcturus);
+  box-shadow: 0 0 10px var(--arcturus);
+  animation: develop 1.2s ease-in-out infinite;
+}
+
+.veil__count {
+  color: var(--arcturus);
+  font-size: 11.5px;
 }
 
 .veil__bar {
-  width: 200px;
   height: 2px;
-  margin-top: 8px;
+  margin-top: 6px;
   background: var(--hairline);
   border-radius: 2px;
   overflow: hidden;
@@ -729,20 +778,6 @@ button {
   height: 100%;
   background: var(--arcturus);
   transition: width 0.3s;
-}
-
-.veil__bar .is-indeterminate {
-  width: 30%;
-  animation: sweep 1.3s ease-in-out infinite;
-}
-
-@keyframes sweep {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(340%);
-  }
 }
 
 /* ---------- dialogs ------------------------------------------------------ */
@@ -762,7 +797,7 @@ button {
   width: min(460px, 100%);
   padding: 22px;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   background: rgba(9, 14, 34, 0.9);
 }
 
@@ -780,6 +815,57 @@ button {
 
 .error-card__reset {
   color: var(--starlight) !important;
+  font-size: 13px;
+}
+
+.error-card__reset span,
+.error-card__repo {
+  color: var(--dim) !important;
+}
+
+.error-card__repo {
+  font-size: 12px;
+}
+
+.glyph {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 2px;
+  fill: var(--starlight);
+}
+
+.glyph__orbit,
+.glyph__line,
+.glyph__hollow,
+.glyph__progress {
+  fill: none;
+  stroke: var(--haze);
+  stroke-width: 1;
+}
+
+.glyph__dash {
+  stroke-dasharray: 3 4;
+}
+
+.glyph__hollow {
+  stroke: var(--starlight);
+}
+
+.glyph__progress {
+  stroke: var(--arcturus);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.glyph__accent {
+  fill: var(--arcturus);
+  filter: drop-shadow(0 0 4px rgba(255, 179, 92, 0.8));
+}
+
+@media (max-width: 600px) {
+  .plate {
+    display: none;
+  }
 }
 
 .error-card__actions {
@@ -814,7 +900,7 @@ button {
 .notice-slot {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--gutter) + 4px);
+  top: calc(var(--gutter) + 56px);
   transform: translateX(-50%);
   z-index: 15;
   width: max-content;
@@ -879,4 +965,27 @@ button {
   .repo-tag__stats span:nth-child(3) {
     display: none;
   }
+}
+
+/* Dialog containers take focus programmatically; their controls show the focus ring. */
+[role='dialog']:focus,
+[role='alertdialog']:focus {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 50;
+  padding: 10px 14px;
+  background: var(--arcturus);
+  color: var(--on-accent);
+  border-radius: var(--radius-s);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.skip-link:focus {
+  top: 12px;
 }

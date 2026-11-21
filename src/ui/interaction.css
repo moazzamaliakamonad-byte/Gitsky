@@ -592,3 +592,57 @@ kbd {
   font-family: var(--font-mono);
   font-size: 10.5px;
 }
+
+/* ---------- HUD icon buttons -------------------------------------------- */
+
+.btn--hud {
+  padding: 0 13px 0 11px;
+  gap: 7px;
+}
+
+.btn--hud svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 1360px) {
+  .btn--hud:not(.btn--accent) {
+    width: 38px;
+    padding: 0;
+  }
+  .btn--hud:not(.btn--accent) .btn__label {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .btn--hud.btn--accent {
+    width: 38px;
+    padding: 0;
+  }
+  .btn--hud .btn__label {
+    display: none;
+  }
+  .hud__actions {
+    gap: 6px;
+  }
+  .brand .wordmark {
+    display: none;
+  }
+  .repo-tag {
+    padding-left: 10px;
+  }
+  .repo-tag__stats,
+  .repo-tag__spectrum {
+    display: none;
+  }
+  .legend {
+    display: none;
+  }
+}

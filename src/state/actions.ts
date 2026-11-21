@@ -4,6 +4,8 @@ import { loadRepo } from '../data/loadRepo';
 import { parseRepoInput } from '../data/parseRepoInput';
 import { getToken } from '../data/token';
 import type { BundledEntry, RepoRef } from '../data/types';
+import { syntheticRepo } from '../data/synthetic';
+import { repoParam } from '../share/shareLayout';
 import { buildModel } from './model';
 import { useStore, type AppError } from './store';
 
@@ -19,8 +21,7 @@ function begin(label: string): AbortSignal {
 /** Put ?repo=owner/name in the address bar so the current sky is a shareable link. */
 export function setRepoParam(fullName: string | null) {
   const url = new URL(window.location.href);
-  if (fullName) url.searchParams.set('repo', fullName);
-  else url.searchParams.delete('repo');
+  url.search = fullName ? `?repo=${repoParam(fullName)}` : '';
   window.history.replaceState(null, '', url);
 }
 
@@ -162,6 +163,18 @@ export async function boot() {
     // Without the index we can still load a live repo from ?repo=.
   }
   useStore.getState().set({ bundled, hasToken: Boolean(getToken()) });
+
+  // Performance testing: ?stress=50000 draws a clearly labelled synthetic sky.
+  const stress = Number(new URLSearchParams(window.location.search).get('stress'));
+  if (Number.isFinite(stress) && stress > 0) {
+    const n = Math.min(Math.round(stress), 200_000);
+    useStore.getState().set({ heroOpen: false });
+    useStore.getState().setModel(buildModel(syntheticRepo(n), 'synthetic'));
+    useStore.getState().set({
+      notice: `Synthetic stress test: ${n.toLocaleString()} generated files, not a real repo.`,
+    });
+    return;
+  }
 
   const param = new URLSearchParams(window.location.search).get('repo');
   const [repoPart, branch] = (param ?? '').split('@');

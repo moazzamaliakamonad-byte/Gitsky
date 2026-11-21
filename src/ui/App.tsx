@@ -47,6 +47,16 @@ export function App() {
 
   return (
     <div className="app">
+      <a
+        href="#list"
+        className="skip-link"
+        onClick={(e) => {
+          e.preventDefault();
+          useStore.getState().set({ heroOpen: false, panel: 'list' });
+        }}
+      >
+        Skip to the file list
+      </a>
       <GalaxyCanvas />
       <FolderLabels />
       <Reticles />

@@ -41,6 +41,7 @@ attribute float aBright;    // churn: 0.38 quiet … 1.0 hottest
 attribute float aSeed;      // 0..1, per-star phase
 attribute float aHighlight; // 0 dimmed, 1 normal, 2 emphasised (pulses)
 attribute float aTouch;     // index of the latest sampled commit ≤ playhead that touched it
+attribute float aSpike;     // 0..1: diffraction spikes (hottest and largest files only)
 
 varying vec3 vColor;
 varying float vAlpha;
@@ -73,8 +74,7 @@ void main() {
   vCore = hot + flash;
 
   // Diffraction spikes, like a telescope photo: the hottest and the very largest files.
-  vSpike = max(smoothstep(0.86, 1.0, aBright), smoothstep(3.8, 4.5, aSize) * 0.55);
-  vSpike = max(vSpike, flash * 0.8) * step(0.5, aHighlight) * p;
+  vSpike = max(aSpike, flash * 0.8) * step(0.5, aHighlight) * p;
   vSpriteScale = 1.0 + 2.2 * vSpike;
 
   // --- size --------------------------------------------------------------------------

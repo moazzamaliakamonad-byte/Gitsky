@@ -29,6 +29,7 @@ export function Starfield({ model }: { model: SkyModel }) {
     g.setAttribute('aColor', new THREE.BufferAttribute(model.colors, 3));
     g.setAttribute('aSize', new THREE.BufferAttribute(model.sizes, 1));
     g.setAttribute('aBright', new THREE.BufferAttribute(model.churn.brightness, 1));
+    g.setAttribute('aSpike', new THREE.BufferAttribute(model.spikes, 1));
     const seeds = new Float32Array(n);
     for (let i = 0; i < n; i++) seeds[i] = ((i * 2654435761) >>> 0) / 4294967296;
     g.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
@@ -97,7 +98,7 @@ export function Starfield({ model }: { model: SkyModel }) {
     // Dense skies add up to white under additive blending; dim them so hues survive.
     material.uniforms.uExposure.value = Math.min(
       1,
-      Math.max(0.42, Math.sqrt(2500 / Math.max(1, model.data.files.length))),
+      Math.max(0.26, Math.sqrt(2500 / Math.max(1, model.data.files.length))),
     );
   }, [model, material]);
 

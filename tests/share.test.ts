@@ -4,13 +4,13 @@ import { shareUrl, wrapText, shareStats, shareFileName } from '../src/share/shar
 describe('shareUrl', () => {
   it('builds a ?repo= deep link on the current page, dropping other params and hashes', () => {
     expect(shareUrl('https://me.github.io/gitsky/?x=1#top', 'react/react')).toBe(
-      'https://me.github.io/gitsky/?repo=react%2Freact',
+      'https://me.github.io/gitsky/?repo=react/react',
     );
   });
 
   it('keeps the branch when it is not the default', () => {
     expect(shareUrl('http://localhost:5173/', 'o/r', 'dev')).toBe(
-      'http://localhost:5173/?repo=o%2Fr%40dev',
+      'http://localhost:5173/?repo=o/r@dev',
     );
   });
 });

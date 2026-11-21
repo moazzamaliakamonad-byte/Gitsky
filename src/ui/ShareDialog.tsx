@@ -5,6 +5,16 @@ import { useStore } from '../state/store';
 
 type Status = { kind: 'idle' | 'ok' | 'error'; text: string };
 
+// Dev-only hook used to render the site's own preview image (public/og-image.jpg).
+if (import.meta.env.DEV) {
+  (window as unknown as Record<string, unknown>).__gitskyCard = (footer: string) => {
+    const { model } = useStore.getState();
+    return model
+      ? renderShareCard(model, window.location.href, { footer, type: 'image/jpeg' })
+      : null;
+  };
+}
+
 /** "Share your sky": a 1200×630 card of the current view, plus the deep link. */
 export function ShareDialog() {
   const model = useStore((s) => s.model);

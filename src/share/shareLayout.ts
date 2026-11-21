@@ -1,11 +1,16 @@
 /** Pure helpers for the share card: links, text wrapping, stat lines. */
 
+/** `?repo=` value with "/" and "@" left readable (both are legal in a query string). */
+export function repoParam(fullName: string, branch?: string): string {
+  const raw = branch ? `${fullName}@${branch}` : fullName;
+  return encodeURIComponent(raw).replace(/%2F/gi, '/').replace(/%40/g, '@');
+}
+
 /** The deep link for a repo: this page's URL with only `?repo=owner/name[@branch]`. */
 export function shareUrl(href: string, fullName: string, branch?: string): string {
   const url = new URL(href);
-  url.search = '';
   url.hash = '';
-  url.searchParams.set('repo', branch ? `${fullName}@${branch}` : fullName);
+  url.search = `?repo=${repoParam(fullName, branch)}`;
   return url.toString();
 }
 
