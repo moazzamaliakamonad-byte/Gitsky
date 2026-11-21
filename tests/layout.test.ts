@@ -77,6 +77,12 @@ describe('computeLayout', () => {
     expect(radius).toBeLessThan(600);
   });
 
+  it('reports a framing extent that ignores far outliers but is never larger than the radius', () => {
+    const l = computeLayout(files);
+    expect(l.extent).toBeGreaterThan(0);
+    expect(l.extent).toBeLessThanOrEqual(l.radius);
+  });
+
   it('is a disk: much flatter in y than in x/z', () => {
     const { positions } = computeLayout(files);
     let xz = 0;

@@ -8,6 +8,11 @@ const base = process.env.BASE_PATH ?? '/';
 export default defineConfig({
   base,
   plugins: [react()],
+  server: {
+    // On Windows, rapid truncate-then-write saves can be missed or read half-written by
+    // the watcher, leaving the dev server serving stale code (learn/stories/the-galaxy-that-vanished.md).
+    watch: { awaitWriteFinish: { stabilityThreshold: 120, pollInterval: 40 } },
+  },
   build: {
     target: 'es2022',
     chunkSizeWarningLimit: 900,

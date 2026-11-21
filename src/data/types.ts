@@ -76,4 +76,7 @@ export interface BundledEntry {
   /** Short human label for the chip, e.g. "a frontend framework". */
   blurb: string;
   fileCount: number;
+  commitCount?: number;
+  /** Language mix by bytes: [colour, fraction] pairs, biggest first. Drawn on the chip. */
+  spectrum?: [string, number][];
 }

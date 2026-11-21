@@ -23,3 +23,8 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 16 | Top-level folders own a segment of their arm; their sub-folders are strung along it. | Real repos have only 5–10 top-level folders, which would look like blobs; strings of clusters read as arms. |
 | 17 | Stateless `rand(seed, k)` instead of a stateful PRNG. | Adding a file never moves other stars. |
 | 18 | Arm count is 2–4, chosen from the number of top-level folders (ceil(n/6)). | Fewer arms keep each arm populated; overridable via `LayoutOptions.arms`. |
+| 19 | Every atmospheric layer (nebulae, haze, spikes, labels, rings) is derived from repo data. | Owner wants exceptional visuals; brief forbids fake data. `learn/decisions/0005-layers-of-light.md`. |
+| 20 | Frame the camera on the 97th-percentile star distance (`layout.extent`), not the max. | A few outliers made big repos tiny in their own frame. |
+| 21 | `camera.setViewOffset` shifts the galaxy above the hero text on the landing page. | Keeps the galaxy visible without moving it in 3D; projection and picking stay exact. |
+| 22 | Vite `server.watch.awaitWriteFinish` enabled. | Windows watcher missed rapid writes and served stale modules. `learn/stories/the-galaxy-that-vanished.md`. |
+| 23 | Spectrum (language mix by bytes) stored in the snapshot index; `npm run snapshot:index` rebuilds it with zero API calls. | Chips show each bundled sky's colours before you open it. |

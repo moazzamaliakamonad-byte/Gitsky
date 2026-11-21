@@ -3,24 +3,148 @@
     "fullName": "vitejs/vite",
     "file": "vitejs__vite.json",
     "blurb": "a monorepo",
-    "fileCount": 3016
+    "fileCount": 3016,
+    "commitCount": 16,
+    "spectrum": [
+      [
+        "#5f6b8f",
+        0.6714
+      ],
+      [
+        "#5b9dff",
+        0.1727
+      ],
+      [
+        "#eef1fb",
+        0.072
+      ],
+      [
+        "#a7b4d3",
+        0.0314
+      ],
+      [
+        "#f4d46b",
+        0.0176
+      ],
+      [
+        "#ff8f73",
+        0.0087
+      ],
+      [
+        "#7d86a8",
+        0.0261
+      ]
+    ]
   },
   {
     "fullName": "react/react",
     "file": "react__react.json",
     "blurb": "a frontend framework",
-    "fileCount": 7282
+    "fileCount": 7282,
+    "commitCount": 17,
+    "spectrum": [
+      [
+        "#f4d46b",
+        0.492
+      ],
+      [
+        "#a7b4d3",
+        0.1613
+      ],
+      [
+        "#eef1fb",
+        0.1089
+      ],
+      [
+        "#5f6b8f",
+        0.0758
+      ],
+      [
+        "#ff9d5c",
+        0.0745
+      ],
+      [
+        "#5b9dff",
+        0.0612
+      ],
+      [
+        "#7d86a8",
+        0.0263
+      ]
+    ]
   },
   {
     "fullName": "golang/go",
     "file": "golang__go.json",
     "blurb": "a compiler and runtime",
-    "fileCount": 12000
+    "fileCount": 12000,
+    "commitCount": 15,
+    "spectrum": [
+      [
+        "#52dbe3",
+        0.6616
+      ],
+      [
+        "#c6cce0",
+        0.0767
+      ],
+      [
+        "#6fa5ad",
+        0.0464
+      ],
+      [
+        "#ff8f73",
+        0.0253
+      ],
+      [
+        "#5f6b8f",
+        0.018
+      ],
+      [
+        "#8ea4c8",
+        0.006
+      ],
+      [
+        "#7d86a8",
+        0.1659
+      ]
+    ]
   },
   {
     "fullName": "pmndrs/zustand",
     "file": "pmndrs__zustand.json",
     "blurb": "a tiny library",
-    "fileCount": 144
+    "fileCount": 144,
+    "commitCount": 18,
+    "spectrum": [
+      [
+        "#5f6b8f",
+        0.4964
+      ],
+      [
+        "#eef1fb",
+        0.2125
+      ],
+      [
+        "#8fbcff",
+        0.1349
+      ],
+      [
+        "#a7b4d3",
+        0.1
+      ],
+      [
+        "#5b9dff",
+        0.0349
+      ],
+      [
+        "#f8e5a3",
+        0.0067
+      ],
+      [
+        "#7d86a8",
+        0.0146
+      ]
+    ]
   }
 ]

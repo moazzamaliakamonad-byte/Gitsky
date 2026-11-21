@@ -36,6 +36,8 @@ export interface Layout {
   folderRadii: Float32Array;
   /** Distance from the core to the farthest star. */
   radius: number;
+  /** 97th-percentile star distance: the visual size, ignoring a few far outliers. Use for framing. */
+  extent: number;
   /** The spiral parameters actually used, for learning/debug UI. */
   spiral: { arms: number; a: number; b: number; sweep: number };
 }
@@ -166,6 +168,7 @@ export function computeLayout(files: FileEntry[], opts: LayoutOptions = {}): Lay
   // Files: a squashed gaussian around their folder centre, stretched along the arm.
   // The root's files are the core bulge instead.
   let maxR2 = 0;
+  const dist2 = new Float32Array(n);
   for (let i = 0; i < n; i++) {
     const f = tree.fileFolder[i];
     const seed = hashString(files[i].path);
@@ -182,7 +185,7 @@ export function computeLayout(files: FileEntry[], opts: LayoutOptions = {}): Lay
       z = g3 * s;
     } else {
       const s = folderRadii[f] * 0.5;
-      const along = g1 * s * 1.6;
+      const along = g1 * s * 2.1;
       const across = g3 * s * 0.8;
       const tx = tangentX[f];
       const tz = tangentZ[f];
@@ -197,6 +200,7 @@ export function computeLayout(files: FileEntry[], opts: LayoutOptions = {}): Lay
     positions[i3 + 2] = z;
     // Measure the stored (float32-rounded) values, so the radius truly bounds them.
     const r2 = positions[i3] ** 2 + positions[i3 + 1] ** 2 + positions[i3 + 2] ** 2;
+    dist2[i] = r2;
     if (r2 > maxR2) maxR2 = r2;
   }
 
@@ -206,6 +210,10 @@ export function computeLayout(files: FileEntry[], opts: LayoutOptions = {}): Lay
     folderCenters,
     folderRadii,
     radius: Math.max(Math.sqrt(maxR2), CORE_RADIUS),
+    extent:
+      n === 0
+        ? CORE_RADIUS
+        : Math.max(Math.sqrt(dist2.sort()[Math.floor((n - 1) * 0.97)]), CORE_RADIUS),
     spiral: { arms, a, b, sweep },
   };
 }

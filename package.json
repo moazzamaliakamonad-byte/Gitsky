@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "snapshot": "tsx scripts/snapshot.ts",
+    "snapshot:index": "tsx scripts/snapshot-index.ts",
     "og": "tsx scripts/og-image.ts"
   },
   "dependencies": {

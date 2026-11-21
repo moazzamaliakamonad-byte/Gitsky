@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { languageOf, legendFor, LANGUAGES, hexToRgb } from '../src/layout/color';
+import { languageOf, legendFor, LANGUAGES, hexToRgb, spectrumOf } from '../src/layout/color';
 import { sizeFromBytes } from '../src/layout/size';
 import { computeChurn } from '../src/layout/churn';
 import type { Commit } from '../src/data/types';
@@ -45,7 +45,10 @@ describe('palette', () => {
 describe('legendFor', () => {
   it('lists languages by file count, capped, with the rest grouped as Other', () => {
     const paths = ['a.ts', 'b.ts', 'c.ts', 'd.go', 'e.go', 'f.md', 'g.rs', 'h.py'];
-    const legend = legendFor(paths.map((p) => ({ path: p, size: 1 })), 3);
+    const legend = legendFor(
+      paths.map((p) => ({ path: p, size: 1 })),
+      3,
+    );
     expect(legend.map((l) => l.name)).toEqual(['TypeScript', 'Go', 'Markdown', 'Other']);
     expect(legend[0].count).toBe(3);
     expect(legend[3].count).toBe(2);
@@ -91,5 +94,25 @@ describe('computeChurn', () => {
     const c = computeChurn(2, []);
     expect(c.brightness[0]).toBe(c.brightness[1]);
     expect(c.brightness[0]).toBeGreaterThan(0.4);
+  });
+});
+
+describe('spectrumOf', () => {
+  it('gives language fractions by bytes that sum to 1, biggest first', () => {
+    const sp = spectrumOf([
+      { path: 'a.ts', size: 600 },
+      { path: 'b.go', size: 300 },
+      { path: 'c.md', size: 100 },
+    ]);
+    expect(sp.map(([c]) => c)).toEqual([
+      languageOf('a.ts').color,
+      languageOf('b.go').color,
+      languageOf('c.md').color,
+    ]);
+    expect(sp.reduce((s, [, f]) => s + f, 0)).toBeCloseTo(1);
+  });
+
+  it('is empty for a repo of empty files', () => {
+    expect(spectrumOf([{ path: 'a.ts', size: 0 }])).toEqual([]);
   });
 });

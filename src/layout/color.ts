@@ -228,3 +228,24 @@ export function legendFor(files: { path: string }[], max = 8): LegendItem[] {
   if (rest > 0) top.push({ id: OTHER.id, name: OTHER.name, color: OTHER.color, count: rest });
   return top;
 }
+
+/** Language mix by bytes, as [colour, fraction] pairs (top `max`, rest grouped as Other). */
+export function spectrumOf(files: { path: string; size: number }[], max = 6): [string, number][] {
+  const bytes = new Map<number, number>();
+  let total = 0;
+  for (const f of files) {
+    const id = languageOf(f.path).id;
+    bytes.set(id, (bytes.get(id) ?? 0) + f.size);
+    total += f.size;
+  }
+  if (total === 0) return [];
+  const sorted = [...bytes.entries()].sort((a, b) => b[1] - a[1]);
+  const top = sorted.filter(([id]) => id !== OTHER.id).slice(0, max);
+  const rest = total - top.reduce((s, [, b]) => s + b, 0);
+  const out: [string, number][] = top.map(([id, b]) => [
+    LANGUAGES[id].color,
+    +(b / total).toFixed(4),
+  ]);
+  if (rest > 0) out.push([OTHER.color, +(rest / total).toFixed(4)]);
+  return out;
+}
