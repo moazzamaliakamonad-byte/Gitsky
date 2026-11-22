@@ -48,3 +48,9 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 41 | `?repo=` keeps / and @ unescaped. | Readable, shareable links (`?repo=owner/name`); both characters are legal in a query string. |
 | 42 | README uses the generated OG card as its image until the hero GIF is recorded. | A real render beats an empty placeholder on the first screen. |
 | 43 | Copyright line uses the git author name from the repo config. | MIT requires a holder; it's the owner's project. |
+| 44 | Stars use a point-spread function (nucleus + Moffat wing + edge roll-off) instead of Gaussian discs. | Power-law wings are what make points read as starlight; no visible sprite edge. `learn/concepts/drawing-a-star.md`. |
+| 45 | Energy-conserving sprites: stars below a 3.2 px footprint are drawn at the footprint, dimmed by lost area. | Far stars became identical blocky dots; now distance reads as faintness. |
+| 46 | A hue-preserving highlight shoulder (knee 0.62) plus fine grain runs after bloom, in the same EffectPass. | Dense cores rolled to flat clipped blotches; the shoulder leaves the tuned mid-tones untouched. Zero extra passes. |
+| 47 | Unresolved-starlight layer: 4 faint points per file (cap 36k High / 12k Low), scattered within the file's own cluster, never pickable, dimmed by densityExposure^1.5. | Gives the galaxy a luminous body while staying exactly as dense as the data. Measured 60 fps at 50k stars on Iris Xe. |
+| 48 | Disk haze gains fbm mottling, dust lanes, star-forming knots, and fades near the core and when edge-on. | Texture on the data-driven spiral; changes how arms look, never where they are. ADR 0005 amendment. |
+| 49 | Bloom threshold raised from 0.12 to 0.2. | Only genuinely bright light blooms; faint stars stay crisp pinpoints. |

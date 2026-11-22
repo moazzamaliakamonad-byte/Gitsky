@@ -48,6 +48,7 @@ varying float vAlpha;
 varying float vCore;
 varying float vSpike;       // 0..1 strength of diffraction spikes
 varying float vSpriteScale; // how much bigger the sprite is than the star's glow
+varying float vSharp;       // 0 for big close stars … 1 for pinpoints
 
 ${formChunk}
 
@@ -79,8 +80,15 @@ void main() {
 
   // --- size --------------------------------------------------------------------------
   float sizeBoost = 1.0 + 0.35 * hot + flash * 1.2 + (aHighlight > 1.5 ? 0.8 : 0.0);
-  float px = aSize * 0.5 * sizeBoost * uScale / max(-mv.z, 0.001);
-  gl_PointSize = clamp(px * uPixelRatio * 2.6, 1.6 * uPixelRatio, 72.0 * uPixelRatio) * vSpriteScale;
+  float want = aSize * 1.3 * sizeBoost * uScale / max(-mv.z, 0.001) * uPixelRatio;
+  // Energy-conserving sprites: a star too small to draw a smooth profile is drawn at the
+  // smallest smooth footprint but dimmer by the area it lost. Distance reads as faintness,
+  // the way a telescope sees it, instead of every far star becoming the same blocky dot.
+  float minPx = 3.2 * uPixelRatio;
+  float fit = clamp(want, minPx, 84.0 * uPixelRatio);
+  vAlpha *= pow(want / fit, 1.4);
+  vSharp = 1.0 - smoothstep(6.0, 40.0, fit / uPixelRatio);
+  gl_PointSize = fit * vSpriteScale;
 }
 `;
 
@@ -91,6 +99,13 @@ varying float vAlpha;
 varying float vCore;
 varying float vSpike;
 varying float vSpriteScale;
+varying float vSharp;
+
+// One diffraction spike along x: a hair-thin line that widens and fades with length.
+float spikeLine(vec2 a) {
+  float w = 0.010 + 0.022 * a.x;
+  return exp(-(a.y * a.y) / (w * w)) * pow(1.0 - a.x, 2.2);
+}
 
 void main() {
   vec2 q = gl_PointCoord - 0.5;
@@ -99,14 +114,25 @@ void main() {
   float spike = 0.0;
   if (vSpike > 0.01) {
     vec2 a = abs(q) * 2.0;                     // 0 at centre, 1 at the sprite edge
-    spike = (exp(-a.y * 70.0) * (1.0 - a.x) + exp(-a.x * 70.0) * (1.0 - a.y)) * vSpike;
+    spike = (spikeLine(a) + spikeLine(a.yx)) * vSpike;
   }
-  if (d2 > 1.0 && spike < 0.004) discard;
-  float core = exp(-d2 * 22.0);
-  float halo = d2 < 1.0 ? exp(-d2 * 5.0) * (0.22 + 0.25 * uHalo) : 0.0;
-  float a = (core + halo + spike * 0.9) * vAlpha;
-  // A hot star's core burns whiter, like a real hot star.
-  vec3 col = mix(vColor, vec3(1.0), (core + spike * 0.5) * (0.25 + 0.4 * clamp(vCore, 0.0, 1.0)));
+  if (d2 > 1.0 && spike < 0.003) discard;
+
+  // A telescope's point-spread function, not a flat disc: a tight nucleus, a Moffat
+  // wing (light falling off as a power law, which is what makes stars look "real"), and
+  // a smooth roll-off to the sprite's edge so no hard circle is ever visible.
+  float edge = 1.0 - smoothstep(0.45, 1.0, d2);
+  float nucleus = exp(-d2 * mix(34.0, 18.0, vSharp));
+  float m = 1.0 / (1.0 + d2 * 26.0);
+  float wing = m * m * edge;
+  float halo = exp(-d2 * 4.0) * edge * 0.16 * uHalo;
+  float a = (nucleus * 1.15 + wing * 0.62 + halo + spike * 0.85) * vAlpha;
+
+  // Colour lives in the wing; the nucleus burns toward white, hotter for busier files.
+  // Deepening the wing's chroma keeps hues rich instead of pastel once light piles up.
+  vec3 deep = pow(vColor, vec3(1.35)) * 1.12;
+  float white = (nucleus + spike * 0.6) * (0.2 + 0.55 * clamp(vCore, 0.0, 1.0));
+  vec3 col = mix(deep, vec3(1.0, 0.97, 0.93), clamp(white, 0.0, 1.0));
   gl_FragColor = vec4(col * a, 1.0);
 }
 `;
@@ -175,9 +201,12 @@ void main() {
  */
 export const hazeVertex = /* glsl */ `
 varying vec2 vXZ;
+varying float vFacing;      // 1 seen face-on … 0 seen exactly edge-on
 void main() {
   vXZ = position.xz;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vFacing = abs(normalize(cameraPosition - world.xyz).y);
+  gl_Position = projectionMatrix * viewMatrix * world;
 }
 `;
 
@@ -189,27 +218,80 @@ uniform float uSweep;
 uniform float uR;
 uniform float uForm;
 uniform float uStrength;
+uniform float uOctaves;     // 4 on High, 2 on Low
 varying vec2 vXZ;
+varying float vFacing;
+
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x),
+             mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+}
+// Fractal noise: the mottled, cloudy texture of a real galaxy's disk.
+float fbm(vec2 p) {
+  float v = 0.0, amp = 0.5;
+  for (int i = 0; i < 4; i++) {
+    if (float(i) >= uOctaves) break;
+    v += amp * noise(p);
+    p = mat2(1.6, 1.2, -1.2, 1.6) * p + 7.3;
+    amp *= 0.5;
+  }
+  return v / (1.0 - pow(0.5, uOctaves));
+}
 
 void main() {
   float r = length(vXZ);
+  float rn = r / uR;
   float ang = atan(vXZ.y, vXZ.x);
   // Invert the spiral: at radius r an arm is at θ = ln(r/a)/b; arm k sits at φ = θ + 2πk/K.
   float theta = log(max(r, 0.001) / uA) / uB;
-  float dens = 0.0;
+  float arm = 0.0;    // light along the arm crests
+  float lane = 0.0;   // dust lanes hugging each arm's inner edge
+  float width = mix(0.55, 0.85, clamp(rn, 0.0, 1.0)); // arms loosen outward
   for (int k = 0; k < 4; k++) {
     if (float(k) >= uArms) break;
     float phi = theta + float(k) * 6.2831853 / uArms;
     float d = mod(ang - phi + 3.1415927, 6.2831853) - 3.1415927;
-    dens += exp(-d * d * 7.0);
+    arm += exp(-(d * d) / (width * width * 0.28));
+    float dl = (d + width * 0.42) / (width * 0.16);
+    lane += exp(-dl * dl);
   }
-  float along = smoothstep(-0.6, 0.3, theta) * (1.0 - smoothstep(uSweep * 0.8, uSweep * 1.2, theta));
-  float disk = exp(-(r * r) / (uR * uR * 0.32));
-  float bulge = exp(-(r * r) / (uA * uA * 0.5));
-  vec3 armCol = vec3(0.38, 0.47, 0.95);
-  vec3 coreCol = vec3(1.0, 0.82, 0.6);
-  vec3 col = armCol * (dens * along * 0.6 + 0.18) * disk * 0.07 + coreCol * bulge * 0.28;
-  gl_FragColor = vec4(col * smoothstep(0.2, 1.0, uForm) * uStrength, 1.0);
+  float along = smoothstep(-0.6, 0.3, theta) * (1.0 - smoothstep(uSweep * 0.8, uSweep * 1.25, theta));
+  // Near the core the log spiral winds into tight rings; let the bulge own that region.
+  float armsIn = smoothstep(0.07, 0.24, rn);
+  arm *= along * armsIn;
+  lane *= along * armsIn;
+
+  vec2 p = vXZ / uR * 6.0;
+  float cloud = fbm(p);
+  float grain = noise(p * 5.3 + 3.1);
+
+  // Disk light: an exponential disk, brighter along the arms, mottled by clouds,
+  // and cut by dark lanes of dust (which are themselves ragged, never clean lines).
+  float disk = exp(-rn * 3.1);
+  float light = disk * (0.10 + 0.9 * arm) * (0.35 + 0.95 * cloud);
+  light *= 1.0 - clamp(lane * smoothstep(0.3, 0.75, cloud + grain * 0.35), 0.0, 1.0) * 0.85;
+
+  // Bulge: old, warm starlight. A tight bright nucleus inside a broad soft glow.
+  float bulge = exp(-pow(r / (uA * 0.55), 1.2)) * 0.55 + exp(-(r * r) / (uA * uA * 3.0)) * 0.22;
+
+  // Star-forming knots: pink clumps that live only on the arm crests.
+  float knots = smoothstep(0.66, 0.9, noise(p * 3.7 + 11.0) * 0.7 + grain * 0.3)
+              * smoothstep(0.55, 0.95, arm) * smoothstep(0.08, 0.3, rn);
+
+  // Colour: warm toward the centre, cool blue in the outer arms (young stars).
+  vec3 inner = vec3(1.0, 0.80, 0.58);
+  vec3 outer = vec3(0.42, 0.56, 1.0);
+  vec3 diskCol = mix(inner, outer, smoothstep(0.05, 0.55, rn));
+  vec3 col = diskCol * light * 0.6
+           + vec3(1.0, 0.84, 0.64) * bulge * 0.42
+           + vec3(1.0, 0.42, 0.62) * knots * disk * 0.22;
+
+  // A flat sheet has no thickness: fade it as the camera turns edge-on.
+  float facing = smoothstep(0.04, 0.4, vFacing);
+  gl_FragColor = vec4(col * smoothstep(0.2, 1.0, uForm) * uStrength * facing, 1.0);
 }
 `;
 
@@ -330,5 +412,78 @@ void main() {
   if (d2 > 1.0) discard;
   float a = exp(-d2 * 6.0) * vBright;
   gl_FragColor = vec4(vec3(0.78, 0.84, 1.0) * a, 1.0);
+}
+`;
+
+/**
+ * Unresolved starlight: tiny, faint points scattered around the real files of each
+ * folder, so a dense folder glows the way a real star cluster does. Decorative and
+ * never pickable; their density follows the data, so the glow can't invent structure.
+ */
+export const glowVertex = /* glsl */ `
+uniform float uForm;
+uniform float uRadius;
+uniform float uScale;
+uniform float uPixelRatio;
+uniform float uGain;
+attribute vec3 aColor;
+attribute float aSize;
+attribute float aBright;
+varying vec3 vColor;
+varying float vAlpha;
+
+${formChunk}
+
+void main() {
+  float p;
+  vec3 pos = formPosition(position, uForm, uRadius, p);
+  vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float want = aSize * uScale / max(-mv.z, 0.001) * uPixelRatio;
+  float fit = clamp(want, 2.4 * uPixelRatio, 48.0 * uPixelRatio);
+  vAlpha = aBright * uGain * pow(want / fit, 1.2) * smoothstep(0.2, 0.7, p);
+  vColor = aColor;
+  gl_PointSize = fit;
+}
+`;
+
+export const glowFragment = /* glsl */ `
+varying vec3 vColor;
+varying float vAlpha;
+void main() {
+  vec2 q = gl_PointCoord - 0.5;
+  float d2 = dot(q, q) * 4.0;
+  if (d2 > 1.0) discard;
+  gl_FragColor = vec4(vColor * exp(-d2 * 7.0) * (1.0 - d2) * vAlpha, 1.0);
+}
+`;
+
+/**
+ * The "film" finish, applied after bloom: a hue-preserving highlight shoulder (bright
+ * cores roll off to white instead of clipping to flat blotches), then fine grain.
+ * Runs as a postprocessing Effect, so it adds no extra pass.
+ */
+export const filmFragment = /* glsl */ `
+uniform float uKnee;
+uniform float uGrain;
+uniform float uSeed;
+
+float luma(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
+
+void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+  vec3 c = max(inputColor.rgb, 0.0);
+  float l = luma(c);
+  // Below the knee: untouched. Above: an exponential shoulder that approaches 1.
+  float k = uKnee;
+  float lm = l < k ? l : k + (1.0 - k) * (1.0 - exp(-(l - k) / (1.0 - k)));
+  c *= l > 1e-5 ? lm / l : 1.0;
+  // Any channel still over 1 desaturates toward white at the same brightness,
+  // which is how an over-exposed star looks on film.
+  float mx = max(c.r, max(c.g, c.b));
+  if (mx > 1.0) c = mix(vec3(lm), c, (1.0 - lm) / max(mx - lm, 1e-5));
+  // Grain: strongest in the mid-darks, invisible in black and in highlights.
+  float n = fract(sin(dot(uv * 1024.0 + uSeed, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+  c += n * uGrain * smoothstep(0.0, 0.08, l) * (1.0 - smoothstep(0.4, 0.9, l));
+  outputColor = vec4(c, inputColor.a);
 }
 `;

@@ -9,6 +9,7 @@ import { captureRef, composerRef } from './sceneRefs';
 import { Starfield } from './Starfield';
 import { Nebulae } from './Nebulae';
 import { GalaxyHaze } from './GalaxyHaze';
+import { StarGlow } from './StarGlow';
 import { StarChart } from './StarChart';
 import { LabelDriver } from './LabelDriver';
 import { Picker } from './Picker';
@@ -75,6 +76,7 @@ export function GalaxyCanvas() {
             <StarChart model={model} />
             <GalaxyHaze model={model} />
             <Nebulae model={model} />
+            <StarGlow model={model} />
             <Starfield model={model} />
             {!reducedMotion && <Comets model={model} />}
           </>

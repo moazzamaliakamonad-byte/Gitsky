@@ -7,6 +7,7 @@ import { ARRIVE } from './timeline';
 import { starFragment, starVertex } from './shaders';
 import { starsRef } from './sceneRefs';
 import { formClock } from './formClock';
+import { densityExposure } from './exposure';
 
 const FORM_SECONDS = 2.6;
 
@@ -96,10 +97,7 @@ export function Starfield({ model }: { model: SkyModel }) {
     formStart.current = null;
     material.uniforms.uRadius.value = model.layout.radius;
     // Dense skies add up to white under additive blending; dim them so hues survive.
-    material.uniforms.uExposure.value = Math.min(
-      1,
-      Math.max(0.26, Math.sqrt(2500 / Math.max(1, model.data.files.length))),
-    );
+    material.uniforms.uExposure.value = densityExposure(model.data.files.length);
   }, [model, material]);
 
   useEffect(() => {
