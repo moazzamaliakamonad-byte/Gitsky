@@ -31,6 +31,7 @@ export function Starfield({ model }: { model: SkyModel }) {
     g.setAttribute('aSize', new THREE.BufferAttribute(model.sizes, 1));
     g.setAttribute('aBright', new THREE.BufferAttribute(model.churn.brightness, 1));
     g.setAttribute('aSpike', new THREE.BufferAttribute(model.spikes, 1));
+    g.setAttribute('aHole', new THREE.BufferAttribute(model.holeMask, 1));
     const seeds = new Float32Array(n);
     for (let i = 0; i < n; i++) seeds[i] = ((i * 2654435761) >>> 0) / 4294967296;
     g.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));

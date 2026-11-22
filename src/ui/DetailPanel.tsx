@@ -1,3 +1,4 @@
+import { HOLE_LABEL } from '../layout/blackHoles';
 import { useEffect, useMemo, useRef } from 'react';
 import { languageOf } from '../layout/color';
 import { fileDetail, folderStats } from '../layout/stats';
@@ -41,11 +42,32 @@ function FileView({ model, index }: { model: SkyModel; index: number }) {
   const { name } = splitPath(file.path);
   const commits = model.data.commits;
   const touched = useMemo(() => new Set(detail.touches), [detail]);
+  const hole = model.holes.find((h) => h.index === index);
+  const isNova = model.supernova?.file === index;
 
   return (
     <>
       <Breadcrumb model={model} path={file.path} isFile />
       <h2 className="detail__title mono">{name}</h2>
+      {hole && (
+        <p className="detail__phenomenon">
+          <span className="detail__glyph detail__glyph--hole" aria-hidden="true" />
+          <span>
+            <strong>Black hole.</strong> This is {HOLE_LABEL[hole.kind]} and one of the heaviest
+            files nobody writes by hand, so it bends the light around it.
+          </span>
+        </p>
+      )}
+      {isNova && model.supernova && (
+        <p className="detail__phenomenon">
+          <span className="detail__glyph detail__glyph--nova" aria-hidden="true" />
+          <span>
+            <strong>Supernova.</strong> The most-changed file in the sample (
+            {model.supernova.touches} of {commits.length} commits). It explodes when the first of
+            those comets lands.
+          </span>
+        </p>
+      )}
       <dl className="facts">
         <div>
           <dt>Language</dt>

@@ -28,6 +28,9 @@ export function Legend() {
           <li className="legend__note">
             Size is file size in bytes. Brightness is how often a file changed in the sampled
             commits.
+            {model.holes.length > 0 &&
+              ` Black holes are the heaviest generated or binary files (${model.holes.length}).`}
+            {model.supernova && ' The most-changed file goes supernova during playback.'}
           </li>
         </ul>
       )}

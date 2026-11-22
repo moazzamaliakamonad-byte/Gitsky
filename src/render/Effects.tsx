@@ -11,7 +11,8 @@ import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
 import { useStore } from '../state/store';
 import { composerRef } from './sceneRefs';
-import { filmFragment } from './shaders';
+import { filmFragment, lensFragment } from './shaders';
+import { fxState, overlayScene } from './fxState';
 
 /** Highlight shoulder + grain. See filmFragment in shaders.ts. */
 class FilmEffect extends Effect {
@@ -23,6 +24,28 @@ class FilmEffect extends Effect {
         ['uSeed', new THREE.Uniform(0)],
       ]),
     });
+  }
+}
+
+/** Gravitational lensing + supernova shock ripple. See lensFragment in shaders.ts. */
+class LensEffect extends Effect {
+  constructor() {
+    super('LensEffect', lensFragment, {
+      uniforms: new Map<string, THREE.Uniform>([
+        ['uHoles', new THREE.Uniform([0, 1, 2].map(() => new THREE.Vector4()))],
+        ['uCount', new THREE.Uniform(0)],
+        ['uShock', new THREE.Uniform(new THREE.Vector4())],
+      ]),
+    });
+  }
+
+  /** Copies this frame's values from fxState; returns whether the pass has work to do. */
+  sync(): boolean {
+    const holes = this.uniforms.get('uHoles')?.value as THREE.Vector4[];
+    for (let i = 0; i < 3; i++) holes[i].fromArray(fxState.holes, i * 4);
+    (this.uniforms.get('uCount') as THREE.Uniform<number>).value = fxState.holeCount;
+    (this.uniforms.get('uShock')?.value as THREE.Vector4).fromArray(fxState.shock);
+    return fxState.holeCount > 0 || fxState.shock[3] > 0;
   }
 }
 
@@ -39,9 +62,19 @@ export function Effects() {
   const dpr = useStore((s) => s.dpr);
   const reducedMotion = useStore((s) => s.reducedMotion);
 
-  const { composer, film } = useMemo(() => {
+  const { composer, film, lens, lensPass, bloom } = useMemo(() => {
     const c = new EffectComposer(gl, { frameBufferType: THREE.HalfFloatType });
     c.addPass(new RenderPass(scene, camera));
+    // Lensing runs before bloom, so bent starlight and the photon ring bloom naturally.
+    // Its pass is disabled on frames with no black hole or shock on screen: zero cost.
+    const lensFx = new LensEffect();
+    const lp = new EffectPass(camera, lensFx);
+    lp.enabled = false;
+    c.addPass(lp);
+    // Then what must stay unbent (the near halves of accretion disks), on top.
+    const overlay = new RenderPass(overlayScene, camera);
+    overlay.clearPass.enabled = false;
+    c.addPass(overlay);
     // A higher threshold than a typical "glow everything" bloom: only genuinely bright
     // light blooms, so faint stars stay crisp pinpoints instead of a soft mush.
     const bloom = new BloomEffect({
@@ -55,7 +88,7 @@ export function Effects() {
     // Merged into one pass with bloom: vignette and film cost almost nothing here.
     const vignette = new VignetteEffect({ offset: 0.28, darkness: 0.62 });
     c.addPass(new EffectPass(camera, bloom, filmFx, vignette));
-    return { composer: c, film: filmFx };
+    return { composer: c, film: filmFx, lens: lensFx, lensPass: lp, bloom };
   }, [gl, scene, camera]);
 
   useEffect(() => {
@@ -76,6 +109,8 @@ export function Effects() {
       const seed = film.uniforms.get('uSeed');
       if (seed) seed.value = (seed.value + 17.13) % 1000;
     }
+    lensPass.enabled = lens.sync();
+    bloom.intensity = 1.15 + fxState.flash * 1.8;
     composer.render(dt);
   }, 1);
   return null;

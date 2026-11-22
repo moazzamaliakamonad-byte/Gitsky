@@ -10,6 +10,9 @@ import { Starfield } from './Starfield';
 import { Nebulae } from './Nebulae';
 import { GalaxyHaze } from './GalaxyHaze';
 import { StarGlow } from './StarGlow';
+import { BlackHoles } from './BlackHoles';
+import { Supernova } from './Supernova';
+import * as THREE from 'three';
 import { StarChart } from './StarChart';
 import { LabelDriver } from './LabelDriver';
 import { Picker } from './Picker';
@@ -52,6 +55,18 @@ function CaptureBridge() {
   return null;
 }
 
+const novaCache = new WeakMap<object, THREE.Vector3>();
+function supernovaPosition(model: NonNullable<ReturnType<typeof useStore.getState>['model']>) {
+  let v = novaCache.get(model);
+  if (!v) {
+    const i = (model.supernova?.file ?? 0) * 3;
+    const p = model.layout.positions;
+    v = new THREE.Vector3(p[i], p[i + 1], p[i + 2]);
+    novaCache.set(model, v);
+  }
+  return v;
+}
+
 export function GalaxyCanvas() {
   const model = useStore((s) => s.model);
   const quality = useStore((s) => s.quality);
@@ -78,7 +93,11 @@ export function GalaxyCanvas() {
             <Nebulae model={model} />
             <StarGlow model={model} />
             <Starfield model={model} />
+            <BlackHoles model={model} />
             {!reducedMotion && <Comets model={model} />}
+            {!reducedMotion && model.supernova && (
+              <Supernova plan={model.supernova} position={supernovaPosition(model)} />
+            )}
           </>
         )}
         <Controls />

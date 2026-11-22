@@ -5,6 +5,8 @@ import { computeLayout, type Layout } from '../layout/galaxy';
 import { computeNebulae, type Nebulae } from '../layout/nebulae';
 import { sizesFor } from '../layout/size';
 import { computeSpikes } from '../layout/spikes';
+import { findBlackHoles, type BlackHole } from '../layout/blackHoles';
+import { planSupernova, type SupernovaPlan } from '../render/supernovaMath';
 
 export type DataSource = 'bundled' | 'network' | 'cache' | 'stale-cache' | 'synthetic';
 
@@ -20,6 +22,12 @@ export interface SkyModel {
   nebulae: Nebulae;
   /** Diffraction-spike strength per file (rare: hottest and largest). */
   spikes: Float32Array;
+  /** The heaviest generated or binary files, drawn as black holes (at most 3). */
+  holes: BlackHole[];
+  /** 1 for files drawn as black holes, else 0 (the `aHole` attribute). */
+  holeMask: Float32Array;
+  /** The most-changed sampled file, which goes supernova during playback. */
+  supernova: SupernovaPlan | null;
   legend: LegendItem[];
   totalBytes: number;
   /** Lowercased paths, for fast search. */
@@ -30,6 +38,14 @@ export function buildModel(data: RepoData, source: DataSource): SkyModel {
   const layout = computeLayout(data.files);
   const { colors, languageIds } = colorsFor(data.files);
   const churn = computeChurn(data.files.length, data.commits);
+  const holes = findBlackHoles(data.files, languageIds);
+  const holeMask = new Float32Array(data.files.length);
+  for (const h of holes) holeMask[h.index] = 1;
+  const spikes = computeSpikes(
+    data.files.map((f) => f.size),
+    churn.counts,
+  );
+  for (const h of holes) spikes[h.index] = 0; // a black hole emits no starlight
   return {
     data,
     source,
@@ -39,10 +55,10 @@ export function buildModel(data: RepoData, source: DataSource): SkyModel {
     sizes: sizesFor(data.files),
     churn,
     nebulae: computeNebulae(data.files, layout, churn.counts),
-    spikes: computeSpikes(
-      data.files.map((f) => f.size),
-      churn.counts,
-    ),
+    spikes,
+    holes,
+    holeMask,
+    supernova: planSupernova(data.commits, data.files.length),
     legend: legendFor(data.files, 7),
     totalBytes: layout.tree.folders[0]?.totalBytes ?? 0,
     searchPaths: data.files.map((f) => f.path.toLowerCase()),

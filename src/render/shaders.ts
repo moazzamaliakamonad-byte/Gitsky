@@ -42,6 +42,7 @@ attribute float aSeed;      // 0..1, per-star phase
 attribute float aHighlight; // 0 dimmed, 1 normal, 2 emphasised (pulses)
 attribute float aTouch;     // index of the latest sampled commit ≤ playhead that touched it
 attribute float aSpike;     // 0..1: diffraction spikes (hottest and largest files only)
+attribute float aHole;      // 1: this file is a black hole and emits no light of its own
 
 varying vec3 vColor;
 varying float vAlpha;
@@ -70,7 +71,7 @@ void main() {
   float flash = (aTouch >= 0.0 && age >= 0.0) ? exp(-age * 1.8) : 0.0;
 
   float exposure = mix(uExposure, 1.0, max(hot, step(1.5, aHighlight)));
-  vAlpha = (aBright * tw * hl * exposure + flash * 1.5) * smoothstep(0.0, 0.35, p);
+  vAlpha = (aBright * tw * hl * exposure + flash * 1.5) * smoothstep(0.0, 0.35, p) * (1.0 - aHole);
   vColor = mix(aColor, vec3(1.0, 0.86, 0.66), flash * 0.65);  // flashes warm
   vCore = hot + flash;
 
@@ -85,7 +86,7 @@ void main() {
   // smallest smooth footprint but dimmer by the area it lost. Distance reads as faintness,
   // the way a telescope sees it, instead of every far star becoming the same blocky dot.
   float minPx = 3.2 * uPixelRatio;
-  float fit = clamp(want, minPx, 84.0 * uPixelRatio);
+  float fit = clamp(want, minPx, 72.0 * uPixelRatio);
   vAlpha *= pow(want / fit, 1.4);
   vSharp = 1.0 - smoothstep(6.0, 40.0, fit / uPixelRatio);
   gl_PointSize = fit * vSpriteScale;
@@ -440,7 +441,7 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
   float want = aSize * uScale / max(-mv.z, 0.001) * uPixelRatio;
-  float fit = clamp(want, 2.4 * uPixelRatio, 48.0 * uPixelRatio);
+  float fit = clamp(want, 2.4 * uPixelRatio, 28.0 * uPixelRatio);
   vAlpha = aBright * uGain * pow(want / fit, 1.2) * smoothstep(0.2, 0.7, p);
   vColor = aColor;
   gl_PointSize = fit;
@@ -484,6 +485,204 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   // Grain: strongest in the mid-darks, invisible in black and in highlights.
   float n = fract(sin(dot(uv * 1024.0 + uSeed, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
   c += n * uGrain * smoothstep(0.0, 0.08, l) * (1.0 - smoothstep(0.4, 0.9, l));
+  outputColor = vec4(c, inputColor.a);
+}
+`;
+
+/** Shared value noise for the black-hole and supernova shaders. */
+const noiseChunk = /* glsl */ `
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1, 0)), u.x),
+             mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), u.x), u.y);
+}
+`;
+
+/**
+ * A black hole's accretion disk: a flat quad in the hole's (tilted) orbital plane.
+ * Hot and white at the inner edge, deep orange outside (temperature falls as r^-3/4),
+ * streaked by gas on Keplerian orbits (inner gas laps the outer), and brighter on the
+ * side rushing toward the camera (relativistic Doppler beaming). The lens effect then
+ * bends the far side of the disk up over the shadow, the "Interstellar" look.
+ */
+export const diskVertex = /* glsl */ `
+varying vec2 vP;
+varying vec3 vWorld;
+varying vec3 vVel;
+void main() {
+  vP = position.xz;
+  vec4 world = modelMatrix * vec4(position, 1.0);
+  vWorld = world.xyz;
+  vVel = normalize(mat3(modelMatrix) * vec3(-position.z, 0.0, position.x));
+  gl_Position = projectionMatrix * viewMatrix * world;
+}
+`;
+
+export const diskFragment = /* glsl */ `
+uniform float uTime;
+uniform float uIntensity;
+uniform vec3 uCenter;
+uniform float uSide;        // 1: draw only the half beyond the hole; -1: only the near half; 0: all
+uniform float uRadius;      // disk radius in world units
+varying vec2 vP;
+varying vec3 vWorld;
+varying vec3 vVel;
+${noiseChunk}
+
+void main() {
+  float r = length(vP);
+  const float rin = 0.3;
+  if (r > 1.0 || r < rin * 0.85) discard;
+  // The far half is lensed (bent up over the shadow); the near half passes in front.
+  // They cross-fade over a band instead of meeting at a hard seam.
+  float behind = dot(vWorld - uCenter, normalize(cameraPosition - uCenter)) / max(uRadius, 1e-3);
+  float keep = uSide == 0.0 ? 1.0 : smoothstep(-0.22, 0.22, -uSide * behind);
+  if (keep < 0.003) discard;
+  // Keplerian shear: angular speed ~ r^-1.5, so streaks wind up as they orbit.
+  float spin = uTime * 0.9 * pow(r / rin, -1.5);
+  float c = cos(spin), s = sin(spin);
+  vec2 q = mat2(c, -s, s, c) * vP;
+  float streak = noise(q * 7.0) * 0.6 + noise(q * 19.0) * 0.4;
+  float bands = 0.65 + 0.35 * noise(vec2(r * 46.0, 3.7));
+  float temp = pow(rin / r, 1.6);
+  float profile = smoothstep(rin * 0.85, rin * 1.12, r) * (1.0 - smoothstep(0.62, 1.0, r));
+  vec3 view = normalize(cameraPosition - vWorld);
+  float doppler = 1.0 + 0.6 * dot(vVel, view);
+  float beam = doppler * doppler * doppler;
+  vec3 hot = vec3(1.0, 0.93, 0.82);
+  vec3 warm = vec3(1.0, 0.56, 0.22);
+  vec3 cool = vec3(0.75, 0.2, 0.08);
+  vec3 col = mix(cool, warm, smoothstep(0.0, 0.45, temp));
+  col = mix(col, hot, smoothstep(0.45, 1.0, temp));
+  col = mix(col, vec3(0.85, 0.9, 1.0), clamp(doppler - 1.0, 0.0, 1.0) * 0.35);
+  float a = profile * temp * (0.45 + 0.75 * streak) * bands * beam * uIntensity * keep;
+  gl_FragColor = vec4(col * a, 1.0);
+}
+`;
+
+/** Low quality has no lens pass, so the shadow is a black billboard drawn over the stars. */
+export const shadowVertex = /* glsl */ `
+uniform float uSize;
+varying vec2 vUv;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+  mv.xy += position.xy * uSize * 2.0;
+  vUv = position.xy * 2.0;
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+export const shadowFragment = /* glsl */ `
+uniform float uOpacity;
+varying vec2 vUv;
+void main() {
+  float r = length(vUv);
+  if (r > 1.0) discard;
+  float a = (1.0 - smoothstep(0.8, 1.0, r)) * uOpacity;
+  gl_FragColor = vec4(0.0, 0.0, 0.0, a);
+}
+`;
+
+/**
+ * Supernova: a camera-facing quad. A blinding flash, then a shock shell of torn
+ * filaments (red hydrogen inside, teal oxygen at the edge, like the Crab and Cas A),
+ * expanding fast and slowing, leaving a faint remnant for the rest of the loop.
+ */
+export const supernovaVertex = /* glsl */ `
+uniform vec3 uCenter;
+uniform float uSize;
+varying vec2 vUv;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(uCenter, 1.0);
+  mv.xy += position.xy * uSize * 2.0;
+  vUv = position.xy * 2.0;
+  gl_Position = projectionMatrix * mv;
+}
+`;
+
+export const supernovaFragment = /* glsl */ `
+uniform float uFlash;
+uniform float uShell;
+uniform float uRemnant;
+uniform float uSeed;
+varying vec2 vUv;
+${noiseChunk}
+
+void main() {
+  float r = length(vUv);
+  if (r > 1.0) discard;
+  vec2 dir = vUv / max(r, 1e-4);
+  // Filaments: noise sampled on the unit circle (seamless in angle) and in radius.
+  vec2 o = vec2(uSeed * 17.0, uSeed * 5.0);
+  float fil = noise(dir * 3.2 + o) * 0.55 + noise(dir * 9.0 + o * 1.7 + r * 4.0) * 0.45;
+  float R = 0.12 + 0.78 * uShell;
+  float edge = R * (0.88 + 0.22 * fil);
+  float thick = 0.05 + 0.1 * uShell;
+  float shellBand = exp(-pow((r - edge) / thick, 2.0));
+  float inner = smoothstep(edge, edge * 0.3, r) * fil * 0.45;
+  float fade = 1.0 - smoothstep(0.82, 1.0, r);
+  vec3 oxygen = vec3(0.35, 0.95, 0.9);
+  vec3 hydrogen = vec3(1.0, 0.32, 0.38);
+  vec3 col = (oxygen * shellBand + hydrogen * inner) * uRemnant * (0.6 + 0.8 * fil);
+  // The flash: white-hot core with a wide glow, plus four long spikes.
+  vec2 a = abs(vUv);
+  float spikes = (exp(-a.y * 140.0) * (1.0 - a.x) + exp(-a.x * 140.0) * (1.0 - a.y));
+  col += vec3(1.0, 0.95, 0.88) * uFlash * (exp(-r * r * 60.0) * 3.0 + exp(-r * r * 9.0) * 0.6 + spikes * 1.4);
+  gl_FragColor = vec4(col * fade, 1.0);
+}
+`;
+
+/**
+ * Gravitational lensing, as a post-processing Effect. A point mass bends a light ray
+ * passing at angle θ from it so that it appears to come from β = θ − θE²/θ (θE: the
+ * Einstein radius). Applied per pixel in mainUv: each screen pixel shows the scene from
+ * where the bent ray really started. Inside θE the image flips (the mirrored secondary
+ * image); at the centre sits the shadow, with a thin photon ring at its edge.
+ * The same pass adds the supernova's shock ripple.
+ */
+export const lensFragment = /* glsl */ `
+uniform vec4 uHoles[3];    // xy: centre (uv), z: Einstein radius (uv height units), w: strength
+uniform float uCount;
+uniform vec4 uShock;       // xy: centre (uv), z: ring radius, w: amplitude
+
+void mainUv(inout vec2 uv) {
+  vec2 asp = vec2(aspect, 1.0);
+  for (int i = 0; i < 3; i++) {
+    if (float(i) >= uCount) break;
+    vec4 h = uHoles[i];
+    vec2 d = (uv - h.xy) * asp;
+    float r = max(length(d), 1e-5);
+    float fade = (1.0 - smoothstep(h.z * 3.5, h.z * 8.0, r)) * h.w;
+    float bend = min(h.z * h.z / r, r + h.z * 3.0) * fade;
+    uv = h.xy + (d - d / r * bend) / asp;
+  }
+  if (uShock.w > 0.0) {
+    vec2 d = (uv - uShock.xy) * asp;
+    float r = max(length(d), 1e-5);
+    float x = (r - uShock.z) / 0.035;
+    uv -= d / r * uShock.w * x * exp(-x * x) / asp;
+  }
+}
+
+void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
+  vec2 suv = gl_FragCoord.xy * texelSize;
+  vec2 asp = vec2(aspect, 1.0);
+  vec3 c = inputColor.rgb;
+  for (int i = 0; i < 3; i++) {
+    if (float(i) >= uCount) break;
+    vec4 h = uHoles[i];
+    float r = length((suv - h.xy) * asp);
+    float rs = h.z * 0.9;
+    // Edges in pixels, not in hole size: a crisp horizon whether the hole is far or close.
+    float px = texelSize.y * 1.2;
+    float shadow = smoothstep(rs - px, rs + px, r);
+    c = mix(c, c * shadow, h.w);
+    float w = max(rs * 0.009, px * 0.8);
+    float ring = exp(-pow((r - rs - w * 1.5) / w, 2.0));
+    c += vec3(1.0, 0.88, 0.7) * ring * 0.8 * h.w;
+  }
   outputColor = vec4(c, inputColor.a);
 }
 `;

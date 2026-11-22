@@ -1,3 +1,4 @@
+import { diskRadius } from '../layout/blackHoles';
 import { useStore } from '../state/store';
 
 /** Fly the camera to a folder's cluster, framing it by its size. */
@@ -18,5 +19,8 @@ export function focusFile(fileIndex: number) {
   const { model, fly } = useStore.getState();
   if (!model) return;
   const p = model.layout.positions;
-  fly([p[fileIndex * 3], p[fileIndex * 3 + 1], p[fileIndex * 3 + 2]], 16);
+  // A black hole is framed by its accretion disk, not by a star's glow.
+  const hole = model.holes.find((h) => h.index === fileIndex);
+  const distance = hole ? diskRadius(hole.mass) * 5.5 : 16;
+  fly([p[fileIndex * 3], p[fileIndex * 3 + 1], p[fileIndex * 3 + 2]], distance);
 }

@@ -646,3 +646,56 @@ kbd {
     display: none;
   }
 }
+
+/* Black hole / supernova note in the file panel: why this star looks different. */
+.detail__phenomenon {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-s);
+  background: rgba(4, 6, 13, 0.55);
+  color: var(--haze);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.detail__phenomenon strong {
+  color: var(--starlight);
+  font-weight: 500;
+}
+
+.detail__glyph {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border-radius: 50%;
+}
+
+/* A shadow inside a thin warm photon ring, with a sliver of disk across it. */
+.detail__glyph--hole {
+  background: linear-gradient(
+      -28deg,
+      transparent 44%,
+      #ff9a4d 47%,
+      #ffe2b8 50%,
+      #ff9a4d 53%,
+      transparent 56%
+    ),
+    radial-gradient(circle, #000 52%, #ffd9a6 58%, rgba(255, 154, 77, 0.35) 66%, transparent 72%);
+}
+
+/* A white-hot point inside a teal shock shell. */
+.detail__glyph--nova {
+  background: radial-gradient(
+    circle,
+    #fff 0 14%,
+    rgba(255, 120, 130, 0.5) 22%,
+    transparent 40%,
+    rgba(90, 240, 225, 0.9) 58%,
+    transparent 72%
+  );
+}
