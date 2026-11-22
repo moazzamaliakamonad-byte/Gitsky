@@ -546,8 +546,13 @@ void main() {
   vec2 q = mat2(c, -s, s, c) * vP;
   float streak = noise(q * 7.0) * 0.6 + noise(q * 19.0) * 0.4;
   float bands = 0.65 + 0.35 * noise(vec2(r * 46.0, 3.7));
+  // Inflow: logarithmic spiral lanes of gas that crawl inward as they turn, so the
+  // disk reads as a whirlpool draining into the hole.
+  float ang = atan(vP.y, vP.x);
+  float lanes = 0.5 + 0.5 * sin(ang * 3.0 + log(r) * 9.0 + uTime * 1.6);
+  lanes = mix(1.0, 0.35 + 1.1 * lanes, smoothstep(rin * 1.1, 0.55, r));
   float temp = pow(rin / r, 1.6);
-  float profile = smoothstep(rin * 0.85, rin * 1.12, r) * (1.0 - smoothstep(0.62, 1.0, r));
+  float profile = smoothstep(rin * 0.85, rin * 1.12, r) * (1.0 - smoothstep(0.55, 1.0, r));
   vec3 view = normalize(cameraPosition - vWorld);
   float doppler = 1.0 + 0.6 * dot(vVel, view);
   float beam = doppler * doppler * doppler;
@@ -557,7 +562,7 @@ void main() {
   vec3 col = mix(cool, warm, smoothstep(0.0, 0.45, temp));
   col = mix(col, hot, smoothstep(0.45, 1.0, temp));
   col = mix(col, vec3(0.85, 0.9, 1.0), clamp(doppler - 1.0, 0.0, 1.0) * 0.35);
-  float a = profile * temp * (0.45 + 0.75 * streak) * bands * beam * uIntensity * keep;
+  float a = profile * (temp + 0.12) * (0.45 + 0.75 * streak) * bands * lanes * beam * uIntensity * keep;
   gl_FragColor = vec4(col * a, 1.0);
 }
 `;
@@ -580,7 +585,7 @@ varying vec2 vUv;
 void main() {
   float r = length(vUv);
   if (r > 1.0) discard;
-  float a = (1.0 - smoothstep(0.8, 1.0, r)) * uOpacity;
+  float a = (1.0 - smoothstep(0.55, 1.0, r)) * uOpacity;
   gl_FragColor = vec4(0.0, 0.0, 0.0, a);
 }
 `;
@@ -639,7 +644,7 @@ void main() {
  * passing at angle θ from it so that it appears to come from β = θ − θE²/θ (θE: the
  * Einstein radius). Applied per pixel in mainUv: each screen pixel shows the scene from
  * where the bent ray really started. Inside θE the image flips (the mirrored secondary
- * image); at the centre sits the shadow, with a thin photon ring at its edge.
+ * image); at the centre sits the shadow, softened into a warm glow at its edge.
  * The same pass adds the supernova's shock ripple.
  */
 export const lensFragment = /* glsl */ `
@@ -675,14 +680,80 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
     vec4 h = uHoles[i];
     float r = length((suv - h.xy) * asp);
     float rs = h.z * 0.9;
-    // Edges in pixels, not in hole size: a crisp horizon whether the hole is far or close.
-    float px = texelSize.y * 1.2;
-    float shadow = smoothstep(rs - px, rs + px, r);
+    // A soft horizon, never an outline: light fades into the dark over a fifth of the
+    // radius, and hot gas just outside it glows warm and wide.
+    float shadow = smoothstep(rs * 0.72, rs * 1.08, r);
     c = mix(c, c * shadow, h.w);
-    float w = max(rs * 0.009, px * 0.8);
-    float ring = exp(-pow((r - rs - w * 1.5) / w, 2.0));
-    c += vec3(1.0, 0.88, 0.7) * ring * 0.8 * h.w;
+    float x = (r - rs * 1.1) / (rs * 0.28);
+    c += vec3(1.0, 0.6, 0.28) * exp(-x * x) * 0.22 * h.w;
   }
   outputColor = vec4(c, inputColor.a);
+}
+`;
+
+/**
+ * Stars being devoured: short streaks that spiral into a black hole along a few lanes,
+ * accelerating and stretching as they fall (spaghettification), heating from the
+ * colours of the files around the hole to white-hot orange, and vanishing into the
+ * disk. Stateless: each streak's progress is fract(time × speed + seed).
+ * Positions are in the disk's local frame (the mesh carries the tilt).
+ */
+export const infallVertex = /* glsl */ `
+uniform float uTime;
+uniform float uIntensity;
+uniform float uPixelRatio;
+attribute float aSeed;
+attribute float aLane;      // starting angle of the streak's lane
+attribute float aEnd;       // 0 = head, 1 = tail
+attribute vec3 aColor;
+varying vec3 vColor;
+varying float vA;
+const float OUTER = 3.3;    // in disk radii
+const float INNER = 0.3;
+
+vec3 fall(float u) {
+  float r = mix(OUTER, INNER, pow(u, 1.6));
+  // Angular position winds faster as the radius shrinks: a log spiral that tightens.
+  float theta = aLane + 2.6 * log(OUTER / r) + uTime * 0.04;
+  float h = (fract(aSeed * 13.17) - 0.5) * 0.55 * (1.0 - u) * (1.0 - u);
+  return vec3(cos(theta) * r, h, sin(theta) * r);
+}
+
+void main() {
+  float speed = 0.045 + 0.05 * fract(aSeed * 7.31);
+  float u = fract(uTime * speed + aSeed);
+  // The tail trails the head; near the hole the same lag covers far more distance,
+  // so streaks stretch out as they fall.
+  float tu = max(0.0, u - 0.018 - 0.03 * u);
+  vec3 p = fall(mix(u, tu, aEnd));
+  float heat = smoothstep(0.35, 0.95, u);
+  vColor = mix(aColor, vec3(1.0, 0.66, 0.34), heat * 0.85);
+  vColor = mix(vColor, vec3(1.0, 0.95, 0.85), smoothstep(0.85, 1.0, u) * 0.6);
+  vA = smoothstep(0.0, 0.1, u) * (1.0 - smoothstep(0.9, 1.0, u)) * (0.3 + 1.3 * heat)
+     * (1.0 - aEnd * 0.9) * uIntensity;
+  vec4 mv = modelViewMatrix * vec4(p, 1.0);
+  gl_Position = projectionMatrix * mv;
+  // Drawn twice from the same buffer: as lines (the streak) and as points (a glowing
+  // head). Lines ignore the point size; tails get none.
+  gl_PointSize = aEnd > 0.5 ? 0.0 : (1.5 + 3.5 * heat) * uPixelRatio;
+}
+`;
+
+export const infallPointFragment = /* glsl */ `
+varying vec3 vColor;
+varying float vA;
+void main() {
+  vec2 q = gl_PointCoord - 0.5;
+  float d2 = dot(q, q) * 4.0;
+  if (d2 > 1.0) discard;
+  gl_FragColor = vec4(vColor * vA * exp(-d2 * 4.0) * 1.3, 1.0);
+}
+`;
+
+export const infallFragment = /* glsl */ `
+varying vec3 vColor;
+varying float vA;
+void main() {
+  gl_FragColor = vec4(vColor * vA, 1.0);
 }
 `;

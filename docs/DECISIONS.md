@@ -72,3 +72,5 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 65 | `?repo=a&vs=b` deep-links a collision; Escape ends it. | Shareable like every other view. |
 | 66 | Up to 12,000 stars per galaxy, fixed (not by quality). | A quality change used to rebuild and restart the simulation mid-story. |
 | 67 | React state in the collision panel changes only on visible changes. | Setting it every frame re-rendered the panel 60 times a second and halved the frame rate. |
+| 68 | Black holes redesigned as "devouring": one hole (more only at 8x the threshold), 2,600 stateless infall streaks spiralling in and stretching, a whirlpool disk with inflow lanes, a soft horizon with a warm glow and no outline. | The owner rejected the first version ("not it"): three identical dark circles with crisp rings read as stickers. Seeing it eat is what makes it a black hole. |
+| 69 | Infall streaks take their colours from the 48 nearest files. | Ties the effect to the neighbourhood it sits in; the panel labels the streams as an effect. |

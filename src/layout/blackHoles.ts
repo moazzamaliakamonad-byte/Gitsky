@@ -6,8 +6,9 @@ import { LANGUAGES } from './color';
  * lot and carry little meaning, so they bend the light of the sky around them.
  *
  * A file becomes a black hole only if it is one of those kinds AND it is genuinely
- * heavy: at least 192 KB and 40× the repo's median file. At most three per sky, so
- * they stay an event, never wallpaper.
+ * heavy: at least 192 KB and 40× the repo's median file. Usually there is just one;
+ * a second or third appears only if it is truly enormous (8× the threshold), so a
+ * black hole stays an event, never wallpaper.
  */
 export type HoleKind = 'lockfile' | 'generated' | 'binary';
 
@@ -21,6 +22,8 @@ export interface BlackHole {
 export const MAX_HOLES = 3;
 const MIN_BYTES = 192 * 1024;
 const MEDIAN_FACTOR = 40;
+/** A second or third black hole must weigh this many times the threshold. */
+const EXTRA_FACTOR = 8;
 
 const LOCKFILES = new Set([
   'package-lock.json',
@@ -79,16 +82,18 @@ export function findBlackHoles(
   );
   for (const i of order) {
     if (files[i].size < threshold || out.length >= MAX_HOLES) break;
+    // The first hole only needs to clear the threshold; any more must be enormous.
+    if (out.length > 0 && files[i].size < threshold * EXTRA_FACTOR) break;
     const kind = heavyKind(files[i].path, languageIds[i]);
     if (!kind) continue;
-    const over = Math.log10(files[i].size / threshold); // 0 at threshold, 1 at 10×
-    out.push({ index: i, kind, mass: 0.45 + 0.55 * Math.min(1, over / 1.3) });
+    const over = Math.log10(files[i].size / threshold); // 0 at threshold, 2 at 100×
+    out.push({ index: i, kind, mass: 0.45 + 0.55 * Math.min(1, over / 2) });
   }
   return out;
 }
 
 /** Accretion-disk outer radius in world units, from the hole's mass (0.45…1). */
-export const diskRadius = (mass: number) => 3.5 + 4.5 * mass;
+export const diskRadius = (mass: number) => 6 + 8 * mass;
 
 export const HOLE_LABEL: Record<HoleKind, string> = {
   lockfile: 'a lockfile',

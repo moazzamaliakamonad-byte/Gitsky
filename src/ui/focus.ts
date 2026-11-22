@@ -19,8 +19,8 @@ export function focusFile(fileIndex: number) {
   const { model, fly, system } = useStore.getState();
   if (!model || system !== null) return;
   const p = model.layout.positions;
-  // A black hole is framed by its accretion disk, not by a star's glow.
+  // A black hole is framed by its whole whirlpool of infalling stars, not a star's glow.
   const hole = model.holes.find((h) => h.index === fileIndex);
-  const distance = hole ? diskRadius(hole.mass) * 5.5 : 16;
+  const distance = hole ? diskRadius(hole.mass) * 7.5 : 16;
   fly([p[fileIndex * 3], p[fileIndex * 3 + 1], p[fileIndex * 3 + 2]], distance);
 }

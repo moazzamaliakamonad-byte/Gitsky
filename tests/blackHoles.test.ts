@@ -37,13 +37,23 @@ describe('findBlackHoles', () => {
   });
 
   it('keeps at most three, heaviest first, with mass growing with size', () => {
-    const big = [1, 2, 3, 4].map((k) => ({ path: `assets/v${k}.mp4`, size: k * 600 * KB }));
+    const big = [1, 2, 3, 4].map((k) => ({ path: `assets/v${k}.mp4`, size: k * 3000 * KB }));
     const h = holesFor([...small, ...big]);
     expect(h).toHaveLength(MAX_HOLES);
     expect(h.map((x) => x.index)).toEqual([43, 42, 41]);
     expect(h[0].mass).toBeGreaterThan(h[2].mass);
     for (const x of h) expect(x.mass).toBeGreaterThanOrEqual(0.45);
     for (const x of h) expect(x.mass).toBeLessThanOrEqual(1);
+  });
+
+  it('shows one black hole; a second only if it is truly enormous', () => {
+    const big = [
+      { path: 'assets/huge.mp4', size: 2000 * KB },
+      { path: 'assets/big.png', size: 900 * KB },
+      { path: 'yarn.lock', size: 600 * KB },
+    ];
+    const h = holesFor([...small, ...big]);
+    expect(h.map((x) => x.index)).toEqual([40]);
   });
 
   it('has nothing to say about tiny repos', () => {

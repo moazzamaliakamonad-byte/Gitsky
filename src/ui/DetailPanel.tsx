@@ -55,8 +55,9 @@ function FileView({ model, index }: { model: SkyModel; index: number }) {
         <p className="detail__phenomenon">
           <span className="detail__glyph detail__glyph--hole" aria-hidden="true" />
           <span>
-            <strong>Black hole.</strong> This is {HOLE_LABEL[hole.kind]} and one of the heaviest
-            files nobody writes by hand, so it bends the light around it.
+            <strong>Black hole.</strong> This is {HOLE_LABEL[hole.kind]}, the heaviest file nobody
+            writes by hand, so it bends light and swallows the stars around it. The infalling stars
+            are an effect, coloured like the files nearby.
           </span>
         </p>
       )}
