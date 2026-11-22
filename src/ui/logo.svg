@@ -1,21 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Gitsky">
+  <!-- A git history drawn as a constellation: a branch forks, two commits run side by
+       side, they merge, and HEAD (the accent star) climbs away. -->
   <defs>
-    <radialGradient id="g" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#1C2C63"/>
+    <radialGradient id="sky" cx="40%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#1A2A5E"/>
+      <stop offset=".6" stop-color="#0A1128"/>
       <stop offset="1" stop-color="#04060D"/>
     </radialGradient>
-    <radialGradient id="c" cx="50%" cy="50%" r="50%">
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
       <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset=".45" stop-color="#E7ECFF"/>
+      <stop offset=".35" stop-color="#DCE5FF" stop-opacity=".9"/>
       <stop offset="1" stop-color="#7FA3FF" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFE2B8"/>
+      <stop offset=".4" stop-color="#FFB35C" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#FF8A3D" stop-opacity="0"/>
+    </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g fill="none" stroke-linecap="round" stroke-width="3.2">
-    <path d="M35 28.5C43 23.5 52.5 30 50.5 40.5C48.5 49.5 38.5 54 29 51" stroke="#9DB6FF"/>
-    <path d="M29 35.5C21 40.5 11.5 34 13.5 23.5C15.5 14.5 25.5 10 35 13" stroke="#9DB6FF" opacity=".75"/>
+  <rect width="64" height="64" rx="14" fill="url(#sky)"/>
+  <g fill="#C9D6FF" opacity=".55">
+    <circle cx="12" cy="14" r=".8"/><circle cx="50" cy="52" r=".9"/><circle cx="22" cy="57" r=".6"/>
+    <circle cx="57" cy="40" r=".6"/><circle cx="41" cy="9" r=".7"/>
   </g>
-  <circle cx="32" cy="32" r="9" fill="url(#c)"/>
-  <circle cx="32" cy="32" r="3.6" fill="#FFFFFF"/>
-  <circle cx="28.5" cy="51" r="4" fill="#FFB35C"/>
+  <g fill="none" stroke="#8EA6F2" stroke-width="2.2" stroke-linecap="round" opacity=".8">
+    <path d="M8 45 L19 37"/>
+    <path d="M19 37 L31 18"/>
+    <path d="M19 37 L31 49"/>
+    <path d="M31 18 L44 33"/>
+    <path d="M31 49 L44 33"/>
+    <path d="M44 33 L52.5 21" stroke="#FFC88A"/>
+  </g>
+  <!-- Commits. Each sits in a knockout ring so lines stop just short, like a star chart. -->
+  <g stroke="#0A1128" stroke-width="2.4">
+    <circle cx="8" cy="45" r="2.1" fill="#AFC0F5"/>
+    <circle cx="19" cy="37" r="3" fill="#FFFFFF"/>
+    <circle cx="31" cy="49" r="2.6" fill="#E3EAFF"/>
+    <circle cx="44" cy="33" r="3.2" fill="#FFFFFF"/>
+  </g>
+  <circle cx="31" cy="18" r="8" fill="url(#glow)"/>
+  <path d="M31 11.5 C31.5 16.5 32.5 17.5 37.5 18 C32.5 18.5 31.5 19.5 31 24.5 C30.5 19.5 29.5 18.5 24.5 18 C29.5 17.5 30.5 16.5 31 11.5Z" fill="#FFFFFF"/>
+  <circle cx="53" cy="20" r="9" fill="url(#warm)"/>
+  <path d="M53 12.5 C53.6 18 55 19.4 60.5 20 C55 20.6 53.6 22 53 27.5 C52.4 22 51 20.6 45.5 20 C51 19.4 52.4 18 53 12.5Z" fill="#FFB35C"/>
+  <circle cx="53" cy="20" r="1.8" fill="#FFF4E4"/>
 </svg>

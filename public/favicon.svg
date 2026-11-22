@@ -1,21 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Gitsky">
+  <!-- The logo's git constellation, redrawn bolder so it survives 16 px. -->
   <defs>
-    <radialGradient id="g" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#1C2C63"/>
-      <stop offset="1" stop-color="#04060D"/>
-    </radialGradient>
-    <radialGradient id="c" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#FFFFFF"/>
-      <stop offset=".45" stop-color="#E7ECFF"/>
-      <stop offset="1" stop-color="#7FA3FF" stop-opacity="0"/>
+    <radialGradient id="sky" cx="40%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#1F3170"/>
+      <stop offset="1" stop-color="#060A18"/>
     </radialGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g fill="none" stroke-linecap="round" stroke-width="3.2">
-    <path d="M35 28.5C43 23.5 52.5 30 50.5 40.5C48.5 49.5 38.5 54 29 51" stroke="#9DB6FF"/>
-    <path d="M29 35.5C21 40.5 11.5 34 13.5 23.5C15.5 14.5 25.5 10 35 13" stroke="#9DB6FF" opacity=".75"/>
+  <rect width="64" height="64" rx="14" fill="url(#sky)"/>
+  <g fill="none" stroke="#9DB4FF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 47 L18 38 L30 18 L43 34 L30 50 L18 38"/>
+    <path d="M43 34 L51 23" stroke="#FFC88A"/>
   </g>
-  <circle cx="32" cy="32" r="9" fill="url(#c)"/>
-  <circle cx="32" cy="32" r="3.6" fill="#FFFFFF"/>
-  <circle cx="28.5" cy="51" r="4" fill="#FFB35C"/>
+  <g fill="#FFFFFF" stroke="#060A18" stroke-width="3">
+    <circle cx="18" cy="38" r="5"/>
+    <circle cx="30" cy="50" r="4.4"/>
+    <circle cx="43" cy="34" r="5"/>
+  </g>
+  <path d="M30 8 C31 15.5 32.5 17 40 18 C32.5 19 31 20.5 30 28 C29 20.5 27.5 19 20 18 C27.5 17 29 15.5 30 8Z" fill="#FFFFFF"/>
+  <path d="M52 10 C53 17.5 54.5 19 62 20 C54.5 21 53 22.5 52 30 C51 22.5 49.5 21 42 20 C49.5 19 51 17.5 52 10Z" fill="#FFB35C"/>
 </svg>
