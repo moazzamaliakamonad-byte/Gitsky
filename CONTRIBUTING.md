@@ -33,16 +33,20 @@ npm run build
    per-star React components, no per-frame allocations, and measure before and after.
 4. **Few dependencies.** Adding one needs a reason in `docs/DECISIONS.md`.
 5. **TypeScript strict, no `any`** without a comment explaining why.
+6. **Short interface copy.** Buttons, fields and panels say what they are; if a name says
+   enough, add no explanation. Methods and caveats belong in LIMITATIONS.md and the docs,
+   not on screen.
 
 ## Where things live
 
 | Folder | What |
 |--------|------|
-| `src/data` | GitHub client, rate-limit budget, cache, snapshot format |
+| `src/data` | GitHub client, rate-limit budget, cache, snapshot format, deep-time history |
 | `src/layout` | Pure functions: tree → positions, colours, churn, insights |
 | `src/render` | three.js / react-three-fiber scene, shaders, picking |
 | `src/ui` | React DOM: panels, search, timeline, dialogs |
 | `src/state` | zustand store and actions |
-| `scripts` | Snapshot tooling |
+| `scripts` | Snapshot tooling (`snapshot`, `snapshot:index`, `snapshot:deep`) |
+| `build` | Build-time code: the service worker template and its precache list |
 
 Good first issues are listed in [docs/IDEAS.md](docs/IDEAS.md).

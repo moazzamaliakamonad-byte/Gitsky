@@ -29,9 +29,39 @@ bundle or a lockfile can be "large" without containing much code. Binary files c
 ## Big repos
 - GitHub truncates very large tree listings (roughly 100,000 entries or 7 MB). Gitsky
   shows the files it received and tells you the tree was truncated.
-- The bundled `golang/go` snapshot keeps 12,000 of its 16,442 files to stay small; the UI
-  reports the full count.
+- Bundled snapshots keep at most 12,000 files to stay small (`golang/go` keeps 12,000 of
+  16,442, `pytorch/pytorch` 12,000 of 22,373), always including the files the sampled
+  commits touched. The UI reports the full count.
 - Building the layout for 50,000 files takes a few hundred milliseconds on the main thread.
+
+## Deep time
+- It shows the repo at up to ten moments (twelve for featured skies), spaced evenly by
+  commit count, not every commit. A file that was added and deleted between two moments
+  never appears.
+- Moments follow the branch's history as GitHub lists it, newest first. For repos with
+  unusual histories (imported projects, rewritten dates), the first moment can be older
+  than the GitHub repo itself.
+- Files are matched by path. A renamed file looks like one file deleted and another born.
+- Deleted files ("ghosts") are placed inside the folder they lived in, or the nearest folder
+  that still exists, not where the full layout would have put them. At most 3,000 are
+  kept, the longest-lived first.
+- Folder labels hide their file counts in deep time (those are today's); the legend keeps
+  today's totals.
+- A repo without a prebuilt history needs about 21 requests. With fewer left this hour it
+  reads fewer moments, and below two it says so instead.
+
+## Constellations
+- A person's constellation joins the files they touched in the sampled commits only, so
+  it shows recent work, not everything they've ever done in the repo.
+- Authors are matched by GitHub login when the commit has one, otherwise by the name on
+  the commit, so one person can appear twice.
+
+## Offline
+- The offline copy needs one visit with a connection first. After that, the site and every
+  sky you've opened work without a network; repos and features you haven't used yet still
+  need GitHub.
+- GitHub API answers aren't kept by the offline copy itself; repos come from the browser's
+  own cache (IndexedDB), and a stale copy is shown with a note when GitHub can't be reached.
 
 ## Other
 - Public repositories only. Private repos return "not found", by GitHub's design.

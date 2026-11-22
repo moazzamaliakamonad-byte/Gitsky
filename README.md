@@ -54,7 +54,7 @@ touched anything in a while.
 - **Collide two repos.** `?repo=react/react&vs=vitejs/vite` crashes two galaxies together in a
   gravity simulation: tidal tails, bridges, a merger. Files they share are threaded with light.
 - **Understand it in 30 seconds.** A written summary, hottest files, largest files,
-  language share, quiet zones and contributors. Click anything to fly there.
+  language share, quiet folders and contributors. Click anything to fly there.
 - **Find anything.** Search pulses every match; Enter flies to the best one. Hover for
   details, click for a panel with recent commits and a link to the file on GitHub.
 - **Share your sky.** Export a 1200×630 poster of your current view, or copy a
@@ -62,6 +62,8 @@ touched anything in a while.
   badge that opens your repo's galaxy.
 - **Works offline.** After the first visit Gitsky opens instantly with no network, along
   with every sky you've viewed. Install it as an app from the browser.
+- **Open repos straight from GitHub links.** Paste a full URL, `owner/repo` or `@username`;
+  the ⌄ beside the repo name switches to another repo or a featured sky.
 - **Accessible.** Every control is keyboard-reachable, and a List view shows the same data
   as a sortable table. Respects reduced motion.
 - **Fast on modest hardware.** 50,000 stars at 60 fps on an Intel Iris Xe laptop GPU, with
@@ -80,7 +82,16 @@ touched anything in a while.
 
 Without a token GitHub allows 60 requests an hour, so Gitsky reads your remaining quota
 first and samples as many commits as it can afford (about 25). With an optional token it
-samples up to 300. Four famous repos are bundled as snapshots and cost no API calls at all.
+samples up to 300.
+
+Nine featured skies are bundled as snapshots and cost no API calls at all: `vitejs/vite`,
+`huggingface/transformers`, `react/react`, `pytorch/pytorch`, `golang/go`,
+`python/cpython`, `ollama/ollama`, `langchain-ai/langchain` and `pmndrs/zustand`.
+
+**Deep time** reads the repo at up to ten moments spread evenly through its commit history
+(one request to count the commits, then two per moment: the commit at that point and its
+whole file tree), about 21 requests in all. Featured skies can ship that history prebuilt,
+and every history is kept in your browser, so each repo pays once.
 
 ## Privacy
 
@@ -90,8 +101,14 @@ to `api.github.com` directly. If you add a token, it stays in this browser tab's
 No analytics, no cookies.
 
 Opening a file reads it from `raw.githubusercontent.com` (no API quota). The Universe view
-asks the GitHub API about the repo's contributors and their public repos, and shows their
-public avatars from GitHub. Nothing is sent anywhere else.
+asks the GitHub API about the repo's contributors and their public repos; the Universe and
+People views show public avatars from GitHub. The interface fonts come from Google Fonts.
+Nothing is sent anywhere else.
+
+Everything Gitsky keeps, it keeps in your browser: repos you've opened (IndexedDB), Universe
+answers and deep-time histories (`localStorage`), and an offline copy of the site and the
+skies you've viewed (a service worker cache). Clearing the site's data in your browser
+removes all of it.
 
 ## Limitations
 
@@ -107,6 +124,7 @@ npm install
 npm run dev        # http://localhost:5173
 npm test           # unit tests, a couple of seconds
 npm run build      # production build in dist/
+npm run preview    # serve dist/ (the offline copy only works in a production build)
 ```
 
 Useful extras:
@@ -116,6 +134,8 @@ Useful extras:
 - `npm run snapshot -- owner/repo` fetches a repo into `public/snapshots/` (set
   `GITHUB_TOKEN` for deeper history), and `npm run snapshot:index` rebuilds the index
   without any API calls.
+- `npm run snapshot:deep -- owner/repo` prebuilds deep time for a featured sky (about 25
+  requests each; with `GITHUB_TOKEN` you can do them all at once).
 
 ## Contributing
 

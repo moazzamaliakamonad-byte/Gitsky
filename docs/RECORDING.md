@@ -1,6 +1,13 @@
 # Recording the hero GIF
 
-> Easiest take: open the site, press **Take the guided tour**, and record the first 20 seconds.
+> Easiest takes: open the site, press **Take the guided tour** and record the first 20
+> seconds; or open a sky and press **D** (drift mode) for a clean, interface-free shot that
+> moves on its own.
+
+## Alternative: deep time (the strongest single shot)
+Open `?repo=vitejs/vite`, press the hourglass (**Deep time**) and record about 15 seconds:
+the galaxy grows from a handful of stars in 2020 to today's spiral, with folders igniting
+as they're born. Move the cursor off the canvas before you start.
 
 The README's first screen needs one 6-second clip that makes people want to try it. This is
 the exact shot list.

@@ -4,7 +4,9 @@
 - [ ] Push to GitHub and enable **Pages → Source: GitHub Actions** (Settings → Pages).
 - [ ] Confirm the Actions run is green and the site loads at
       `https://moazzamaliakamonad-byte.github.io/Gitsky/`.
-- [ ] Record the hero GIF (`docs/RECORDING.md`) and put it in the README.
+- [ ] Record the hero GIF (`docs/RECORDING.md`) and put it in the README. Deep time on
+      vite is the strongest shot.
+- [ ] Prebuild deep time for the remaining featured skies (`npm run snapshot:deep`).
 - [ ] Paste the site URL into a link-preview checker (e.g. opengraph.xyz) and confirm the
       card image shows.
 - [ ] Open it on a phone over mobile data. Check the landing sky appears quickly.
@@ -52,7 +54,9 @@ trending that week. Tag the maintainers only when you have something kind and sp
 2. Show HN: Your repo's night sky – files as stars, recent commits as comets
 3. Show HN: I turned GitHub repos into spiral galaxies (static site, no backend)
 4. Show HN: Gitsky – understand a codebase in 30 seconds by flying through it
+5. Show HN: Watch a GitHub repo's galaxy form over its whole history
 
 **First comment draft:** what it is in one sentence; how it works (client-side, 60 req/h
 budget, cached, one draw call for 50k stars on an Iris Xe); what's honest about it
-(sampled history, bytes not lines); what you'd like feedback on.
+(sampled history, bytes not lines); the fun parts (deep time, constellations of
+contributors, drift mode, works offline); what you'd like feedback on.
