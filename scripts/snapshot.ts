@@ -24,6 +24,12 @@ const BLURBS: Record<string, string> = {
   'golang/go': 'a compiler and runtime',
   'pmndrs/zustand': 'a tiny library',
   'vitejs/vite': 'a monorepo',
+  'pytorch/pytorch': 'a deep learning framework',
+  'huggingface/transformers': 'a library of AI models',
+  'python/cpython': 'a programming language',
+  'ollama/ollama': 'local AI models',
+  'karpathy/nanogpt': 'a GPT in one file',
+  'langchain-ai/langchain': 'an AI agent framework',
 };
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -42,6 +48,29 @@ function args() {
   return { maxFiles, samples, repos };
 }
 
+/**
+ * On a slow or flaky connection a request can drop mid-way. These are read-only GETs,
+ * so retrying is safe: up to five tries, waiting a little longer each time.
+ */
+async function patientFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(input, init);
+      // Read the body now, so a connection that drops mid-download is retried too.
+      const body = await res.arrayBuffer();
+      return new Response(body, {
+        status: res.status,
+        statusText: res.statusText,
+        headers: res.headers,
+      });
+    } catch (e) {
+      if (attempt >= 5) throw e;
+      console.log(`  connection dropped, retrying (${attempt}/4)`);
+      await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
+  }
+}
+
 async function main() {
   const { maxFiles, samples, repos } = args();
   if (repos.length === 0) {
@@ -50,7 +79,7 @@ async function main() {
   }
   const token = process.env.GITHUB_TOKEN;
   const budget = new RequestBudget({}, 1);
-  const client = createGitHubClient({ budget, token });
+  const client = createGitHubClient({ budget, token, fetchImpl: patientFetch });
   const rate = await client.rateLimit();
   console.log(
     `rate limit: ${rate.remaining}/${rate.limit}, resets ${new Date(rate.resetAt).toLocaleTimeString()}`,

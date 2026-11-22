@@ -48,7 +48,16 @@ export function Hero() {
         <p className="tagline">Your repo&rsquo;s night sky.</p>
         <RepoInput size="hero" autoFocus={!useStore.getState().isTouch} />
         {bundled.length > 0 && (
-          <ul className="chips" aria-label="Example skies">
+          <ul
+            className="chips"
+            aria-label="Example skies"
+            onWheel={(e) => {
+              // A mouse wheel slides the shelf sideways.
+              const el = e.currentTarget;
+              if (el.scrollWidth > el.clientWidth && Math.abs(e.deltaY) > Math.abs(e.deltaX))
+                el.scrollLeft += e.deltaY;
+            }}
+          >
             {bundled.map((b) => (
               <li key={b.fullName}>
                 <button

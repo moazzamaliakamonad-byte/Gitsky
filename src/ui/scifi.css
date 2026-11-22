@@ -580,3 +580,30 @@
     scrollbar-color: var(--tele-dim) transparent;
   }
 }
+
+/* ---------- example skies: one sliding shelf ------------------------------------- */
+
+.hero .chips {
+  flex-wrap: nowrap;
+  justify-content: safe center;
+  max-width: min(100%, 1080px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 28px;
+  padding: 2px 28px 10px;
+  /* The edges fade so a chip half out of view reads as "more this way". */
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 28px,
+    #000 calc(100% - 28px),
+    transparent
+  );
+  mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+
+.hero .chips > li {
+  flex: none;
+  scroll-snap-align: start;
+}

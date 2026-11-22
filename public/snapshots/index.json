@@ -37,6 +37,43 @@
     ]
   },
   {
+    "fullName": "huggingface/transformers",
+    "file": "huggingface__transformers.json",
+    "blurb": "a library of AI models",
+    "fileCount": 6873,
+    "commitCount": 7,
+    "spectrum": [
+      [
+        "#7fdb8f",
+        0.8162
+      ],
+      [
+        "#eef1fb",
+        0.1361
+      ],
+      [
+        "#5f6b8f",
+        0.0145
+      ],
+      [
+        "#8ea4c8",
+        0.0062
+      ],
+      [
+        "#a7b4d3",
+        0.0055
+      ],
+      [
+        "#c6cce0",
+        0.0006
+      ],
+      [
+        "#7d86a8",
+        0.021
+      ]
+    ]
+  },
+  {
     "fullName": "react/react",
     "file": "react__react.json",
     "blurb": "a frontend framework",
@@ -74,6 +111,43 @@
     ]
   },
   {
+    "fullName": "pytorch/pytorch",
+    "file": "pytorch__pytorch.json",
+    "blurb": "a deep learning framework",
+    "fileCount": 12000,
+    "commitCount": 14,
+    "spectrum": [
+      [
+        "#7fdb8f",
+        0.4614
+      ],
+      [
+        "#bb94ff",
+        0.1322
+      ],
+      [
+        "#7f86e0",
+        0.1065
+      ],
+      [
+        "#5f6b8f",
+        0.0779
+      ],
+      [
+        "#eef1fb",
+        0.0126
+      ],
+      [
+        "#c6cce0",
+        0.0105
+      ],
+      [
+        "#7d86a8",
+        0.1989
+      ]
+    ]
+  },
+  {
     "fullName": "golang/go",
     "file": "golang__go.json",
     "blurb": "a compiler and runtime",
@@ -107,6 +181,117 @@
       [
         "#7d86a8",
         0.1659
+      ]
+    ]
+  },
+  {
+    "fullName": "python/cpython",
+    "file": "python__cpython.json",
+    "blurb": "a programming language",
+    "fileCount": 5699,
+    "commitCount": 7,
+    "spectrum": [
+      [
+        "#7fdb8f",
+        0.3404
+      ],
+      [
+        "#9fa6ff",
+        0.1584
+      ],
+      [
+        "#eef1fb",
+        0.1366
+      ],
+      [
+        "#7f86e0",
+        0.1151
+      ],
+      [
+        "#c6cce0",
+        0.0587
+      ],
+      [
+        "#5f6b8f",
+        0.0426
+      ],
+      [
+        "#7d86a8",
+        0.1483
+      ]
+    ]
+  },
+  {
+    "fullName": "ollama/ollama",
+    "file": "ollama__ollama.json",
+    "blurb": "local AI models",
+    "fileCount": 1727,
+    "commitCount": 14,
+    "spectrum": [
+      [
+        "#5f6b8f",
+        0.3936
+      ],
+      [
+        "#52dbe3",
+        0.2537
+      ],
+      [
+        "#c6cce0",
+        0.1077
+      ],
+      [
+        "#8ea4c8",
+        0.0703
+      ],
+      [
+        "#7f86e0",
+        0.0585
+      ],
+      [
+        "#8fbcff",
+        0.0118
+      ],
+      [
+        "#7d86a8",
+        0.1043
+      ]
+    ]
+  },
+  {
+    "fullName": "langchain-ai/langchain",
+    "file": "langchain-ai__langchain.json",
+    "blurb": "an AI agent framework",
+    "fileCount": 3308,
+    "commitCount": 14,
+    "spectrum": [
+      [
+        "#7fdb8f",
+        0.3405
+      ],
+      [
+        "#a7b4d3",
+        0.2627
+      ],
+      [
+        "#5f6b8f",
+        0.2519
+      ],
+      [
+        "#8ea4c8",
+        0.04
+      ],
+      [
+        "#eef1fb",
+        0.0393
+      ],
+      [
+        "#c2d97a",
+        0.0015
+      ],
+      [
+        "#7d86a8",
+        0.0641
       ]
     ]
   },
