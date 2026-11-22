@@ -255,12 +255,12 @@ void main() {
     float phi = theta + float(k) * 6.2831853 / uArms;
     float d = mod(ang - phi + 3.1415927, 6.2831853) - 3.1415927;
     arm += exp(-(d * d) / (width * width * 0.28));
-    float dl = (d + width * 0.42) / (width * 0.16);
+    float dl = (d + width * 0.42) / (width * 0.24);
     lane += exp(-dl * dl);
   }
   float along = smoothstep(-0.6, 0.3, theta) * (1.0 - smoothstep(uSweep * 0.8, uSweep * 1.25, theta));
   // Near the core the log spiral winds into tight rings; let the bulge own that region.
-  float armsIn = smoothstep(0.07, 0.24, rn);
+  float armsIn = smoothstep(0.12, 0.4, rn);
   arm *= along * armsIn;
   lane *= along * armsIn;
 
@@ -272,7 +272,7 @@ void main() {
   // and cut by dark lanes of dust (which are themselves ragged, never clean lines).
   float disk = exp(-rn * 3.1);
   float light = disk * (0.10 + 0.9 * arm) * (0.35 + 0.95 * cloud);
-  light *= 1.0 - clamp(lane * smoothstep(0.3, 0.75, cloud + grain * 0.35), 0.0, 1.0) * 0.85;
+  light *= 1.0 - clamp(lane * smoothstep(0.3, 0.75, cloud + grain * 0.35), 0.0, 1.0) * 0.6;
 
   // Bulge: old, warm starlight. A tight bright nucleus inside a broad soft glow.
   float bulge = exp(-pow(r / (uA * 0.55), 1.2)) * 0.55 + exp(-(r * r) / (uA * uA * 3.0)) * 0.22;
