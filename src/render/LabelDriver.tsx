@@ -15,14 +15,14 @@ const LABEL_H = 34;
  */
 export function LabelDriver() {
   useFrame(({ camera, size }) => {
-    const { model, heroOpen } = useStore.getState();
+    const { model, heroOpen, system, warping } = useStore.getState();
     const els = labelEls.current;
     if (!model) return;
 
     for (const a of anchors.values()) {
       const p = a.pos();
       if (p) v.set(p[0], p[1], p[2]).project(camera);
-      const on = p !== null && v.z < 1 && formClock.value > 0.98;
+      const on = p !== null && v.z < 1 && formClock.value > 0.98 && system === null;
       if (on) {
         const x = (v.x * 0.5 + 0.5) * size.width;
         const y = (-v.y * 0.5 + 0.5) * size.height;
@@ -31,7 +31,7 @@ export function LabelDriver() {
       a.el.style.visibility = on ? 'visible' : 'hidden';
     }
 
-    const show = !heroOpen && formClock.value > 0.92;
+    const show = !heroOpen && formClock.value > 0.92 && system === null && !warping;
     // With a folder selected, labels outside it fade back like their stars.
     const sel = useStore.getState().selection;
     const selPath = sel?.kind === 'folder' ? model.layout.tree.folders[sel.index].path : null;

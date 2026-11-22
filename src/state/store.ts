@@ -66,6 +66,11 @@ export interface AppState {
   panel: 'none' | 'insights' | 'list' | 'token' | 'share';
   hasToken: boolean;
 
+  /** The folder being viewed up close as a solar system, or null for the galaxy. */
+  system: number | null;
+  /** A warp between views is in progress: the UI steps aside. */
+  warping: boolean;
+
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
   fly: (target: [number, number, number], distance: number) => void;
@@ -102,6 +107,8 @@ export const useStore = create<AppState>((set) => ({
 
   panel: 'none',
   hasToken: false,
+  system: null,
+  warping: false,
 
   set: (p) => set(p),
   setModel: (m) =>
@@ -116,6 +123,8 @@ export const useStore = create<AppState>((set) => ({
       hovered: -1,
       commitIndex: -1,
       flyTo: null,
+      system: null,
+      warping: false,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),
 }));

@@ -19,6 +19,8 @@ import { InsightsPanel } from './InsightsPanel';
 import { ListView } from './ListView';
 import { HighlightChip } from './HighlightChip';
 import { ShareDialog } from './ShareDialog';
+import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
+import { warpUp } from '../state/systemActions';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
@@ -30,6 +32,7 @@ function useEscape() {
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
       else if (s.panel === 'insights') s.set({ panel: 'none' });
+      else if (s.system !== null) warpUp();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -39,6 +42,8 @@ function useEscape() {
 export function App() {
   const heroOpen = useStore((s) => s.heroOpen);
   const panel = useStore((s) => s.panel);
+  const inSystem = useStore((s) => s.system !== null);
+  const warping = useStore((s) => s.warping);
   useEscape();
 
   useEffect(() => {
@@ -58,15 +63,18 @@ export function App() {
         Skip to the file list
       </a>
       <GalaxyCanvas />
-      <FolderLabels />
-      <Reticles />
+      {!inSystem && <FolderLabels />}
+      {!inSystem && <Reticles />}
+      <SystemLabels />
       {heroOpen ? <Hero /> : <Hud />}
-      {!heroOpen && panel !== 'insights' && <Legend />}
+      {!heroOpen && !inSystem && panel !== 'insights' && <Legend />}
       {!heroOpen && panel === 'insights' && <InsightsPanel />}
-      {!heroOpen && <HighlightChip />}
-      {!heroOpen && <Timeline />}
+      {!heroOpen && !inSystem && <HighlightChip />}
+      {!heroOpen && !inSystem && !warping && <Timeline />}
+      {!heroOpen && inSystem && !warping && <SystemHud />}
       {!heroOpen && <DetailPanel />}
       <Tooltip />
+      <WarpFlash />
       <LoadingVeil />
       <ErrorCard />
       <Notice />

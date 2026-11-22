@@ -1,0 +1,144 @@
+/* Solar-system view: floating body names, the HUD that replaces the timeline, the warp flash. */
+
+.sys-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Anchored at the point above the body; the text sits centred over it. */
+.sys-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(4, 6, 13, 0.4);
+  color: var(--starlight);
+  font-size: 12px;
+  white-space: nowrap;
+  translate: -50% -100%;
+  pointer-events: auto;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+  will-change: transform;
+}
+
+.sys-label:hover,
+.sys-label:focus-visible,
+.sys-label[data-hot='1'] {
+  border-color: var(--hairline-strong);
+  background: rgba(10, 17, 41, 0.85);
+}
+
+.sys-label:focus-visible {
+  outline: 2px solid var(--arcturus);
+  outline-offset: 2px;
+}
+
+.sys-label__count {
+  color: var(--haze);
+  font-size: 11px;
+}
+
+.sys-label--sun {
+  font-size: 13px;
+  border-color: rgba(255, 201, 131, 0.28);
+}
+
+.system-hud {
+  position: absolute;
+  left: 50%;
+  bottom: var(--gutter);
+  transform: translateX(-50%);
+  width: min(620px, calc(100vw - 2 * var(--gutter)));
+  padding: 12px 16px 14px;
+  display: grid;
+  gap: 6px;
+  background: rgba(8, 12, 30, 0.74);
+  z-index: 5;
+  animation: system-hud-in 0.45s ease both;
+}
+
+.system-hud__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.system-hud__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.system-hud__actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.system-hud__facts {
+  margin: 0;
+  color: var(--starlight);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.system-hud__key {
+  margin: 0;
+  color: var(--haze);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@keyframes system-hud-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+}
+
+/* The white-out under which the views switch. Opacity is set every frame. */
+.warp-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, #e6eeff 45%, #b9c9ff 100%);
+}
+
+@media (max-width: 760px) {
+  .system-hud {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    transform: none;
+    animation: none;
+  }
+  .system-hud__head {
+    flex-wrap: wrap;
+  }
+  .system-hud__key {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-hud {
+    animation: none;
+  }
+}

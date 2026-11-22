@@ -1,4 +1,5 @@
 import { HOLE_LABEL } from '../layout/blackHoles';
+import { enterSystem } from '../state/systemActions';
 import { useEffect, useMemo, useRef } from 'react';
 import { languageOf } from '../layout/color';
 import { fileDetail, folderStats } from '../layout/stats';
@@ -36,6 +37,7 @@ function Breadcrumb({ model, path, isFile }: { model: SkyModel; path: string; is
 }
 
 function FileView({ model, index }: { model: SkyModel; index: number }) {
+  const system = useStore((st) => st.system);
   const file = model.data.files[index];
   const detail = useMemo(() => fileDetail(model, index), [model, index]);
   const lang = languageOf(file.path);
@@ -131,15 +133,18 @@ function FileView({ model, index }: { model: SkyModel; index: number }) {
         <a className="btn btn--accent" href={detail.githubUrl} target="_blank" rel="noreferrer">
           Open on GitHub
         </a>
-        <button type="button" className="btn btn--ghost" onClick={() => focusFile(index)}>
-          Fly here
-        </button>
+        {system === null && (
+          <button type="button" className="btn btn--ghost" onClick={() => focusFile(index)}>
+            Fly here
+          </button>
+        )}
       </div>
     </>
   );
 }
 
 function FolderView({ model, index }: { model: SkyModel; index: number }) {
+  const system = useStore((st) => st.system);
   const folder = model.layout.tree.folders[index];
   const stats = useMemo(() => folderStats(model, index), [model, index]);
   const commits = model.data.commits;
@@ -239,9 +244,16 @@ function FolderView({ model, index }: { model: SkyModel; index: number }) {
         >
           Open on GitHub
         </a>
-        <button type="button" className="btn btn--ghost" onClick={() => focusFolder(index)}>
-          Fly here
-        </button>
+        {system !== index && (
+          <button type="button" className="btn btn--ghost" onClick={() => enterSystem(index)}>
+            Warp in
+          </button>
+        )}
+        {system === null && (
+          <button type="button" className="btn btn--ghost" onClick={() => focusFolder(index)}>
+            Fly here
+          </button>
+        )}
       </div>
     </>
   );

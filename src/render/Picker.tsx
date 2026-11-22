@@ -33,7 +33,7 @@ export function Picker() {
 
   const pickAt = (x: number, y: number, radius: number) => {
     const { model: mdl } = useStore.getState();
-    if (!mdl || formClock.value < 0.98) return -1;
+    if (!mdl || formClock.value < 0.98 || useStore.getState().system !== null) return -1;
     vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     return pickNearest(
       mdl.layout.positions,
@@ -97,6 +97,7 @@ export function Picker() {
   }, [gl]);
 
   useFrame(() => {
+    if (useStore.getState().system !== null) return; // SystemView picks inside a system
     const p = pointer.current;
     // Re-pick when the pointer moved, or when the camera moved under a still pointer.
     const camMoved = !lastCam.equals(camera.matrixWorld);

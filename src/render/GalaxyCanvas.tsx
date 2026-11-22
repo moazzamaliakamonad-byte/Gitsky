@@ -12,6 +12,9 @@ import { GalaxyHaze } from './GalaxyHaze';
 import { StarGlow } from './StarGlow';
 import { BlackHoles } from './BlackHoles';
 import { Supernova } from './Supernova';
+import { SystemView } from './SystemView';
+import { WarpDriver } from './WarpDriver';
+import { WarpStreaks } from './WarpStreaks';
 import * as THREE from 'three';
 import { StarChart } from './StarChart';
 import { LabelDriver } from './LabelDriver';
@@ -72,6 +75,7 @@ export function GalaxyCanvas() {
   const quality = useStore((s) => s.quality);
   const dpr = useStore((s) => s.dpr);
   const reducedMotion = useStore((s) => s.reducedMotion);
+  const system = useStore((s) => s.system);
   const label = model
     ? `3D galaxy of ${model.data.meta.fullName}: ${model.data.files.length.toLocaleString()} files as stars. Use the List view for an accessible table of the same data.`
     : 'A 3D galaxy is loading.';
@@ -87,7 +91,7 @@ export function GalaxyCanvas() {
       >
         <Background />
         {model && (
-          <>
+          <group visible={system === null}>
             <StarChart model={model} />
             <GalaxyHaze model={model} />
             <Nebulae model={model} />
@@ -98,8 +102,11 @@ export function GalaxyCanvas() {
             {!reducedMotion && model.supernova && (
               <Supernova plan={model.supernova} position={supernovaPosition(model)} />
             )}
-          </>
+          </group>
         )}
+        {model && system !== null && <SystemView key={system} model={model} folder={system} />}
+        <WarpStreaks />
+        <WarpDriver />
         <Controls />
         {quality === 'high' && <Effects />}
         <TimelineDriver />

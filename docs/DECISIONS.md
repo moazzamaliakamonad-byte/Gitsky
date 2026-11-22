@@ -61,3 +61,8 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 54 | Supernova = the most-changed sampled file (2+ touches), triggered by its first comet, a pure function of the playhead. | Rewards the busiest file with the biggest event; scrubbing stays correct with no state. |
 | 55 | Black-hole and supernova files explain themselves in the file panel and the legend note. | Honesty: a striking effect must say what data produced it. |
 | 56 | Close-up sprite caps: stars 72 px, glow 28 px (device-independent). | Zoomed into react's core, overdraw dropped from 46 to 55 fps; the governor covers the rest. |
+| 57 | A folder seen up close is a solar system: the folder is the sun, direct files are planets (most-changed innermost), sub-folders are ringed gas giants with a moon per file, overflow files are an asteroid belt. | A second, closer level of detail that still encodes only real data; Kepler speeds make it feel physical. `learn/concepts/warp-and-solar-systems.md`. |
+| 58 | Caps: 24 planets, 8 giants, 12 moons each; anything beyond is counted in the system panel. | Keeps every system readable and cheap; honesty requires saying what isn't drawn. |
+| 59 | The warp is camera flight + FOV 50 to 96 degrees + camera-space streaks + a DOM white flash that hides the scene switch. | The wide FOV sells speed; the flash makes an instant scene swap invisible. Reduced motion swaps instantly. |
+| 60 | The galaxy stays mounted but hidden inside a system. | Coming back is instant: no re-forming animation, no rebuilt buffers. |
+| 61 | Escape climbs one level (system, parent system, galaxy). | Consistent with Escape peeling back one layer everywhere else. |
