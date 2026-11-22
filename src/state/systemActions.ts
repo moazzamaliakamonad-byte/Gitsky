@@ -4,8 +4,8 @@ import { useStore } from './store';
 
 /** Warp into a folder's solar system: from the galaxy, or deeper from a system. */
 export function enterSystem(folder: number) {
-  const { model, system, heroOpen } = useStore.getState();
-  if (!model || warp.active || heroOpen || folder <= 0 || folder === system) return;
+  const { model, system, heroOpen, collision } = useStore.getState();
+  if (!model || warp.active || heroOpen || collision || folder <= 0 || folder === system) return;
   let aim: [number, number, number];
   const giant = system !== null ? bodies.get(`g${folder}`) : undefined;
   if (giant) aim = [giant.pos.x, giant.pos.y, giant.pos.z];

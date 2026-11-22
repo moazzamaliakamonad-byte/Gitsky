@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { spectrumOf } from '../layout/color';
 import { openBundled } from '../state/actions';
+import { endCollision, startCollision } from '../state/collisionActions';
 import { useStore, type Quality } from '../state/store';
 import logoUrl from './logo.svg';
 import { RepoInput } from './RepoInput';
@@ -13,6 +14,7 @@ const ICONS = {
   list: 'M7 5h10M7 10h10M7 15h10M3.5 5h.01M3.5 10h.01M3.5 15h.01',
   open: 'M10 4.5v11M4.5 10h11',
   share: 'M10 12.5V3.5M6.5 7 10 3.5 13.5 7M4.5 11v4.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11',
+  collide: 'M2.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0M8.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0',
 };
 
 /** A HUD button: icon always, text label on wide screens (aria-label keeps it named). */
@@ -93,6 +95,75 @@ function OpenRepo() {
                 </button>
               </li>
             ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** "Collide with another repo": pick the second galaxy. */
+function Collide() {
+  const [open, setOpen] = useState(false);
+  const bundled = useStore((s) => s.bundled);
+  const model = useStore((s) => s.model);
+  const other = useStore((s) => s.collision);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('pointerdown', onDoc);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDoc);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+  useEffect(() => setOpen(false), [other]);
+
+  if (!model) return null;
+  const me = model.data.meta.fullName;
+  return (
+    <div className="open-repo" ref={ref}>
+      <HudButton
+        icon="collide"
+        label={other ? 'End collision' : 'Collide'}
+        aria-pressed={Boolean(other)}
+        aria-expanded={other ? undefined : open}
+        aria-controls="collide-pop"
+        onClick={() => (other ? endCollision() : setOpen((o) => !o))}
+      />
+      {open && !other && (
+        <div className="open-repo__pop panel" id="collide-pop">
+          <p className="open-repo__lead">
+            Crash <span className="mono">{me}</span> into another repo and watch gravity do the
+            rest.
+          </p>
+          <RepoInput
+            size="compact"
+            id="collide-input"
+            cta="Collide"
+            placeholder="owner/repo to collide with"
+            autoFocus
+            onSubmitValue={startCollision}
+          />
+          <p className="open-repo__hint">Or a bundled sky, which costs no API calls:</p>
+          <ul className="open-repo__list">
+            {bundled
+              .filter((b) => b.fullName !== me)
+              .map((b) => (
+                <li key={b.fullName}>
+                  <button type="button" onClick={() => void startCollision(b.fullName)}>
+                    <span className="mono">{b.fullName}</span>
+                    <span className="open-repo__blurb">{b.blurb}</span>
+                    {b.spectrum && <Spectrum parts={b.spectrum} className="open-repo__spectrum" />}
+                  </button>
+                </li>
+              ))}
           </ul>
         </div>
       )}
@@ -257,6 +328,7 @@ export function Hud() {
           onClick={() => toggle('list')}
         />
         <OpenRepo />
+        <Collide />
         <HudButton
           icon="share"
           label="Share"

@@ -70,6 +70,8 @@ export interface AppState {
   system: number | null;
   /** A warp between views is in progress: the UI steps aside. */
   warping: boolean;
+  /** The other galaxy in a collision, or null. */
+  collision: SkyModel | null;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -109,6 +111,7 @@ export const useStore = create<AppState>((set) => ({
   hasToken: false,
   system: null,
   warping: false,
+  collision: null,
 
   set: (p) => set(p),
   setModel: (m) =>
@@ -125,6 +128,7 @@ export const useStore = create<AppState>((set) => ({
       flyTo: null,
       system: null,
       warping: false,
+      collision: null,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),
 }));

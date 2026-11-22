@@ -29,6 +29,13 @@ touched anything in a while.
   The hottest files get diffraction spikes.
 - **Comets.** The last N commits replay in order: one comet per touched file, coloured by
   author, flashing its star on arrival. Scrub the timeline to any commit.
+- **Black holes and a supernova.** The heaviest lockfiles, bundles and binaries become black
+  holes that bend the starlight behind them (real gravitational lensing). The most-changed
+  file goes supernova when its comet lands.
+- **Warp into any folder.** It becomes a solar system: its files are planets (most-changed
+  closest to the sun), its sub-folders ringed gas giants you can warp into next.
+- **Collide two repos.** `?repo=react/react&vs=vitejs/vite` crashes two galaxies together in a
+  gravity simulation: tidal tails, bridges, a merger. Files they share are threaded with light.
 - **Understand it in 30 seconds.** A written summary, hottest files, largest files,
   language share, quiet zones and contributors. Click anything to fly there.
 - **Find anything.** Search pulses every match; Enter flies to the best one. Hover for

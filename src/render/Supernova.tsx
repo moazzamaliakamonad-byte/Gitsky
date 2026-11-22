@@ -46,8 +46,8 @@ export function Supernova({ plan, position }: { plan: SupernovaPlan; position: T
   );
 
   useFrame(({ camera }) => {
-    const s =
-      useStore.getState().system === null ? supernovaAt(plan, timelineClock.playhead) : null;
+    const { system, collision } = useStore.getState();
+    const s = system === null && !collision ? supernovaAt(plan, timelineClock.playhead) : null;
     if (mesh.current) mesh.current.visible = s !== null;
     if (!s) {
       fxState.flash = 0;

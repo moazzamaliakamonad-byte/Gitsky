@@ -66,3 +66,9 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 59 | The warp is camera flight + FOV 50 to 96 degrees + camera-space streaks + a DOM white flash that hides the scene switch. | The wide FOV sells speed; the flash makes an instant scene swap invisible. Reduced motion swaps instantly. |
 | 60 | The galaxy stays mounted but hidden inside a system. | Coming back is instant: no re-forming animation, no rebuilt buffers. |
 | 61 | Escape climbs one level (system, parent system, galaxy). | Consistent with Escape peeling back one layer everywhere else. |
+| 62 | Galaxy collisions use a restricted three-body simulation (Toomre & Toomre 1972): softened point-mass cores, massless file stars, leapfrog on the CPU. | Two force evaluations per star (~0.3 ms for 10k) instead of N-squared; reproduces tails and bridges. `learn/concepts/galaxy-collisions.md`. |
+| 63 | Mass from sqrt(file count); Plummer softening 0.5 of radius; G set so the bigger disk's edge orbits in 24 s; drag on the cores while they overlap. | Disks keep their shape until disturbed; measured haze vs tails to pick the softening; friction gives the story its acts (pass, tails, fall back, merge). |
+| 64 | Files with the same path in both repos pulse and are joined by threads while the galaxies touch. | The one place the collision shows data rather than physics; the panel says which is which. |
+| 65 | `?repo=a&vs=b` deep-links a collision; Escape ends it. | Shareable like every other view. |
+| 66 | Up to 12,000 stars per galaxy, fixed (not by quality). | A quality change used to rebuild and restart the simulation mid-story. |
+| 67 | React state in the collision panel changes only on visible changes. | Setting it every frame re-rendered the panel 60 times a second and halved the frame rate. |

@@ -92,7 +92,7 @@ export function BlackHoles({ model }: { model: SkyModel }) {
   useFrame((state) => {
     const camera = state.camera as THREE.PerspectiveCamera;
     const t = state.clock.elapsedTime;
-    const inGalaxy = useStore.getState().system === null;
+    const inGalaxy = useStore.getState().system === null && !useStore.getState().collision;
     const formed = inGalaxy ? THREE.MathUtils.smoothstep(formClock.value, 0.85, 1) : 0;
     const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     let n = 0;

@@ -33,7 +33,8 @@ export function Picker() {
 
   const pickAt = (x: number, y: number, radius: number) => {
     const { model: mdl } = useStore.getState();
-    if (!mdl || formClock.value < 0.98 || useStore.getState().system !== null) return -1;
+    const { system, collision } = useStore.getState();
+    if (!mdl || formClock.value < 0.98 || system !== null || collision) return -1;
     vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     return pickNearest(
       mdl.layout.positions,
@@ -97,7 +98,11 @@ export function Picker() {
   }, [gl]);
 
   useFrame(() => {
-    if (useStore.getState().system !== null) return; // SystemView picks inside a system
+    // Inside a system SystemView picks; in a collision nothing is pickable.
+    if (useStore.getState().system !== null || useStore.getState().collision) {
+      if (useStore.getState().hovered !== -1) useStore.getState().set({ hovered: -1 });
+      return;
+    }
     const p = pointer.current;
     // Re-pick when the pointer moved, or when the camera moved under a still pointer.
     const camMoved = !lastCam.equals(camera.matrixWorld);

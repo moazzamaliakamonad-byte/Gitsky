@@ -282,3 +282,64 @@ void main() {
   gl_FragColor = vec4(col * vA * (0.25 + 0.75 * vEnd), 1.0);
 }
 `;
+
+/**
+ * Collision stars: positions come straight from the CPU simulation every frame. Writes
+ * the same varyings as starVertex, so the collision reuses the star's point-spread
+ * fragment shader. Files whose path exists in both repos pulse while the galaxies touch.
+ */
+export const collisionVertex = /* glsl */ `
+uniform float uScale;
+uniform float uPixelRatio;
+uniform float uTime;
+uniform float uExposure;
+uniform float uTouch;       // 0 … 1: how strongly the two galaxies interact right now
+uniform float uIntro;
+uniform float uReach;       // beyond this distance from the centre, strays fade a little
+attribute vec3 aColor;
+attribute float aSize;
+attribute float aBright;
+attribute float aShared;
+varying vec3 vColor;
+varying float vAlpha;
+varying float vCore;
+varying float vSpike;
+varying float vSpriteScale;
+varying float vSharp;
+void main() {
+  vec4 mv = modelViewMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mv;
+  float pulse = aShared * uTouch * (0.6 + 0.4 * sin(uTime * 4.0 + position.x * 0.05));
+  float stray = mix(1.0, 0.45, smoothstep(uReach * 0.6, uReach * 1.4, length(position)));
+  vAlpha = (aBright * uExposure * stray + pulse * 1.4) * uIntro;
+  vColor = mix(aColor, vec3(0.55, 1.0, 0.92), pulse * 0.7);
+  vCore = smoothstep(0.55, 1.0, aBright) + pulse;
+  vSpike = pulse * 0.7;
+  vSpriteScale = 1.0 + 2.2 * vSpike;
+  float want = aSize * 1.55 * (1.0 + pulse * 0.8) * uScale / max(-mv.z, 0.001) * uPixelRatio;
+  float fit = clamp(want, 3.2 * uPixelRatio, 72.0 * uPixelRatio);
+  vAlpha *= pow(want / fit, 1.4);
+  vSharp = 1.0 - smoothstep(6.0, 40.0, fit / uPixelRatio);
+  gl_PointSize = fit * vSpriteScale;
+}
+`;
+
+/** Threads of light between files that share a path, fading with length. */
+export const threadVertex = /* glsl */ `
+attribute float aEnd;
+varying float vEnd;
+void main() {
+  vEnd = aEnd;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+
+export const threadFragment = /* glsl */ `
+uniform float uOpacity;
+varying float vEnd;
+void main() {
+  // Brightest at both ends (the files), dimmer in the middle of the span.
+  float ends = 0.35 + 0.65 * pow(abs(vEnd * 2.0 - 1.0), 2.0);
+  gl_FragColor = vec4(vec3(0.45, 0.95, 0.88) * ends * uOpacity, 1.0);
+}
+`;

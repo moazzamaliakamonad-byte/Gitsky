@@ -20,7 +20,9 @@ import { ListView } from './ListView';
 import { HighlightChip } from './HighlightChip';
 import { ShareDialog } from './ShareDialog';
 import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
+import { CollisionHud, CollisionLabels } from './CollisionUi';
 import { warpUp } from '../state/systemActions';
+import { endCollision } from '../state/collisionActions';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
@@ -33,6 +35,7 @@ function useEscape() {
       else if (s.highlight) setHighlight(null);
       else if (s.panel === 'insights') s.set({ panel: 'none' });
       else if (s.system !== null) warpUp();
+      else if (s.collision) endCollision();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -44,6 +47,8 @@ export function App() {
   const panel = useStore((s) => s.panel);
   const inSystem = useStore((s) => s.system !== null);
   const warping = useStore((s) => s.warping);
+  const colliding = useStore((s) => s.collision !== null);
+  const galaxyUi = !inSystem && !colliding;
   useEscape();
 
   useEffect(() => {
@@ -63,16 +68,18 @@ export function App() {
         Skip to the file list
       </a>
       <GalaxyCanvas />
-      {!inSystem && <FolderLabels />}
-      {!inSystem && <Reticles />}
+      {galaxyUi && <FolderLabels />}
+      {galaxyUi && <Reticles />}
+      <CollisionLabels />
       <SystemLabels />
       {heroOpen ? <Hero /> : <Hud />}
-      {!heroOpen && !inSystem && panel !== 'insights' && <Legend />}
+      {!heroOpen && galaxyUi && panel !== 'insights' && <Legend />}
       {!heroOpen && panel === 'insights' && <InsightsPanel />}
-      {!heroOpen && !inSystem && <HighlightChip />}
-      {!heroOpen && !inSystem && !warping && <Timeline />}
+      {!heroOpen && galaxyUi && <HighlightChip />}
+      {!heroOpen && galaxyUi && !warping && <Timeline />}
+      {!heroOpen && colliding && <CollisionHud />}
       {!heroOpen && inSystem && !warping && <SystemHud />}
-      {!heroOpen && <DetailPanel />}
+      {!heroOpen && !colliding && <DetailPanel />}
       <Tooltip />
       <WarpFlash />
       <LoadingVeil />

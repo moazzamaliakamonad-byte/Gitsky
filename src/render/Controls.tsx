@@ -129,7 +129,10 @@ export function Controls() {
   const viewShift = useRef(0);
   useFrame((state, dt) => {
     const cam = state.camera as THREE.PerspectiveCamera;
-    const want = useStore.getState().heroOpen ? 0.17 : 0;
+    // The landing page, a collision and a system all have a panel at the bottom: lift
+    // the scene above it.
+    const st = useStore.getState();
+    const want = st.heroOpen ? 0.17 : st.collision ? 0.2 : st.system !== null ? 0.1 : 0;
     const k = reducedMotion ? 1 : Math.min(1, dt * 3);
     viewShift.current += (want - viewShift.current) * k;
     const { width: w, height: h } = state.size;

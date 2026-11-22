@@ -18,12 +18,37 @@ function begin(label: string): AbortSignal {
   return current.signal;
 }
 
-/** Put ?repo=owner/name in the address bar so the current sky is a shareable link. */
-export function setRepoParam(fullName: string | null) {
+/** Put ?repo=owner/name (and ?vs= in a collision) in the address bar: a shareable link. */
+export function setRepoParam(fullName: string | null, vs?: string | null) {
   const url = new URL(window.location.href);
-  url.search = fullName ? `?repo=${repoParam(fullName)}` : '';
+  url.search = fullName ? `?repo=${repoParam(fullName)}${vs ? `&vs=${repoParam(vs)}` : ''}` : '';
   window.history.replaceState(null, '', url);
 }
+
+/**
+ * Load a repo into a model without putting it on screen (the second galaxy of a
+ * collision). Bundled skies cost no API calls; live ones use the normal pipeline.
+ */
+export async function loadModel(ref: RepoRef, signal: AbortSignal) {
+  const fullName = `${ref.owner}/${ref.repo}`;
+  const snap = !ref.branch ? findBundled(useStore.getState().bundled, fullName) : undefined;
+  if (snap) return buildModel(await loadBundled(snap), 'bundled');
+  const result = await loadRepo(ref, {
+    token: getToken(),
+    signal,
+    onProgress: (progress) => {
+      if (!signal.aborted) useStore.getState().set({ progress });
+    },
+  });
+  return buildModel(result.data, result.source);
+}
+
+/** Begin a cancellable load with the loading veil (shared with collisions). */
+export function beginLoad(label: string): AbortSignal {
+  return begin(label);
+}
+
+export { fail as failLoad };
 
 export async function openBundled(entry: BundledEntry, opts: { updateUrl?: boolean } = {}) {
   const signal = begin(entry.fullName);
@@ -184,10 +209,19 @@ export async function boot() {
     useStore.getState().set({ heroOpen: false });
     const ref = branch ? { ...parsed.ref, branch } : parsed.ref;
     const snap = !branch ? findBundled(bundled, `${ref.owner}/${ref.repo}`) : undefined;
-    if (snap) return openBundled(snap, { updateUrl: false });
-    // Draw something beautiful right away while the real repo loads.
-    if (bundled[0]) await openBundled(bundled[0], { updateUrl: false });
-    return openRepo(ref);
+    if (snap) await openBundled(snap, { updateUrl: false });
+    else {
+      // Draw something beautiful right away while the real repo loads.
+      if (bundled[0]) await openBundled(bundled[0], { updateUrl: false });
+      await openRepo(ref);
+    }
+    // ?vs=owner/name: collide with a second repo.
+    const vs = new URLSearchParams(window.location.search).get('vs');
+    if (vs && useStore.getState().model) {
+      const { startCollision } = await import('./collisionActions');
+      await startCollision(vs);
+    }
+    return;
   }
   if (bundled[0]) return openBundled(bundled[0], { updateUrl: false });
   fail({

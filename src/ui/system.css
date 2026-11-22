@@ -142,3 +142,185 @@
     animation: none;
   }
 }
+
+/* ---------- galaxy collision ------------------------------------------------ */
+
+.open-repo__lead {
+  margin: 0 0 10px;
+  color: var(--haze);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.collide-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -100%;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(4, 6, 13, 0.55);
+  border: 1px solid var(--hairline);
+  color: var(--starlight);
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+
+/* Warm for the home galaxy, cool for the visitor: the same tints as their cores. */
+.collide-label--0 {
+  border-color: rgba(255, 216, 168, 0.35);
+}
+.collide-label--1 {
+  border-color: rgba(207, 224, 255, 0.35);
+}
+
+.collide-hud {
+  position: absolute;
+  left: 50%;
+  bottom: var(--gutter);
+  transform: translateX(-50%);
+  width: min(680px, calc(100vw - 2 * var(--gutter)));
+  padding: 14px 16px;
+  display: grid;
+  gap: 10px;
+  background: rgba(8, 12, 30, 0.76);
+  z-index: 5;
+  animation: system-hud-in 0.45s ease both;
+}
+
+.collide-hud__sides {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+
+/* Two overlapping orbits: the collision, drawn in the hairline ink. */
+.collide-hud__vs {
+  align-self: center;
+  height: 18px;
+  background: radial-gradient(
+      circle at 34% 50%,
+      transparent 5px,
+      var(--hairline-strong) 5.5px,
+      var(--hairline-strong) 6.5px,
+      transparent 7px
+    ),
+    radial-gradient(
+      circle at 66% 50%,
+      transparent 5px,
+      var(--hairline-strong) 5.5px,
+      var(--hairline-strong) 6.5px,
+      transparent 7px
+    );
+}
+
+.collide-side {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.collide-side--1 {
+  text-align: right;
+}
+
+.collide-side__name {
+  color: var(--starlight);
+  font-size: 13px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collide-side__name:hover {
+  text-decoration: underline;
+}
+
+.collide-side__spectrum {
+  height: 3px;
+}
+
+.collide-side__facts {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.collide-side--1 .collide-side__facts {
+  justify-content: flex-end;
+}
+
+.collide-side__facts dt {
+  color: var(--dim);
+  font-size: 11px;
+}
+
+.collide-side__facts dd {
+  margin: 0;
+  color: var(--starlight);
+}
+
+.collide-hud__story {
+  margin: 0;
+  color: var(--starlight);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.collide-hud__bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.collide-hud__phase {
+  flex: 1;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--starlight);
+}
+
+.collide-hud__track {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.collide-hud__track span {
+  display: block;
+  height: 100%;
+  background: var(--arcturus);
+  transform-origin: left;
+}
+
+.collide-hud__note {
+  margin: 0;
+  color: var(--dim);
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .collide-hud {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    transform: none;
+    animation: none;
+  }
+  .collide-side__facts div:nth-child(3),
+  .collide-hud__note {
+    display: none;
+  }
+}
