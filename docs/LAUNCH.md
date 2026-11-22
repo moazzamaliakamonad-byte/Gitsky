@@ -4,8 +4,8 @@
 - [ ] Push to GitHub and enable **Pages → Source: GitHub Actions** (Settings → Pages).
 - [ ] Confirm the Actions run is green and the site loads at
       `https://moazzamaliakamonad-byte.github.io/Gitsky/`.
-- [ ] Record the hero GIF (`docs/RECORDING.md`) and put it in the README. Deep time on
-      vite is the strongest shot.
+- [x] Hero GIF in the README (deep time on vite, `docs/media/deep-time.gif`).
+- [ ] Optional: a screen recording that shows the interface too (`docs/RECORDING.md`).
 - [ ] Prebuild deep time for the remaining featured skies (`npm run snapshot:deep`).
 - [ ] Paste the site URL into a link-preview checker (e.g. opengraph.xyz) and confirm the
       card image shows.

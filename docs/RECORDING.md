@@ -48,10 +48,11 @@ Dark, noisy space scenes compress poorly. If the GIF is too large, drop to `fps=
 `scale=640:-1`. Alternatively, commit `docs/hero.mp4` and embed it as a video in the README
 (GitHub renders uploaded MP4s in issues and READMEs when dragged into the web editor).
 
-## Putting it in the README
-Save as `docs/hero.gif`, then in `README.md` replace the `<img src="public/og-image.jpg" …>`
-line with:
-
-```md
-![Gitsky: the react repo forming as a spiral galaxy, comets streaking in](docs/hero.gif)
-```
+## How the README's media were made
+The README's deep-time GIF and gallery stills come from the running app, not a screen
+recorder: `npx tsx scripts/capture-receiver.ts --minutes 30` listens locally, and the page
+posts canvas frames to it as `media/<name>.png|jpg`, which land in `docs/media/`. Frames
+are rendered on demand (camera and deep-time moment set per frame, film grain off so the
+GIF compresses), then assembled into a GIF with one shared palette. That gives perfectly
+smooth motion on any machine. A screen recording (above) is the way to show the interface
+itself.
