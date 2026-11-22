@@ -831,3 +831,222 @@
 .timeline__author:focus-visible {
   color: var(--tele);
 }
+
+/* ---------- the header: brand, search, one tool strip ----------------------------- */
+
+/* Search stays near the centre; the side columns never squeeze their contents into it. */
+.hud {
+  grid-template-columns: minmax(0, 1fr) minmax(190px, 360px) minmax(max-content, 1fr);
+  gap: 16px;
+}
+
+.hud__center {
+  width: 100%;
+}
+
+.hud__actions {
+  align-items: center;
+  gap: 8px;
+}
+
+/* One strip, three groups: where to look | watch | study. */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 4px;
+  background: rgba(6, 11, 28, 0.74);
+  border: 1px solid var(--tele-dim);
+  border-radius: 2px;
+  box-shadow: inset 0 1px 0 rgba(94, 224, 200, 0.12);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+}
+
+.toolbar__sep {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  margin: 0 5px;
+  background: var(--tele-dim);
+}
+
+.tool,
+.repo-tag__switch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 32px;
+  padding: 0;
+  color: var(--haze);
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.tool svg,
+.repo-tag__switch svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tool:hover,
+.tool:focus-visible,
+.repo-tag__switch:hover,
+.repo-tag__switch:focus-visible,
+.repo-tag__switch[aria-expanded='true'] {
+  color: var(--starlight);
+  background: var(--tele-faint);
+}
+
+.tool[aria-pressed='true'],
+.tool[aria-expanded='true'] {
+  color: var(--tele);
+  background: rgba(94, 224, 200, 0.1);
+  box-shadow: inset 0 -2px 0 var(--tele);
+}
+
+/* The name, on hover or keyboard focus, in a small console label under the icon. */
+.tool::after,
+.repo-tag__switch::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 50%;
+  z-index: 30;
+  translate: -50% -3px;
+  padding: 4px 9px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--starlight);
+  background: rgba(7, 11, 28, 0.96);
+  border: 1px solid var(--tele-dim);
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.14s ease,
+    translate 0.14s ease;
+}
+
+.tool:hover::after,
+.tool:focus-visible::after,
+.repo-tag__switch:hover::after,
+.repo-tag__switch:focus-visible::after {
+  opacity: 1;
+  translate: -50% 0;
+  transition-delay: 0.25s;
+}
+
+/* A popover's own control doesn't need its tooltip while the popover is open. */
+.tool[aria-expanded='true']::after,
+.repo-tag__switch[aria-expanded='true']::after {
+  display: none;
+}
+
+/* The last tool's tooltip would hang off the strip's end: keep it inside. */
+.toolbar > :last-child.tool::after {
+  left: auto;
+  right: 0;
+  translate: 0 -3px;
+}
+
+.toolbar > :last-child.tool:hover::after,
+.toolbar > :last-child.tool:focus-visible::after {
+  translate: 0 0;
+}
+
+/* Open another repo: a switch beside the repo's name. */
+.repo-tag__row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.repo-tag__switch {
+  width: 24px;
+  height: 22px;
+}
+
+.repo-tag__switch svg {
+  width: 15px;
+  height: 15px;
+}
+
+.open-repo--left .open-repo__pop {
+  left: -14px;
+  right: auto;
+}
+
+.open-repo__pop {
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+/* Share keeps its word while there's room. */
+@media (max-width: 1440px) {
+  .hud .btn--hud.btn--accent {
+    width: 40px;
+    padding: 0;
+  }
+  .hud .btn--hud.btn--accent .btn__label {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .repo-tag__stats {
+    display: none;
+  }
+}
+
+/* Phones: brand and actions on top, search below, the strip across the full width. */
+@media (max-width: 760px) {
+  .hud {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 10px;
+  }
+  .hud__actions {
+    display: contents;
+  }
+  .hud__actions > .btn--hud,
+  .hud__actions > .open-repo {
+    grid-row: 1;
+  }
+  .hud__actions > .btn--hud {
+    grid-column: 2;
+    justify-self: end;
+    margin-right: 48px;
+  }
+  .hud__actions > .open-repo {
+    grid-column: 2;
+    justify-self: end;
+  }
+  .hud__center {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+  .toolbar {
+    grid-row: 3;
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+  .tool {
+    flex: 1;
+  }
+}

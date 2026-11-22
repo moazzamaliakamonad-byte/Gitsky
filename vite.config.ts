@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { fileURLToPath } from 'node:url';
+import { serviceWorker } from './build/swPlugin';
 
 // GitHub Pages serves a project site from /<repo-name>/.
 // CI sets BASE_PATH from the repository name; locally we serve from /.
@@ -7,7 +9,7 @@ const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base,
-  plugins: [react()],
+  plugins: [react(), serviceWorker(fileURLToPath(new URL('.', import.meta.url)))],
   server: {
     // On Windows, rapid truncate-then-write saves can be missed or read half-written by
     // the watcher, leaving the dev server serving stale code.

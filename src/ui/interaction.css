@@ -290,7 +290,9 @@
 }
 
 .open-repo__list .mono {
+  flex: none;
   font-size: 12.5px;
+  white-space: nowrap;
 }
 
 .open-repo__blurb {

@@ -17,7 +17,6 @@ import { startDrift } from '../state/drift';
 const ICONS = {
   insights: 'M3.5 16.5v-5M8.5 16.5v-9M13.5 16.5V9.5M17 4.5l-4 3-3.5-2.5L3 9',
   list: 'M7 5h10M7 10h10M7 15h10M3.5 5h.01M3.5 10h.01M3.5 15h.01',
-  open: 'M10 4.5v11M4.5 10h11',
   share: 'M10 12.5V3.5M6.5 7 10 3.5 13.5 7M4.5 11v4.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11',
   collide: 'M2.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0M8.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0',
   overview: 'M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4M10 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5',
@@ -28,17 +27,30 @@ const ICONS = {
     'M10 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M4 5.5a1.2 1.2 0 1 0 0.01 0M16 4.5a1.2 1.2 0 1 0 0.01 0M15.5 15.5a1.2 1.2 0 1 0 0.01 0M4.5 15a1.2 1.2 0 1 0 0.01 0M8.4 8.6 5 6.3M11.6 8.6 15 5.4M11.7 11.3l3 3.3M8.3 11.4 5.4 14',
 };
 
-/** A HUD button: icon always, text label on wide screens (aria-label keeps it named). */
+/**
+ * A HUD button. `tool`: icon only, inside the tool strip, named by a tooltip on hover or
+ * focus. Otherwise a full button with a text label on wide screens.
+ */
 function HudButton({
   icon,
   label,
   accent,
+  tool,
   ...props
 }: {
   icon: keyof typeof ICONS;
   label: string;
   accent?: boolean;
+  tool?: boolean;
 } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  if (tool)
+    return (
+      <button type="button" className="tool" aria-label={label} data-tip={label} {...props}>
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d={ICONS[icon]} />
+        </svg>
+      </button>
+    );
   return (
     <button
       type="button"
@@ -80,18 +92,24 @@ function OpenRepo() {
   useEffect(() => setOpen(false), [model]);
 
   return (
-    <div className="open-repo" ref={ref}>
-      <HudButton
-        icon="open"
-        label="Open repo"
+    <div className="open-repo open-repo--left" ref={ref}>
+      <button
+        type="button"
+        className="repo-tag__switch"
+        aria-label="Open another repo"
+        data-tip="Open another repo"
         aria-expanded={open}
         aria-controls="open-repo-pop"
         onClick={() => setOpen((o) => !o)}
-      />
+      >
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M6 8l4 4 4-4" />
+        </svg>
+      </button>
       {open && (
         <div className="open-repo__pop panel" id="open-repo-pop">
           <RepoInput size="compact" autoFocus />
-          <p className="open-repo__hint">Or one of the bundled skies, which cost no API calls:</p>
+          <p className="open-repo__hint">Featured skies</p>
           <ul className="open-repo__list">
             {bundled.map((b) => (
               <li key={b.fullName}>
@@ -141,6 +159,7 @@ function Collide() {
   return (
     <div className="open-repo" ref={ref}>
       <HudButton
+        tool
         icon="collide"
         label={other ? 'End collision' : 'Collide'}
         aria-pressed={Boolean(other)}
@@ -151,8 +170,7 @@ function Collide() {
       {open && !other && (
         <div className="open-repo__pop panel" id="collide-pop">
           <p className="open-repo__lead">
-            Crash <span className="mono">{me}</span> into another repo and watch gravity do the
-            rest.
+            Collide <span className="mono">{me}</span> with
           </p>
           <RepoInput
             size="compact"
@@ -162,7 +180,7 @@ function Collide() {
             autoFocus
             onSubmitValue={startCollision}
           />
-          <p className="open-repo__hint">Or a bundled sky, which costs no API calls:</p>
+          <p className="open-repo__hint">Featured skies</p>
           <ul className="open-repo__list">
             {bundled
               .filter((b) => b.fullName !== me)
@@ -291,9 +309,17 @@ export function Hud() {
         </button>
         {meta && model && (
           <div className="repo-tag">
-            <a className="repo-tag__name mono" href={meta.htmlUrl} target="_blank" rel="noreferrer">
-              {meta.fullName}
-            </a>
+            <span className="repo-tag__row">
+              <a
+                className="repo-tag__name mono"
+                href={meta.htmlUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {meta.fullName}
+              </a>
+              <OpenRepo />
+            </span>
             <Spectrum parts={spectrum} className="repo-tag__spectrum" />
             <span className="repo-tag__stats">
               <span>{model.data.files.length.toLocaleString()} files</span>
@@ -308,35 +334,42 @@ export function Hud() {
       </div>
 
       <div className="hud__actions">
-        <HudButton icon="overview" label="Whole galaxy" onClick={focusGalaxy} />
-        <HudButton icon="tour" label="Tour" onClick={startTour} />
-        <HudButton icon="drift" label="Drift" onClick={startDrift} />
-        <HudButton
-          icon="universe"
-          label="Universe"
-          aria-pressed={inUniverse}
-          onClick={() => (inUniverse ? closeUniverse() : void openUniverse())}
-        />
-        <HudButton
-          icon="people"
-          label="People"
-          aria-pressed={panel === 'people'}
-          onClick={() => toggle('people')}
-        />
-        <HudButton
-          icon="insights"
-          label="Insights"
-          aria-pressed={panel === 'insights'}
-          onClick={() => toggle('insights')}
-        />
-        <HudButton
-          icon="list"
-          label="List view"
-          aria-pressed={panel === 'list'}
-          onClick={() => toggle('list')}
-        />
-        <OpenRepo />
-        <Collide />
+        <div className="toolbar" role="toolbar" aria-label="Views and tools">
+          <HudButton tool icon="overview" label="Whole galaxy" onClick={focusGalaxy} />
+          <HudButton
+            tool
+            icon="universe"
+            label="Universe"
+            aria-pressed={inUniverse}
+            onClick={() => (inUniverse ? closeUniverse() : void openUniverse())}
+          />
+          <Collide />
+          <span className="toolbar__sep" aria-hidden="true" />
+          <HudButton tool icon="tour" label="Tour" onClick={startTour} />
+          <HudButton tool icon="drift" label="Drift" onClick={startDrift} />
+          <span className="toolbar__sep" aria-hidden="true" />
+          <HudButton
+            tool
+            icon="people"
+            label="People"
+            aria-pressed={panel === 'people'}
+            onClick={() => toggle('people')}
+          />
+          <HudButton
+            tool
+            icon="insights"
+            label="Insights"
+            aria-pressed={panel === 'insights'}
+            onClick={() => toggle('insights')}
+          />
+          <HudButton
+            tool
+            icon="list"
+            label="List view"
+            aria-pressed={panel === 'list'}
+            onClick={() => toggle('list')}
+          />
+        </div>
         <HudButton
           icon="share"
           label="Share"

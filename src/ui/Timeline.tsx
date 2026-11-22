@@ -141,11 +141,7 @@ export function Timeline() {
               </span>
             </span>
           </>
-        ) : (
-          <span className="timeline__waiting">
-            Comets arrive in the order the commits were made.
-          </span>
-        )}
+        ) : null}
       </div>
     </section>
   );
