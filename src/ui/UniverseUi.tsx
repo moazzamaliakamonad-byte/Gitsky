@@ -126,7 +126,8 @@ export function UniverseHud() {
         </button>
       </div>
       <p className="universe-hud__facts">
-        {data.galaxies.length} projects and {data.people.length} people
+        {data.galaxies.length} {data.galaxies.length === 1 ? 'project' : 'projects'} and{' '}
+        {data.people.length} {data.people.length === 1 ? 'person' : 'people'}
         {bridges > 0
           ? `; ${bridges} ${bridges === 1 ? 'person bridges' : 'people bridge'} several projects (gold)`
           : ''}

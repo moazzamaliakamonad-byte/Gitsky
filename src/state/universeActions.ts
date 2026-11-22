@@ -97,6 +97,7 @@ export async function openUniverse() {
     reportMissing(x);
     const next = apply(g, x.patch);
     setU({ status: 'ready', busy: false, ...next, focus: { kind: 'galaxy', index: 0 } });
+    setUniverseParam(meta.fullName);
   } catch (e) {
     if (ctrl.signal.aborted) return;
     useStore.getState().set({ universe: null, error: toAppError(e, meta.fullName) });
@@ -195,10 +196,12 @@ export async function chartGalaxy(fullName: string) {
   await openRepoInput(fullName);
 }
 
-/** `?user=login` in the address bar while a person's universe is open. */
+/** The address bar follows the universe: `?user=login`, or `?repo=…&universe=1`. */
 function setUniverseParam(label: string | null) {
   const url = new URL(window.location.href);
+  url.searchParams.delete('user');
+  url.searchParams.delete('universe');
   if (label?.startsWith('@')) url.searchParams.set('user', label.slice(1));
-  else url.searchParams.delete('user');
-  window.history.replaceState(null, '', url);
+  else if (label) url.searchParams.set('universe', '1');
+  window.history.replaceState(null, '', url.toString().replace(/%2F/g, '/').replace(/%40/g, '@'));
 }

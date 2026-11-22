@@ -224,6 +224,15 @@ export async function boot() {
       if (bundled[0]) await openBundled(bundled[0], { updateUrl: false });
       await openRepo(ref);
     }
+    // ?universe=1: open the universe around it.
+    if (
+      new URLSearchParams(window.location.search).get('universe') === '1' &&
+      useStore.getState().model
+    ) {
+      const { openUniverse } = await import('./universeActions');
+      await openUniverse();
+      return;
+    }
     // ?vs=owner/name: collide with a second repo.
     const vs = new URLSearchParams(window.location.search).get('vs');
     if (vs && useStore.getState().model) {
