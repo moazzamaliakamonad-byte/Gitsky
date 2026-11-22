@@ -201,6 +201,15 @@ export async function boot() {
     return;
   }
 
+  // ?user=login: open that person's universe over the first bundled sky.
+  const userParam = new URLSearchParams(window.location.search).get('user');
+  if (userParam && /^[A-Za-z0-9-]{1,39}$/.test(userParam)) {
+    if (bundled[0]) await openBundled(bundled[0], { updateUrl: false });
+    const { openUserUniverse } = await import('./universeActions');
+    await openUserUniverse(userParam);
+    return;
+  }
+
   const param = new URLSearchParams(window.location.search).get('repo');
   const [repoPart, branch] = (param ?? '').split('@');
   const parsed = param ? parseRepoInput(repoPart) : null;

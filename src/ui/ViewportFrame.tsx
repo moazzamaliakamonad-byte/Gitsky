@@ -41,6 +41,8 @@ function sectorAt(x: number, y: number, z: number): string {
  */
 export function ViewportFrame() {
   const heroOpen = useStore((st) => st.heroOpen);
+  // The detail panel fills the right edge; the readout steps aside while it's open.
+  const panelOpen = useStore((st) => st.selection !== null && !st.universe);
   const sector = useRef<HTMLSpanElement>(null);
   const range = useRef<HTMLSpanElement>(null);
   const heading = useRef<HTMLSpanElement>(null);
@@ -71,7 +73,7 @@ export function ViewportFrame() {
       if (now - lastSector > 250 && sector.current) {
         lastSector = now;
         const mode = s.universe
-          ? `UNIVERSE  ${s.model.data.meta.fullName}`
+          ? `UNIVERSE  ${s.universe.label}`
           : s.collision
             ? `COLLISION  ${s.collision.data.meta.fullName}`
             : s.system !== null
@@ -91,7 +93,10 @@ export function ViewportFrame() {
   }, []);
 
   return (
-    <div className={`viewfinder${heroOpen ? ' is-hero' : ''}`} aria-hidden="true">
+    <div
+      className={`viewfinder${heroOpen ? ' is-hero' : ''}${panelOpen ? ' is-panel' : ''}`}
+      aria-hidden="true"
+    >
       <span className="viewfinder__corner viewfinder__corner--tl" />
       <span className="viewfinder__corner viewfinder__corner--tr" />
       <span className="viewfinder__corner viewfinder__corner--bl" />

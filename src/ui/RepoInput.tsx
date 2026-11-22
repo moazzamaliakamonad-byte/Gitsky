@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { openRepoInput } from '../state/actions';
+import { openUserUniverse } from '../state/universeActions';
 import { useStore } from '../state/store';
 
 /** The "paste a repo" field. `size="hero"` on the landing page, compact in the HUD. */
@@ -29,6 +30,13 @@ export function RepoInput({
       if (await onSubmitValue(value)) setValue('');
       return;
     }
+    // "@login" opens that person's universe instead of a repo.
+    const user = /^@([A-Za-z0-9-]{1,39})$/.exec(value.trim());
+    if (user) {
+      setValue('');
+      await openUserUniverse(user[1]);
+      return;
+    }
     const ok = await openRepoInput(value);
     if (ok) {
       useStore.getState().set({ heroOpen: false });
@@ -50,7 +58,8 @@ export function RepoInput({
         spellCheck={false}
         autoFocus={autoFocus}
         placeholder={
-          placeholder ?? (size === 'hero' ? 'Paste a GitHub repo' : 'owner/repo or GitHub URL')
+          placeholder ??
+          (size === 'hero' ? 'Paste a GitHub repo, or @username' : 'owner/repo, URL or @user')
         }
         value={value}
         onChange={(e) => setValue(e.target.value)}

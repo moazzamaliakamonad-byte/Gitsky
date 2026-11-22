@@ -3,18 +3,28 @@ import type { GitHubErrorKind } from '../data/github';
 import type { BundledEntry, Progress } from '../data/types';
 import type { SkyModel } from './model';
 import type { FileSymbol } from '../layout/outline';
-import type { Universe } from '../layout/universe';
+import type { UGraph, Universe, Vec3 } from '../layout/universeGraph';
 
 export interface UniverseState {
   status: 'loading' | 'ready';
-  /** Requests done / planned while loading. */
+  /** Requests done / planned while loading or expanding. */
   done: number;
   total: number;
+  /** What the universe is centred on: a repo (`owner/name`) or a person (`@login`). */
+  label: string;
+  graph?: UGraph;
+  layout?: Map<string, Vec3>;
   data?: Universe;
   /** What's selected in the universe. */
   focus: { kind: 'galaxy' | 'person'; index: number } | null;
+  /** An expansion is in flight. */
+  busy: boolean;
+  /** Only galaxies in these languages are lit (null: all). */
+  languages: string[] | null;
+  /** Branches the request budget cut from the last expansion, and when it resets. */
+  missing?: number;
+  resetAt?: number;
 }
-
 export interface ContentState {
   file: number;
   status: 'loading' | 'ready' | 'binary' | 'too-big' | 'unavailable' | 'error';

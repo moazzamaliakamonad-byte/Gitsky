@@ -37,7 +37,9 @@ touched anything in a while.
 - **Zoom into a file.** Select any star and its contents load: its functions, classes and
   headings orbit it as planets, and a code panel shows the outline and source.
 - **Zoom out to the universe.** See the people who build a repo and the other projects they
-  build, as a field of galaxies joined by filaments. Chart any of them with one click.
+  build, as a field of galaxies joined by filaments. Expand any galaxy or person and the web
+  grows; people who bridge projects glow gold; live projects burn bright, dormant ones cool.
+  Type `@username` to see a person's universe.
 - **Collide two repos.** `?repo=react/react&vs=vitejs/vite` crashes two galaxies together in a
   gravity simulation: tidal tails, bridges, a merger. Files they share are threaded with light.
 - **Understand it in 30 seconds.** A written summary, hottest files, largest files,

@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
+import { expansionCost } from '../data/universeData';
 import { colorForLanguageName } from '../layout/color';
 import { universeLabels } from '../render/universeLabels';
-import { chartGalaxy, closeUniverse } from '../state/universeActions';
+import { chartGalaxy, closeUniverse, expandFocus, toggleLanguage } from '../state/universeActions';
 import { useStore } from '../state/store';
+import { relativeTime } from './format';
 
 const fmt = (n: number) =>
   n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : n.toLocaleString();
@@ -19,7 +22,7 @@ export function UniverseLabels() {
     <div className="sys-labels">
       {data.galaxies.map((g, i) => (
         <button
-          key={g.fullName}
+          key={g.key}
           type="button"
           className={`u-label u-label--galaxy${g.home ? ' is-home' : ''}`}
           ref={(el) => {
@@ -33,15 +36,21 @@ export function UniverseLabels() {
       ))}
       {data.people.map((p, i) => (
         <button
-          key={p.login}
+          key={p.key}
           type="button"
-          className="u-label u-label--person"
+          className={`u-label u-label--person${p.bridge ? ' is-bridge' : ''}`}
           ref={(el) => {
             if (el) universeLabels.people[i] = el;
           }}
           onClick={() => focusOn('person', i)}
         >
-          <img src={`${p.avatar}&s=40`} alt="" width={18} height={18} loading="lazy" />
+          <img
+            src={`${p.avatar}${p.avatar.includes('?') ? '&' : '?'}s=40`}
+            alt=""
+            width={18}
+            height={18}
+            loading="lazy"
+          />
           <span className="mono">{p.login}</span>
         </button>
       ))}
@@ -49,20 +58,31 @@ export function UniverseLabels() {
   );
 }
 
+/** Languages present in the universe, most common first (for the filter chips). */
+function useLanguages() {
+  const data = useStore((s) => s.universe?.data);
+  return useMemo(() => {
+    const count = new Map<string, number>();
+    for (const g of data?.galaxies ?? [])
+      if (g.language) count.set(g.language, (count.get(g.language) ?? 0) + 1);
+    return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, 7);
+  }, [data]);
+}
+
 /** The panel at the bottom of the universe: what you're looking at and what you can do. */
 export function UniverseHud() {
-  const model = useStore((s) => s.model);
   const u = useStore((s) => s.universe);
-  if (!model || !u) return null;
-  const home = model.data.meta.fullName;
+  const hasToken = useStore((s) => s.hasToken);
+  const langs = useLanguages();
+  if (!u) return null;
 
   if (u.status === 'loading') {
     return (
       <section className="universe-hud panel" aria-live="polite">
-        <p className="universe-hud__title">Mapping the universe around {home}…</p>
+        <p className="universe-hud__title">Mapping the universe around {u.label}…</p>
         <p className="universe-hud__facts">
           {u.total > 0
-            ? `Asked GitHub about ${u.done} of ${u.total}: the people who build it and what else they build.`
+            ? `Asked GitHub ${u.done} of ${u.total} questions: who builds it, and what else they build.`
             : 'Finding the people who build it.'}
         </p>
         <div className="universe-hud__bar">
@@ -81,23 +101,64 @@ export function UniverseHud() {
   const f = u.focus;
   const g = f?.kind === 'galaxy' ? data.galaxies[f.index] : null;
   const p = f?.kind === 'person' ? data.people[f.index] : null;
-  const owned = p ? data.galaxies.filter((x) => x.owner === f!.index) : [];
+  const bridges = data.people.filter((x) => x.bridge).length;
+  const owned = p ? data.links.filter((l) => l.kind === 'owns' && l.person === f!.index).length : 0;
+  const works = p
+    ? data.links
+        .filter((l) => l.kind === 'contributes' && l.person === f!.index)
+        .map((l) => data.galaxies[l.galaxy].fullName)
+    : [];
+  const cost = g
+    ? expansionCost('repo', g.fullName, hasToken)
+    : p
+      ? expansionCost('user', p.login, hasToken)
+      : 0;
+  const canExpand = g ? !g.expanded : p ? !p.expanded : false;
 
   return (
     <section className="universe-hud panel" aria-label="Universe">
       <div className="universe-hud__head">
         <p className="universe-hud__title">
-          The universe around <span className="mono">{home}</span>
+          The universe around <span className="mono">{u.label}</span>
         </p>
         <button type="button" className="btn btn--accent" onClick={closeUniverse}>
           Back to the galaxy
         </button>
       </div>
       <p className="universe-hud__facts">
-        {data.people.length === 0
-          ? 'No other contributors to follow yet, so this galaxy is alone in its universe.'
-          : `${data.people.length} of its top contributors, and ${data.galaxies.length - 1} other projects they build. Galaxy size is GitHub stars; colour is the main language; filaments are who connects them.`}
+        {data.galaxies.length} projects and {data.people.length} people
+        {bridges > 0
+          ? `; ${bridges} ${bridges === 1 ? 'person bridges' : 'people bridge'} several projects (gold)`
+          : ''}
+        . Size is stars, colour is language, brightness is how recently it was pushed.
       </p>
+      {(u.missing ?? 0) > 0 && (
+        <p className="universe-hud__warn" role="status">
+          GitHub’s hourly request limit ran out, so {u.missing}{' '}
+          {u.missing === 1 ? 'branch' : 'branches'} couldn’t be loaded
+          {u.resetAt
+            ? `. More after ${new Date(u.resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
+            : ''}
+          , or add a token in Settings for 5,000 an hour.
+        </p>
+      )}
+      {langs.length > 1 && (
+        <div className="universe-hud__langs" role="group" aria-label="Show only these languages">
+          {langs.map(([lang, n]) => (
+            <button
+              key={lang}
+              type="button"
+              className="lang-chip"
+              aria-pressed={u.languages?.includes(lang) ?? false}
+              onClick={() => toggleLanguage(lang)}
+            >
+              <span className="swatch" style={{ background: colorForLanguageName(lang) }} />
+              {lang}
+              <span className="lang-chip__n mono">{n}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {g && (
         <div className="universe-card">
@@ -107,18 +168,29 @@ export function UniverseHud() {
             <p className="universe-card__meta">
               ★ {g.stars.toLocaleString()}
               {g.language ? ` · ${g.language}` : ''}
-              {!g.home && g.owner >= 0 ? ` · by ${data.people[g.owner].login}` : ''}
+              {g.pushedAt ? ` · pushed ${relativeTime(new Date(g.pushedAt).toISOString())}` : ''}
             </p>
             {g.description && <p className="universe-card__desc">{g.description}</p>}
           </div>
           <div className="universe-card__actions">
+            {canExpand && (
+              <button
+                type="button"
+                className="btn btn--ghost"
+                disabled={u.busy}
+                onClick={() => void expandFocus()}
+                title={cost ? `Uses up to ${cost} GitHub requests` : 'Already cached: free'}
+              >
+                {u.busy ? `Expanding ${u.done}/${u.total}` : 'Who builds it?'}
+              </button>
+            )}
             {!g.home && (
               <button
                 type="button"
                 className="btn btn--accent"
                 onClick={() => void chartGalaxy(g.fullName)}
               >
-                Chart this galaxy
+                Chart it
               </button>
             )}
             <a
@@ -136,19 +208,34 @@ export function UniverseHud() {
         <div className="universe-card">
           <img
             className="universe-card__avatar"
-            src={`${p.avatar}&s=80`}
+            src={`${p.avatar}${p.avatar.includes('?') ? '&' : '?'}s=80`}
             alt=""
             width={36}
             height={36}
           />
           <div className="universe-card__body">
-            <p className="universe-card__name mono">{p.login}</p>
+            <p className="universe-card__name mono">
+              {p.login}
+              {p.bridge && <span className="bridge-tag">bridge</span>}
+            </p>
             <p className="universe-card__meta">
-              {p.contributions.toLocaleString()} commits to {home}
-              {owned.length ? ` · ${owned.length} projects of their own here` : ''}
+              {p.contributions > 0 ? `${p.contributions.toLocaleString()} commits to ` : 'Builds '}
+              {works.slice(0, 3).join(', ') || `${owned} projects of their own`}
+              {works.length > 3 ? ` and ${works.length - 3} more` : ''}
             </p>
           </div>
           <div className="universe-card__actions">
+            {canExpand && (
+              <button
+                type="button"
+                className="btn btn--ghost"
+                disabled={u.busy}
+                onClick={() => void expandFocus()}
+                title={cost ? `Uses up to ${cost} GitHub requests` : 'Already cached: free'}
+              >
+                {u.busy ? `Expanding ${u.done}/${u.total}` : 'Their projects'}
+              </button>
+            )}
             <a
               className="btn btn--ghost"
               href={`https://github.com/${p.login}`}

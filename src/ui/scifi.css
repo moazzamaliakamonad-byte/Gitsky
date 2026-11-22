@@ -493,3 +493,8 @@
   gap: 18px;
   flex-wrap: wrap;
 }
+
+.viewfinder.is-panel .telemetry {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
