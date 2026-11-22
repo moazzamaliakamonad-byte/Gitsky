@@ -3,6 +3,17 @@ import type { GitHubErrorKind } from '../data/github';
 import type { BundledEntry, Progress } from '../data/types';
 import type { SkyModel } from './model';
 import type { FileSymbol } from '../layout/outline';
+import type { Universe } from '../layout/universe';
+
+export interface UniverseState {
+  status: 'loading' | 'ready';
+  /** Requests done / planned while loading. */
+  done: number;
+  total: number;
+  data?: Universe;
+  /** What's selected in the universe. */
+  focus: { kind: 'galaxy' | 'person'; index: number } | null;
+}
 
 export interface ContentState {
   file: number;
@@ -85,6 +96,8 @@ export interface AppState {
   content: ContentState | null;
   /** Index into content.outline of the symbol in focus (a planet), or -1. */
   symbol: number;
+  /** The universe of related projects and people, or null. */
+  universe: UniverseState | null;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -127,6 +140,7 @@ export const useStore = create<AppState>((set) => ({
   collision: null,
   content: null,
   symbol: -1,
+  universe: null,
 
   set: (p) => set(p),
   setModel: (m) =>
@@ -146,6 +160,12 @@ export const useStore = create<AppState>((set) => ({
       collision: null,
       content: null,
       symbol: -1,
+      universe: null,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),
 }));
+
+/** True when the home galaxy itself is on screen (not a system, collision or universe). */
+export function inGalaxyView(s: Pick<AppState, 'system' | 'collision' | 'universe'>): boolean {
+  return s.system === null && !s.collision && !s.universe;
+}

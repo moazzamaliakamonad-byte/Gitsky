@@ -16,7 +16,7 @@ const LABEL_H = 34;
 export function LabelDriver() {
   useFrame(({ camera, size }) => {
     const { model, heroOpen, warping, collision } = useStore.getState();
-    const system = collision ? -1 : useStore.getState().system;
+    const system = collision || useStore.getState().universe ? -1 : useStore.getState().system;
     const els = labelEls.current;
     if (!model) return;
 

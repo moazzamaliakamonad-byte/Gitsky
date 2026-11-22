@@ -324,3 +324,164 @@
     display: none;
   }
 }
+
+/* ---------- universe ---------------------------------------------------------- */
+
+.u-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  translate: -50% -100%;
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(4, 6, 13, 0.5);
+  color: var(--starlight);
+  font: inherit;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  transition:
+    opacity 0.25s ease,
+    border-color 0.2s ease;
+  will-change: transform;
+}
+
+.u-label[data-hot='1'] {
+  border-color: var(--hairline-strong);
+  background: rgba(10, 17, 41, 0.9);
+}
+
+.u-label.is-home {
+  font-size: 13px;
+  border-color: rgba(255, 201, 131, 0.35);
+}
+
+.u-label__stars {
+  color: var(--haze);
+}
+
+.u-label--person {
+  translate: 12px -50%;
+}
+
+.u-label--person img {
+  border-radius: 50%;
+}
+
+.universe-hud {
+  position: absolute;
+  left: 50%;
+  bottom: var(--gutter);
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 2 * var(--gutter)));
+  padding: 12px 16px 14px;
+  display: grid;
+  gap: 8px;
+  background: rgba(8, 12, 30, 0.78);
+  z-index: 5;
+  animation: system-hud-in 0.45s ease both;
+}
+
+.universe-hud__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.universe-hud__title {
+  margin: 0;
+  font-size: 14px;
+  color: var(--starlight);
+}
+
+.universe-hud__facts {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--haze);
+}
+
+.universe-hud__bar {
+  height: 2px;
+  background: var(--hairline);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.universe-hud__bar span {
+  display: block;
+  height: 100%;
+  background: #5ee0c8;
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.universe-hud__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.universe-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-s);
+  background: rgba(4, 6, 13, 0.5);
+}
+
+.universe-card .swatch {
+  margin-top: 5px;
+}
+
+.universe-card__avatar {
+  border-radius: 50%;
+}
+
+.universe-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.universe-card__name {
+  margin: 0;
+  font-size: 13px;
+  color: var(--starlight);
+  overflow-wrap: anywhere;
+}
+
+.universe-card__meta,
+.universe-card__desc {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: var(--haze);
+  line-height: 1.45;
+}
+
+.universe-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: none;
+}
+
+@media (max-width: 760px) {
+  .universe-hud {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: auto;
+    transform: none;
+  }
+  .universe-card {
+    flex-wrap: wrap;
+  }
+}

@@ -22,20 +22,31 @@ import { ShareDialog } from './ShareDialog';
 import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
 import { CollisionHud, CollisionLabels } from './CollisionUi';
 import { CodePanel, NearLabels, OrbitLabels } from './CodePanel';
+import { UniverseHud, UniverseLabels } from './UniverseUi';
+import { closeUniverse } from '../state/universeActions';
 import { watchSelection } from '../state/contentActions';
 import { warpUp } from '../state/systemActions';
 import { endCollision } from '../state/collisionActions';
+import { focusGalaxy } from './focus';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const typing =
+        e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement;
+      if (e.key === 'Home' && !typing && !e.defaultPrevented) {
+        e.preventDefault();
+        focusGalaxy();
+        return;
+      }
       if (e.key !== 'Escape' || e.defaultPrevented) return;
       const s = useStore.getState();
       if (s.panel === 'list' || s.panel === 'token' || s.panel === 'share' || s.error) return; // dialogs handle Escape
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
       else if (s.panel === 'insights') s.set({ panel: 'none' });
+      else if (s.universe) closeUniverse();
       else if (s.system !== null) warpUp();
       else if (s.collision) endCollision();
     };
@@ -50,7 +61,8 @@ export function App() {
   const inSystem = useStore((s) => s.system !== null);
   const warping = useStore((s) => s.warping);
   const colliding = useStore((s) => s.collision !== null);
-  const galaxyUi = !inSystem && !colliding;
+  const inUniverse = useStore((s) => s.universe !== null);
+  const galaxyUi = !inSystem && !colliding && !inUniverse;
   const hasContent = useStore((s) => s.content !== null);
   useEscape();
 
@@ -85,8 +97,10 @@ export function App() {
       {!heroOpen && galaxyUi && <HighlightChip />}
       {!heroOpen && galaxyUi && !warping && <Timeline />}
       {!heroOpen && colliding && <CollisionHud />}
+      {!heroOpen && inUniverse && <UniverseHud />}
+      <UniverseLabels />
       {!heroOpen && inSystem && !warping && <SystemHud />}
-      {!heroOpen && !colliding && <DetailPanel />}
+      {!heroOpen && !colliding && !inUniverse && <DetailPanel />}
       <Tooltip />
       <WarpFlash />
       <LoadingVeil />

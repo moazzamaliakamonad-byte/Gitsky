@@ -32,6 +32,10 @@ touched anything in a while.
 - **A supernova.** The most-changed file explodes when its comet lands.
 - **Warp into any folder.** It becomes a solar system: its files are planets (most-changed
   closest to the sun), its sub-folders ringed gas giants you can warp into next.
+- **Zoom into a file.** Select any star and its contents load: its functions, classes and
+  headings orbit it as planets, and a code panel shows the outline and source.
+- **Zoom out to the universe.** See the people who build a repo and the other projects they
+  build, as a field of galaxies joined by filaments. Chart any of them with one click.
 - **Collide two repos.** `?repo=react/react&vs=vitejs/vite` crashes two galaxies together in a
   gravity simulation: tidal tails, bridges, a merger. Files they share are threaded with light.
 - **Understand it in 30 seconds.** A written summary, hottest files, largest files,
@@ -66,6 +70,10 @@ There is **no Gitsky server**. The site is static files on GitHub Pages; your br
 to `api.github.com` directly. If you add a token, it stays in this browser tab's
 `sessionStorage` (gone when you close the tab) and is only ever sent to `api.github.com`.
 No analytics, no cookies.
+
+Opening a file reads it from `raw.githubusercontent.com` (no API quota). The Universe view
+asks the GitHub API about the repo's contributors and their public repos, and shows their
+public avatars from GitHub. Nothing is sent anywhere else.
 
 ## Limitations
 

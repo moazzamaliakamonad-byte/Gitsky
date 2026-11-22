@@ -249,3 +249,10 @@ export function spectrumOf(files: { path: string; size: number }[], max = 6): [s
   if (rest > 0) out.push([OTHER.color, +(rest / total).toFixed(4)]);
   return out;
 }
+
+/** A language colour from GitHub's language name ("TypeScript", "Go"…), for repos we haven't charted. */
+export function colorForLanguageName(name: string | null): string {
+  if (!name) return '#9db6ff';
+  const l = LANGUAGES.find((x) => x.name.toLowerCase() === name.toLowerCase());
+  return l?.color ?? '#9db6ff';
+}

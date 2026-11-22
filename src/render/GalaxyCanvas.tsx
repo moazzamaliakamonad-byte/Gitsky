@@ -15,6 +15,7 @@ import { NearStars } from './NearStars';
 import { Supernova } from './Supernova';
 import { SystemView } from './SystemView';
 import { CollisionView } from './CollisionView';
+import { UniverseView } from './UniverseView';
 import { WarpDriver } from './WarpDriver';
 import { WarpStreaks } from './WarpStreaks';
 import * as THREE from 'three';
@@ -79,6 +80,7 @@ export function GalaxyCanvas() {
   const reducedMotion = useStore((s) => s.reducedMotion);
   const system = useStore((s) => s.system);
   const collision = useStore((s) => s.collision);
+  const universe = useStore((s) => s.universe?.data ?? null);
   const label = model
     ? `3D galaxy of ${model.data.meta.fullName}: ${model.data.files.length.toLocaleString()} files as stars. Use the List view for an accessible table of the same data.`
     : 'A 3D galaxy is loading.';
@@ -94,7 +96,7 @@ export function GalaxyCanvas() {
       >
         <Background />
         {model && (
-          <group visible={system === null && collision === null}>
+          <group visible={system === null && collision === null && !universe}>
             <StarChart model={model} />
             <GalaxyHaze model={model} />
             <Nebulae model={model} />
@@ -110,6 +112,7 @@ export function GalaxyCanvas() {
         )}
         {model && system !== null && <SystemView key={system} model={model} folder={system} />}
         {model && collision && <CollisionView a={model} b={collision} />}
+        {universe && <UniverseView universe={universe} />}
         <WarpStreaks />
         <WarpDriver />
         <Controls />

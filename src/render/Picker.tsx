@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { clearSelection, selectFile } from '../state/selection';
-import { useStore } from '../state/store';
+import { inGalaxyView, useStore } from '../state/store';
 import { formClock } from './formClock';
 import { pickNearest } from './picking';
 import { fileOrbitState } from './fileOrbitState';
@@ -34,8 +34,7 @@ export function Picker() {
 
   const pickAt = (x: number, y: number, radius: number) => {
     const { model: mdl } = useStore.getState();
-    const { system, collision } = useStore.getState();
-    if (!mdl || formClock.value < 0.98 || system !== null || collision) return -1;
+    if (!mdl || formClock.value < 0.98 || !inGalaxyView(useStore.getState())) return -1;
     vp.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     return pickNearest(
       mdl.layout.positions,
@@ -104,7 +103,7 @@ export function Picker() {
 
   useFrame(() => {
     // Inside a system SystemView picks; in a collision nothing is pickable.
-    if (useStore.getState().system !== null || useStore.getState().collision) {
+    if (!inGalaxyView(useStore.getState())) {
       if (useStore.getState().hovered !== -1) useStore.getState().set({ hovered: -1 });
       return;
     }

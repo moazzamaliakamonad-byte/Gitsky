@@ -2,7 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import type { SkyModel } from '../state/model';
-import { useStore } from '../state/store';
+import { inGalaxyView, useStore } from '../state/store';
 import { formClock } from './formClock';
 import { starBodyFragment, starBodyVertex } from './systemShaders';
 import { NEAR, nearLabels } from './nearConfig';
@@ -79,11 +79,12 @@ export function NearStars({ model }: { model: SkyModel }) {
 
   useFrame((state) => {
     const camera = state.camera;
-    const { system, collision, content, heroOpen } = useStore.getState();
+    const st = useStore.getState();
+    const { content, heroOpen } = st;
     const im = mesh.current;
     if (!im) return;
     material.uniforms.uTime.value = state.clock.elapsedTime;
-    const active = system === null && !collision && formClock.value > 0.98;
+    const active = inGalaxyView(st) && formClock.value > 0.98;
     if (!active) {
       im.count = 0;
       nearLabels.els.forEach((el) => (el.style.opacity = '0'));

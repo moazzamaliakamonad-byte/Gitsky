@@ -20,3 +20,18 @@ export function focusFile(fileIndex: number) {
   const p = model.layout.positions;
   fly([p[fileIndex * 3], p[fileIndex * 3 + 1], p[fileIndex * 3 + 2]], 16);
 }
+
+/** Back to the whole galaxy: the overview framing, from wherever the camera is. */
+export function focusGalaxy() {
+  const { model, fly, system, collision, universe } = useStore.getState();
+  if (!model || collision) return;
+  if (universe) {
+    void import('../state/universeActions').then((m) => m.closeUniverse());
+    return;
+  }
+  if (system !== null) {
+    void import('../state/systemActions').then((m) => m.exitSystem());
+    return;
+  }
+  fly([0, 0, 0], model.layout.extent * 1.85 + 14);
+}

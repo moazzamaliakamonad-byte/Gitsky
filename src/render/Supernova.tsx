@@ -6,7 +6,7 @@ import { supernovaAt } from './supernovaMath';
 import { fxState } from './fxState';
 import { supernovaFragment, supernovaVertex } from './shaders';
 import { timelineClock } from './timelineClock';
-import { useStore } from '../state/store';
+import { inGalaxyView, useStore } from '../state/store';
 
 /** World-space radius of the fully expanded remnant. */
 const SIZE = 16;
@@ -46,8 +46,7 @@ export function Supernova({ plan, position }: { plan: SupernovaPlan; position: T
   );
 
   useFrame(({ camera }) => {
-    const { system, collision } = useStore.getState();
-    const s = system === null && !collision ? supernovaAt(plan, timelineClock.playhead) : null;
+    const s = inGalaxyView(useStore.getState()) ? supernovaAt(plan, timelineClock.playhead) : null;
     if (mesh.current) mesh.current.visible = s !== null;
     if (!s) {
       fxState.flash = 0;

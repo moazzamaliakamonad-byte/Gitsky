@@ -8,6 +8,8 @@ import { RepoInput } from './RepoInput';
 import { SearchBox } from './SearchBox';
 import { Spectrum } from './Spectrum';
 import { Wordmark } from './Wordmark';
+import { focusGalaxy } from './focus';
+import { closeUniverse, openUniverse } from '../state/universeActions';
 
 const ICONS = {
   insights: 'M3.5 16.5v-5M8.5 16.5v-9M13.5 16.5V9.5M17 4.5l-4 3-3.5-2.5L3 9',
@@ -15,6 +17,9 @@ const ICONS = {
   open: 'M10 4.5v11M4.5 10h11',
   share: 'M10 12.5V3.5M6.5 7 10 3.5 13.5 7M4.5 11v4.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11',
   collide: 'M2.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0M8.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0',
+  overview: 'M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4M10 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5',
+  universe:
+    'M10 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M4 5.5a1.2 1.2 0 1 0 0.01 0M16 4.5a1.2 1.2 0 1 0 0.01 0M15.5 15.5a1.2 1.2 0 1 0 0.01 0M4.5 15a1.2 1.2 0 1 0 0.01 0M8.4 8.6 5 6.3M11.6 8.6 15 5.4M11.7 11.3l3 3.3M8.3 11.4 5.4 14',
 };
 
 /** A HUD button: icon always, text label on wide screens (aria-label keeps it named). */
@@ -256,6 +261,9 @@ function Settings() {
             <span>
               <kbd>Esc</kbd> back
             </span>
+            <span>
+              <kbd>Home</kbd> whole galaxy
+            </span>
             <span>Drag to orbit, scroll to zoom, double-click a star to fly to it</span>
           </div>
         </div>
@@ -274,6 +282,7 @@ const SOURCE_LABEL = {
 
 /** Compact chrome once the hero is dismissed: brand, current repo, search, controls. */
 export function Hud() {
+  const inUniverse = useStore((s) => s.universe !== null);
   const model = useStore((s) => s.model);
   const panel = useStore((s) => s.panel);
   const toggle = (p: 'insights' | 'list') =>
@@ -315,6 +324,19 @@ export function Hud() {
       </div>
 
       <div className="hud__actions">
+        <HudButton
+          icon="overview"
+          label="Whole galaxy"
+          title="Whole galaxy (Home)"
+          onClick={focusGalaxy}
+        />
+        <HudButton
+          icon="universe"
+          label="Universe"
+          title="Universe: related projects and people (uses about 13 GitHub requests, cached for a day)"
+          aria-pressed={inUniverse}
+          onClick={() => (inUniverse ? closeUniverse() : void openUniverse())}
+        />
         <HudButton
           icon="insights"
           label="Insights"

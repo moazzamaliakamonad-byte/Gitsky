@@ -6,7 +6,7 @@ import { KIND_COLOR, layoutFileOrbit } from '../layout/fileOrbit';
 import type { FileSymbol } from '../layout/outline';
 import { orbitPosition } from '../layout/system';
 import type { SkyModel } from '../state/model';
-import { useStore } from '../state/store';
+import { inGalaxyView, useStore } from '../state/store';
 import { fileOrbitState } from './fileOrbitState';
 import {
   coronaFragment,
@@ -172,8 +172,9 @@ function FileOrbitScene({
 
   useFrame((state, dt) => {
     const camera = state.camera as THREE.PerspectiveCamera;
-    const { reducedMotion, pointer, system, collision } = useStore.getState();
-    const visible = system === null && !collision;
+    const st = useStore.getState();
+    const { reducedMotion, pointer } = st;
+    const visible = inGalaxyView(st);
     intro.current = Math.min(1, intro.current + dt / 0.7);
     const k = visible ? intro.current : 0;
     for (const m of Object.values(mats)) if ('uIntro' in m.uniforms) m.uniforms.uIntro.value = k;
