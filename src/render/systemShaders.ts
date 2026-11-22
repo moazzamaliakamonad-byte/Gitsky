@@ -1,6 +1,5 @@
 /**
  * GLSL for the solar-system view (a folder seen up close) and the warp between views.
- * Explained in learn/concepts/warp-and-solar-systems.md.
  */
 
 const noise3 = /* glsl */ `

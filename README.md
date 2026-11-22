@@ -107,12 +107,6 @@ Useful extras:
   `GITHUB_TOKEN` for deeper history), and `npm run snapshot:index` rebuilds the index
   without any API calls.
 
-## Learn how it's built
-
-[`learn/`](learn/README.md) is a short course written alongside the code: spiral-galaxy
-math, shaders, instanced rendering, bloom, picking, rate-limited APIs, caching, and the real
-bugs we hit along the way. Start at [learn/README.md](learn/README.md).
-
 ## Contributing
 
 Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and

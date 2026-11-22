@@ -4,8 +4,7 @@
  * point at its core, the two cores orbit each other, and every file is a massless test
  * particle pulled by both cores. Tails and bridges emerge on their own.
  *
- * Units are world units and seconds of simulation time. Explained in
- * learn/concepts/galaxy-collisions.md.
+ * Units are world units and seconds of simulation time.
  */
 export interface GalaxyInput {
   positions: Float32Array;

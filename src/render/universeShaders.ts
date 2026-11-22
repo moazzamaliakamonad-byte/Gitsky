@@ -1,6 +1,6 @@
 /**
  * GLSL for the universe view: every related project as a small spiral galaxy, people as
- * bright stars, and the filaments between them. Explained in learn/concepts/universe.md.
+ * bright stars, and the filaments between them.
  */
 
 /** A galaxy disk: one instanced quad lying in the galaxy's own (tilted) plane. */

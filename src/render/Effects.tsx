@@ -45,8 +45,7 @@ class RippleEffect extends Effect {
 }
 
 /**
- * Bloom, driven directly with pmndrs/postprocessing. Explained in
- * learn/concepts/bloom-and-postprocessing.md.
+ * Bloom, driven directly with pmndrs/postprocessing.
  *
  * Mounting this component takes over rendering: a useFrame with priority > 0 tells
  * react-three-fiber "I'll render the frame myself". Unmounting it (Low quality) hands

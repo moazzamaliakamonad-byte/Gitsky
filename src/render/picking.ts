@@ -4,7 +4,7 @@
  * Instead of casting a 3D ray, we project every star to the screen with the camera's
  * view-projection matrix and take the nearest one within `radiusPx`. For points this
  * is simpler and more forgiving than ray casting (small stars are still easy to hover),
- * and 50,000 stars take about a millisecond. See learn/concepts/picking.md.
+ * and 50,000 stars take about a millisecond.
  *
  * `m` is a column-major 4×4 matrix (three.js `Matrix4.elements`).
  */

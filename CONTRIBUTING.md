@@ -30,12 +30,9 @@ npm run build
    tested with Vitest in Node. Write the test first when you can. No browser or end-to-end
    tests: they're slow and flaky.
 3. **Performance is a feature.** The target is 60 fps on an integrated laptop GPU. No
-   per-star React components, no per-frame allocations, and measure before and after
-   (the snippet is in `learn/stories/fifty-thousand-stars-on-iris-xe.md`).
+   per-star React components, no per-frame allocations, and measure before and after.
 4. **Few dependencies.** Adding one needs a reason in `docs/DECISIONS.md`.
 5. **TypeScript strict, no `any`** without a comment explaining why.
-6. **Teach as you go.** If you add a concept, add a page to `learn/concepts/`. If you fix a
-   hard bug, write it up in `learn/stories/`.
 
 ## Where things live
 
@@ -47,6 +44,5 @@ npm run build
 | `src/ui` | React DOM: panels, search, timeline, dialogs |
 | `src/state` | zustand store and actions |
 | `scripts` | Snapshot tooling |
-| `learn` | The course |
 
 Good first issues are listed in [docs/IDEAS.md](docs/IDEAS.md).

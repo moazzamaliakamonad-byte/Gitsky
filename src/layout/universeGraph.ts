@@ -6,7 +6,6 @@
  * Layout is a small 3D force simulation (springs along edges, repulsion between every
  * pair, a gentle pull toward a disk), warm-started from the previous layout so the map
  * grows instead of reshuffling. Everything here is pure and deterministic.
- * Explained in learn/concepts/universe.md.
  */
 export type Vec3 = [number, number, number];
 

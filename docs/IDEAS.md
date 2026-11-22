@@ -17,7 +17,6 @@ self-contained.
 
 ## Medium
 - **Web Worker for `buildModel`.** Move layout off the main thread; transfer the typed arrays.
-  See `learn/stories/fifty-thousand-stars-on-iris-xe.md`.
 - **Compare two branches.** Two galaxies side by side, or one galaxy with added and removed
   stars highlighted.
 - **Author filter.** Click an author in the timeline to replay only their comets.

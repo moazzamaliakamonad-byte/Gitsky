@@ -1,5 +1,5 @@
 /**
- * Automatic quality downgrade. See learn/concepts/performance-on-integrated-gpus.md.
+ * Automatic quality downgrade.
  *
  * Every frame we add the frame time to a 1-second window. At the end of each window we
  * compute the average FPS. Two low windows in a row means a real problem, not a hiccup

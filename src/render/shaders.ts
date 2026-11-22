@@ -1,5 +1,5 @@
 /**
- * All GLSL in one place. Explained line by line in learn/concepts/shaders-101.md.
+ * All GLSL in one place.
  *
  * Per-object data arrives as attributes; per-frame values (time, animation progress)
  * as uniforms. All animation (forming, twinkle, pulse, the comet flash) happens on
@@ -393,7 +393,7 @@ void main() {
   float n = noise(p * 2.2) * 0.6 + noise(p * 5.3) * 0.4;
   col += uNebula * smoothstep(0.45, 0.9, n) * 0.22 * (1.0 - smoothstep(0.2, 1.1, r));
   // Dither to avoid banding in the dark gradient (8-bit displays), using interleaved
-  // gradient noise. (See learn/stories/the-striped-sky-that-wasnt.md for a stripe hunt.)
+  // gradient noise.
   float ign = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
   col += (ign - 0.5) / 255.0;
   gl_FragColor = vec4(col, 1.0);

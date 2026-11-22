@@ -1,5 +1,5 @@
 /**
- * Language → star colour. See learn/concepts/color-and-perception.md.
+ * Language → star colour.
  *
  * Rules we follow:
  * - Related languages share a hue family and differ in lightness (TS / TSX,

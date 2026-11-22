@@ -26,7 +26,7 @@
   the image, with the link in a comment, following each subreddit's self-promotion rules),
   **r/javascript** (on its showcase day).
 - **three.js forum**, "Showcase" category.
-- **DEV.to**: an article version of `learn/concepts/spiral-galaxy-layout-math.md`.
+- **DEV.to**: an article on the spiral-galaxy layout math.
 - **Lobsters** (needs an invite; tag `visualization`).
 
 ### Awesome lists to open PRs against (read each list's contribution rules first)

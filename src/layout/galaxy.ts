@@ -4,7 +4,7 @@ import { gauss, rand } from './random';
 import { buildFolderTree, type FolderTree } from './tree';
 
 /**
- * Tree → 3D positions. The math is explained in learn/concepts/spiral-galaxy-layout-math.md.
+ * Tree → 3D positions.
  *
  * - The root's own files form the bright core (a squashed 3D gaussian "bulge").
  * - Top-level folders sit on K logarithmic spiral arms, r = a·e^(bθ). The largest
@@ -38,7 +38,7 @@ export interface Layout {
   radius: number;
   /** 97th-percentile star distance: the visual size, ignoring a few far outliers. Use for framing. */
   extent: number;
-  /** The spiral parameters actually used, for learning/debug UI. */
+  /** The spiral parameters actually used, for debug UI. */
   spiral: { arms: number; a: number; b: number; sweep: number };
 }
 
