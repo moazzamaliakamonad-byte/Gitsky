@@ -8,6 +8,7 @@
  * Set GITHUB_TOKEN to sample more commits. Without it the script splits the
  * remaining hourly budget evenly across the repos you ask for.
  */
+import { patientFetch } from './patientFetch';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -46,29 +47,6 @@ function args() {
     else repos.push(argv[i]);
   }
   return { maxFiles, samples, repos };
-}
-
-/**
- * On a slow or flaky connection a request can drop mid-way. These are read-only GETs,
- * so retrying is safe: up to five tries, waiting a little longer each time.
- */
-async function patientFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
-  for (let attempt = 1; ; attempt++) {
-    try {
-      const res = await fetch(input, init);
-      // Read the body now, so a connection that drops mid-download is retried too.
-      const body = await res.arrayBuffer();
-      return new Response(body, {
-        status: res.status,
-        statusText: res.statusText,
-        headers: res.headers,
-      });
-    } catch (e) {
-      if (attempt >= 5) throw e;
-      console.log(`  connection dropped, retrying (${attempt}/4)`);
-      await new Promise((r) => setTimeout(r, 1500 * attempt));
-    }
-  }
 }
 
 async function main() {

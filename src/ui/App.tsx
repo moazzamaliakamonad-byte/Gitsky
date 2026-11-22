@@ -1,3 +1,5 @@
+import { DeepTimePanel } from './DeepTimePanel';
+import { closeDeepTime } from '../state/deepActions';
 import { PeoplePanel } from './PeoplePanel';
 import { constellationLabel } from '../render/constellationLabel';
 import { useEffect } from 'react';
@@ -65,6 +67,7 @@ function useEscape() {
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
       else if (s.panel === 'insights' || s.panel === 'people') s.set({ panel: 'none' });
+      else if (s.deep) closeDeepTime();
       else if (s.universe) closeUniverse();
       else if (s.system !== null) warpUp();
       else if (s.collision) endCollision();
@@ -84,6 +87,7 @@ export function App() {
   const galaxyUi = !inSystem && !colliding && !inUniverse;
   const hasContent = useStore((s) => s.content !== null);
   const drift = useStore((s) => s.drift);
+  const deep = useStore((s) => s.deep !== null);
   useEscape();
 
   useEffect(() => {
@@ -92,7 +96,7 @@ export function App() {
   useEffect(() => watchSelection(), []);
 
   return (
-    <div className={drift ? 'app app--drift' : 'app'}>
+    <div className={`app${drift ? ' app--drift' : ''}${deep ? ' app--deep' : ''}`}>
       <a
         href="#list"
         className="skip-link"
@@ -128,7 +132,7 @@ export function App() {
         />
       )}
       {!heroOpen && galaxyUi && <HighlightChip />}
-      {!heroOpen && galaxyUi && !warping && <Timeline />}
+      {!heroOpen && galaxyUi && !warping && (deep ? <DeepTimePanel /> : <Timeline />)}
       {!heroOpen && colliding && <CollisionHud />}
       {!heroOpen && inUniverse && <UniverseHud />}
       <UniverseLabels />

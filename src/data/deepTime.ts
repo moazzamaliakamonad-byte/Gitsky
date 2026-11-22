@@ -184,3 +184,8 @@ export function decodeHistory(raw: unknown): DeepHistory {
     ghosts: e.ghosts.map(([path, born, died]) => ({ path, born, died })),
   };
 }
+
+/** The `.deep.json` next to a featured sky's snapshot, if one was built. */
+export function deepFileOf(entry: { file: string }): string {
+  return entry.file.replace(/\.json$/, '.deep.json');
+}

@@ -26,6 +26,13 @@ touched anything in a while.
   `moazzamaliakamonad-byte.github.io/Gitsky` and press Enter:
   `github.com/pmndrs/zustand` becomes that repo's sky, and a profile URL opens that
   person's universe.
+- **Deep time.** Watch the galaxy form over the repo's whole life: from the first commit to
+  today, files ignite as they're born and deleted ones burn out, with a slider across the
+  years.
+- **Constellations.** Pick a contributor and their files join into a constellation, drawn in
+  their colour with their name at its heart.
+- **Drift.** Press D and the interface fades: the camera drifts through the galaxy, moving on
+  to the next featured sky every minute or so. A screensaver for a second monitor.
 - **A guided tour.** One click and the camera flies itself through the repo, explaining what
   it finds, from the largest region to the busiest file to a warp into its folder.
 - **A galaxy per repo.** Top-level folders sit on logarithmic spiral arms, biggest near the
@@ -51,7 +58,10 @@ touched anything in a while.
 - **Find anything.** Search pulses every match; Enter flies to the best one. Hover for
   details, click for a panel with recent commits and a link to the file on GitHub.
 - **Share your sky.** Export a 1200×630 poster of your current view, or copy a
-  `?repo=owner/name` link that opens straight to it.
+  `?repo=owner/name` link that opens straight to it. The Share dialog also has a README
+  badge that opens your repo's galaxy.
+- **Works offline.** After the first visit Gitsky opens instantly with no network, along
+  with every sky you've viewed. Install it as an app from the browser.
 - **Accessible.** Every control is keyboard-reachable, and a List view shows the same data
   as a sortable table. Respects reduced motion.
 - **Fast on modest hardware.** 50,000 stars at 60 fps on an Intel Iris Xe laptop GPU, with

@@ -1,3 +1,4 @@
+import { deepClock } from './deepClock';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
@@ -68,7 +69,7 @@ export function Nebulae({ model }: { model: SkyModel }) {
 
   useEffect(() => {
     // Without bloom the clouds carry more of the glow on their own.
-    material.uniforms.uStrength.value = quality === 'low' ? 0.2 : 0.15;
+    material.userData.base = quality === 'low' ? 0.2 : 0.15;
   }, [quality, material]);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
@@ -77,6 +78,8 @@ export function Nebulae({ model }: { model: SkyModel }) {
   useFrame((state) => {
     material.uniforms.uTime.value = state.clock.elapsedTime;
     material.uniforms.uForm.value = formClock.value;
+    material.uniforms.uStrength.value =
+      ((material.userData.base as number | undefined) ?? 0.15) * Math.pow(deepClock.alive, 0.8);
   });
 
   return <mesh geometry={geometry} material={material} frustumCulled={false} renderOrder={1} />;

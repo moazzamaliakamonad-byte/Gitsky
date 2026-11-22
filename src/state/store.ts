@@ -4,6 +4,7 @@ import type { BundledEntry, Progress } from '../data/types';
 import type { SkyModel } from './model';
 import type { FileSymbol } from '../layout/outline';
 import type { UGraph, Universe, Vec3 } from '../layout/universeGraph';
+import type { DeepHistory } from '../data/deepTime';
 
 export interface UniverseState {
   status: 'loading' | 'ready';
@@ -25,6 +26,17 @@ export interface UniverseState {
   missing?: number;
   resetAt?: number;
 }
+export interface DeepState {
+  status: 'loading' | 'ready';
+  /** Reading the history: moments read so far, of how many. */
+  done: number;
+  total: number;
+  history?: DeepHistory;
+  /** The whole moment the playhead is on (the fraction lives in render/deepClock.ts). */
+  epoch: number;
+  playing: boolean;
+}
+
 export interface ContentState {
   file: number;
   status: 'loading' | 'ready' | 'binary' | 'too-big' | 'unavailable' | 'error';
@@ -114,6 +126,8 @@ export interface AppState {
   tour: { step: number; total: number; caption: string; seconds: number } | null;
   /** Drift mode: no interface, a slow camera, the featured skies one after another. */
   drift: boolean;
+  /** Deep time: the galaxy forming over the repo's whole history, or null. */
+  deep: DeepState | null;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -159,6 +173,7 @@ export const useStore = create<AppState>((set) => ({
   universe: null,
   tour: null,
   drift: false,
+  deep: null,
 
   set: (p) => set(p),
   setModel: (m) =>
@@ -179,6 +194,7 @@ export const useStore = create<AppState>((set) => ({
       content: null,
       symbol: -1,
       universe: null,
+      deep: null,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),
 }));

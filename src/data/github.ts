@@ -26,6 +26,8 @@ export class GitHubError extends Error {
 export interface GitHubClient {
   /** GET a JSON resource. `path` starts with '/'. Spends one call from the budget. */
   getJson<T>(path: string): Promise<T>;
+  /** Like getJson, plus the Link header (pagination: how many pages there are). */
+  getJsonWithLink<T>(path: string): Promise<{ data: T; link: string | null }>;
   /** GET /rate_limit. Free: does not count against the limit. */
   rateLimit(): Promise<RateState>;
   readonly hasToken: boolean;
@@ -62,24 +64,33 @@ export function createGitHubClient(opts: ClientOptions): GitHubClient {
     }
   }
 
+  async function getResponse(path: string): Promise<Response> {
+    const { budget } = opts;
+    if (!budget.hasQuota(1)) {
+      throw new GitHubError(
+        'rate_limited',
+        'GitHub API limit reached for this hour.',
+        403,
+        budget.state.resetAt || undefined,
+      );
+    }
+    budget.spend(1);
+    const res = await request(path);
+    budget.updateFromHeaders((n) => res.headers.get(n));
+    if (res.ok) return res;
+    throw await toError(res);
+  }
+
   return {
     hasToken: Boolean(token),
 
     async getJson<T>(path: string): Promise<T> {
-      const { budget } = opts;
-      if (!budget.hasQuota(1)) {
-        throw new GitHubError(
-          'rate_limited',
-          'GitHub API limit reached for this hour.',
-          403,
-          budget.state.resetAt || undefined,
-        );
-      }
-      budget.spend(1);
-      const res = await request(path);
-      budget.updateFromHeaders((n) => res.headers.get(n));
-      if (res.ok) return (await res.json()) as T;
-      throw await toError(res);
+      return (await (await getResponse(path)).json()) as T;
+    },
+
+    async getJsonWithLink<T>(path: string) {
+      const res = await getResponse(path);
+      return { data: (await res.json()) as T, link: res.headers.get('link') };
     },
 
     async rateLimit(): Promise<RateState> {

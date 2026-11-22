@@ -18,8 +18,11 @@ export function buildGlow(model: SkyModel, cap: number) {
   const col = new Float32Array(count * 3);
   const size = new Float32Array(count);
   const bright = new Float32Array(count);
+  /** Which file each glow point borrows from (deep time needs its birth). */
+  const src = new Uint32Array(count);
   for (let j = 0; j < count; j++) {
     const i = Math.min(n - 1, Math.floor(rand(j, 0) * n));
+    src[j] = i;
     const sigma = Math.max(0.5, folderRadii[tree.fileFolder[i]] * 0.32);
     pos[j * 3] = positions[i * 3] + gauss(j, 1) * sigma;
     pos[j * 3 + 1] = positions[i * 3 + 1] + gauss(j, 3) * sigma * 0.35;
@@ -38,5 +41,5 @@ export function buildGlow(model: SkyModel, cap: number) {
       bright[j] = 0.1 + rand(j, 8) * 0.14;
     }
   }
-  return { count, pos, col, size, bright };
+  return { count, pos, col, size, bright, src };
 }

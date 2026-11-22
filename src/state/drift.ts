@@ -1,3 +1,4 @@
+import { closeDeepTime } from './deepActions';
 import { useStore } from './store';
 import { stopTour } from './tour';
 import { closeUniverse } from './universeActions';
@@ -13,6 +14,7 @@ export function startDrift() {
   const s = useStore.getState();
   if (s.drift) return;
   if (s.tour) stopTour();
+  if (s.deep) closeDeepTime();
   if (s.universe) closeUniverse();
   else if (s.system !== null) warpUp();
   else if (s.collision) endCollision();

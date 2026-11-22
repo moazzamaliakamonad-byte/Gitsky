@@ -15,6 +15,7 @@
     "format": "prettier --write .",
     "snapshot": "tsx scripts/snapshot.ts",
     "snapshot:index": "tsx scripts/snapshot-index.ts",
+    "snapshot:deep": "tsx scripts/snapshot-deep.ts",
     "og": "tsx scripts/og-image.ts"
   },
   "dependencies": {

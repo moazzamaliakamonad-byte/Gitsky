@@ -79,4 +79,6 @@ export interface BundledEntry {
   commitCount?: number;
   /** Language mix by bytes: [colour, fraction] pairs, biggest first. Drawn on the chip. */
   spectrum?: [string, number][];
+  /** A prebuilt deep-time history sits beside the snapshot (`*.deep.json`). */
+  deep?: boolean;
 }

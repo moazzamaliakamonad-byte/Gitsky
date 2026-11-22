@@ -1,3 +1,4 @@
+import { deepClock } from './deepClock';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
@@ -49,6 +50,7 @@ export function GalaxyHaze({ model }: { model: SkyModel }) {
 
   useFrame(() => {
     material.uniforms.uForm.value = formClock.value;
+    material.uniforms.uStrength.value = Math.pow(deepClock.alive, 0.8);
   });
 
   return <mesh geometry={geometry} material={material} frustumCulled={false} renderOrder={0} />;

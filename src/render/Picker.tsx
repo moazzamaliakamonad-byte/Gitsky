@@ -1,3 +1,4 @@
+import { deepClock, momentOf } from './deepClock';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -16,6 +17,12 @@ const lastCam = new THREE.Matrix4();
  * A click is a pointerup within 5 px and 400 ms of its pointerdown, so dragging to
  * rotate never selects anything.
  */
+function pickFilter(mask: Uint8Array | null): ((i: number) => boolean) | undefined {
+  const born = useStore.getState().deep?.history?.born;
+  if (!mask && !born) return undefined;
+  return (i) => (!mask || mask[i] === 1) && (!born || momentOf(born[i]) <= deepClock.epoch);
+}
+
 export function Picker() {
   const { gl, camera, size } = useThree();
   const pointer = useRef({ x: 0, y: 0, inside: false, dirty: false });
@@ -45,7 +52,7 @@ export function Picker() {
       x,
       y,
       radius,
-      mask ? (i) => mask[i] === 1 : undefined,
+      pickFilter(mask),
     );
   };
   const pickRef = useRef(pickAt);

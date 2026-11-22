@@ -1,3 +1,5 @@
+import { deepClock, momentOf } from './deepClock';
+import { folderBirths, type DeepHistory } from '../data/deepTime';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useStore } from '../state/store';
@@ -7,6 +9,12 @@ import { anchors } from './anchors';
 
 const v = new THREE.Vector3();
 const LABEL_H = 34;
+
+let births: { h: DeepHistory; fb: Uint8Array } | null = null;
+function birthsOf(h: DeepHistory, tree: Parameters<typeof folderBirths>[0]) {
+  if (births?.h !== h) births = { h, fb: folderBirths(tree, h.born) };
+  return births.fb;
+}
 
 /**
  * Every frame, project each labelled folder's centre to the screen and move its DOM
@@ -38,6 +46,9 @@ export function LabelDriver() {
     const selPath = sel?.kind === 'folder' ? model.layout.tree.folders[sel.index].path : null;
     const placed: [number, number, number, number][] = [];
     const centers = model.layout.folderCenters;
+    const h = useStore.getState().deep?.history;
+    const fb =
+      h && h.born.length === model.data.files.length ? birthsOf(h, model.layout.tree) : null;
 
     for (const item of els) {
       const f = item.folder;
@@ -45,6 +56,7 @@ export function LabelDriver() {
       const x = (v.x * 0.5 + 0.5) * size.width;
       const y = (-v.y * 0.5 + 0.5) * size.height;
       let visible = show && v.z < 1 && x > 8 && x < size.width - 8 && y > 70 && y < size.height - 8;
+      if (visible && fb && momentOf(fb[f]) > deepClock.epoch) visible = false;
       if (visible) {
         // Label box: anchored at the dot, text up and to the right.
         const box: [number, number, number, number] = [x - 6, y - LABEL_H, x + item.w, y + 6];

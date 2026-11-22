@@ -1,3 +1,5 @@
+import { deepClock, OFF } from './deepClock';
+import { NOW } from '../data/deepTime';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import * as THREE from 'three';
@@ -21,7 +23,10 @@ export function StarGlow({ model }: { model: SkyModel }) {
     g.setAttribute('aColor', new THREE.BufferAttribute(glow.col, 3));
     g.setAttribute('aSize', new THREE.BufferAttribute(glow.size, 1));
     g.setAttribute('aBright', new THREE.BufferAttribute(glow.bright, 1));
-    return { g, count: glow.count };
+    const born = new THREE.BufferAttribute(new Float32Array(glow.count), 1);
+    born.setUsage(THREE.DynamicDrawUsage);
+    g.setAttribute('aBorn', born);
+    return { g, count: glow.count, src: glow.src };
   }, [model, quality]);
 
   const material = useMemo(
@@ -40,6 +45,7 @@ export function StarGlow({ model }: { model: SkyModel }) {
           uGain: { value: 0.1 },
           uCamPos: { value: new THREE.Vector3() },
           uNear: { value: NEAR },
+          uEpoch: { value: OFF },
         },
       }),
     [],
@@ -47,6 +53,31 @@ export function StarGlow({ model }: { model: SkyModel }) {
 
   useEffect(() => () => geometry.g.dispose(), [geometry]);
   useEffect(() => () => material.dispose(), [material]);
+
+  // Deep time: unresolved light appears with the files it belongs to.
+  useEffect(() => {
+    const attr = geometry.g.getAttribute('aBorn') as THREE.BufferAttribute;
+    const apply = () => {
+      const h = useStore.getState().deep?.history;
+      const arr = attr.array as Float32Array;
+      if (!h || h.born.length !== model.data.files.length) arr.fill(0);
+      else {
+        const last = h.epochs.length;
+        for (let j = 0; j < arr.length; j++) {
+          const b = h.born[geometry.src[j]];
+          arr[j] = b === NOW ? last : b;
+        }
+      }
+      attr.needsUpdate = true;
+    };
+    apply();
+    return useStore.subscribe((s, prev) => {
+      if (s.deep?.history !== prev.deep?.history) apply();
+    });
+  }, [geometry, model]);
+  useFrame(() => {
+    material.uniforms.uEpoch.value = deepClock.epoch;
+  });
 
   // Each file gets the same share of glow, dimmed for dense skies faster than the stars
   // (where stars already crowd together, they are their own glow). When something is

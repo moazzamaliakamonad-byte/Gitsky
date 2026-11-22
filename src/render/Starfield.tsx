@@ -1,3 +1,5 @@
+import { deepClock, OFF } from './deepClock';
+import { NOW, type DeepHistory } from '../data/deepTime';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -41,6 +43,9 @@ export function Starfield({ model }: { model: SkyModel }) {
     const touch = new THREE.BufferAttribute(new Float32Array(n).fill(-1), 1);
     touch.setUsage(THREE.DynamicDrawUsage);
     g.setAttribute('aTouch', touch);
+    const born = new THREE.BufferAttribute(new Float32Array(n), 1);
+    born.setUsage(THREE.DynamicDrawUsage);
+    g.setAttribute('aBorn', born);
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(), model.layout.radius * 1.1);
     return g;
   }, [model]);
@@ -66,6 +71,7 @@ export function Starfield({ model }: { model: SkyModel }) {
           uExposure: { value: 1 },
           uCamPos: { value: new THREE.Vector3() },
           uNear: { value: NEAR },
+          uEpoch: { value: OFF },
         },
       }),
     [],
@@ -105,6 +111,24 @@ export function Starfield({ model }: { model: SkyModel }) {
   }, [geometry]);
   useEffect(() => () => material.dispose(), [material]);
 
+  // Deep time: each file's birth moment → aBorn (all 0 when there's no history).
+  useEffect(() => {
+    const attr = geometry.getAttribute('aBorn') as THREE.BufferAttribute;
+    const apply = (h: DeepHistory | undefined) => {
+      const arr = attr.array as Float32Array;
+      if (!h || h.born.length !== arr.length) arr.fill(0);
+      else {
+        const last = h.epochs.length;
+        for (let i = 0; i < arr.length; i++) arr[i] = h.born[i] === NOW ? last : h.born[i];
+      }
+      attr.needsUpdate = true;
+    };
+    apply(useStore.getState().deep?.history);
+    return useStore.subscribe((s, prev) => {
+      if (s.deep?.history !== prev.deep?.history) apply(s.deep?.history);
+    });
+  }, [geometry]);
+
   // Restart the forming animation for each new repo.
   useEffect(() => {
     formStart.current = null;
@@ -128,6 +152,7 @@ export function Starfield({ model }: { model: SkyModel }) {
     const t = state.clock.elapsedTime;
     material.uniforms.uTime.value = t;
     material.uniforms.uCamPos.value.copy(state.camera.position);
+    material.uniforms.uEpoch.value = deepClock.epoch;
     if (formStart.current === null) formStart.current = t;
     const form = reducedMotion ? 1 : Math.min(1, (t - formStart.current) / FORM_SECONDS);
     material.uniforms.uForm.value = form;

@@ -1,3 +1,4 @@
+import { closeDeepTime, openDeepTime } from '../state/deepActions';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { spectrumOf } from '../layout/color';
 import { openBundled } from '../state/actions';
@@ -21,6 +22,7 @@ const ICONS = {
   collide: 'M2.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0M8.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0',
   overview: 'M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4M10 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5',
   tour: 'M10 2.8a7.2 7.2 0 1 0 0.01 0M8.3 7v6l5-3z',
+  deep: 'M5.5 2.8h9M5.5 17.2h9M6.5 2.8c0 4.2 7 4.2 7 7.2s-7 3-7 7.2M13.5 2.8c0 4.2-7 4.2-7 7.2s7 3 7 7.2M8 15.5h4',
   people: 'M3.5 14.5 7 8l4.5 3.5L16.5 5M3.5 14.5h.01M7 8h.01M11.5 11.5h.01M16.5 5h.01',
   drift: 'M2.5 12.5c2.4-3.4 5-3.4 7.5 0s5.1 3.4 7.5 0M5 6.2h.01M10.5 4.2h.01M15.5 7h.01',
   universe:
@@ -288,6 +290,7 @@ function Settings() {
 /** Compact chrome once the hero is dismissed: brand, current repo, search, controls. */
 export function Hud() {
   const inUniverse = useStore((s) => s.universe !== null);
+  const inDeep = useStore((s) => s.deep !== null);
   const model = useStore((s) => s.model);
   const panel = useStore((s) => s.panel);
   const toggle = (p: 'insights' | 'people' | 'list') =>
@@ -345,6 +348,13 @@ export function Hud() {
           />
           <Collide />
           <span className="toolbar__sep" aria-hidden="true" />
+          <HudButton
+            tool
+            icon="deep"
+            label="Deep time"
+            aria-pressed={inDeep}
+            onClick={() => (inDeep ? closeDeepTime() : void openDeepTime())}
+          />
           <HudButton tool icon="tour" label="Tour" onClick={startTour} />
           <HudButton tool icon="drift" label="Drift" onClick={startDrift} />
           <span className="toolbar__sep" aria-hidden="true" />

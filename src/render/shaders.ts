@@ -49,9 +49,11 @@ uniform float uArrive;      // when, within a commit's slot, comets reach their 
 uniform float uExposure;    // < 1 for dense repos, so additive light doesn't burn to white
 uniform vec3 uCamPos;
 uniform float uNear;        // within this distance a star is drawn as a body (NearStars)
+uniform float uEpoch;       // deep time's playhead (far in the future when it's off)
 
 attribute vec3 aColor;
 attribute float aSize;
+attribute float aBorn;      // deep time: the moment this file first existed
 attribute float aBright;    // churn: 0.38 quiet … 1.0 hottest
 attribute float aSeed;      // 0..1, per-star phase
 attribute float aHighlight; // 0 dimmed, 1 normal, 2 emphasised (pulses)
@@ -91,12 +93,20 @@ void main() {
   vColor = mix(aColor, vec3(1.0, 0.86, 0.66), flash * 0.65);  // flashes warm
   vCore = hot + flash;
 
+  // Deep time: a star appears at the moment its file was born, igniting as it does.
+  float since = uEpoch - aBorn;
+  float born = smoothstep(-0.02, 0.2, since);
+  float ignite = since >= 0.0 ? exp(-since * 2.2) : 0.0;
+  vAlpha = (vAlpha + ignite * 1.4) * born;
+  vColor = mix(vColor, vec3(1.0, 0.93, 0.8), ignite * 0.55);
+  vCore += ignite;
+
   // Diffraction spikes, like a telescope photo: the hottest and the very largest files.
   vSpike = max(aSpike, flash * 0.8) * step(0.5, aHighlight) * step(aHighlight, 2.5) * p;
   vSpriteScale = 1.0 + 2.2 * vSpike;
 
   // --- size --------------------------------------------------------------------------
-  float sizeBoost = 1.0 + 0.35 * hot + flash * 1.2 + (aHighlight > 1.5 ? 0.8 : 0.0);
+  float sizeBoost = 1.0 + 0.35 * hot + flash * 1.2 + ignite + (aHighlight > 1.5 ? 0.8 : 0.0);
   float want = aSize * 1.3 * sizeBoost * uScale / max(-mv.z, 0.001) * uPixelRatio;
   // Energy-conserving sprites: a star too small to draw a smooth profile is drawn at the
   // smallest smooth footprint but dimmer by the area it lost. Distance reads as faintness,
@@ -451,9 +461,11 @@ uniform float uPixelRatio;
 uniform float uGain;
 uniform vec3 uCamPos;
 uniform float uNear;
+uniform float uEpoch;
 attribute vec3 aColor;
 attribute float aSize;
 attribute float aBright;
+attribute float aBorn;
 varying vec3 vColor;
 varying float vAlpha;
 
@@ -470,7 +482,8 @@ void main() {
   float fit = min(glarePx(want, minPx), 18.0 * uPixelRatio);
   float gain = want < minPx ? pow(want / minPx, 1.2) : min(pow(want / fit, 1.0), 2.0);
   vAlpha = aBright * uGain * gain * smoothstep(0.2, 0.7, p)
-         * smoothstep(uNear * 0.4, uNear * 1.2, length(pos - uCamPos));
+         * smoothstep(uNear * 0.4, uNear * 1.2, length(pos - uCamPos))
+         * smoothstep(-0.02, 0.35, uEpoch - aBorn);
   vColor = aColor;
   gl_PointSize = fit;
 }

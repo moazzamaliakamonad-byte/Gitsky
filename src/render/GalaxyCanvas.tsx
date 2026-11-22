@@ -1,3 +1,5 @@
+import { DeepDriver } from './DeepDriver';
+import { DeepGhosts } from './DeepGhosts';
 import { Constellation } from './Constellation';
 import { DriftDriver } from './DriftDriver';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -83,6 +85,7 @@ export function GalaxyCanvas() {
   const system = useStore((s) => s.system);
   const collision = useStore((s) => s.collision);
   const universe = useStore((s) => s.universe?.data ?? null);
+  const deepHistory = useStore((s) => s.deep?.history ?? null);
   const label = model
     ? `3D galaxy of ${model.data.meta.fullName}: ${model.data.files.length.toLocaleString()} files as stars. Use the List view for an accessible table of the same data.`
     : 'A 3D galaxy is loading.';
@@ -107,6 +110,7 @@ export function GalaxyCanvas() {
             <NearStars model={model} />
             <Starfield model={model} />
             <Constellation model={model} />
+            {deepHistory && <DeepGhosts model={model} history={deepHistory} />}
             {!reducedMotion && <Comets model={model} />}
             {!reducedMotion && model.supernova && (
               <Supernova plan={model.supernova} position={supernovaPosition(model)} />
@@ -120,6 +124,7 @@ export function GalaxyCanvas() {
         <WarpDriver />
         <Controls />
         <DriftDriver />
+        <DeepDriver />
         {quality === 'high' && <Effects />}
         <TimelineDriver />
         <Picker />

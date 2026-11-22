@@ -1,3 +1,4 @@
+import { deepClock, momentOf } from './deepClock';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
@@ -121,8 +122,10 @@ export function NearStars({ model }: { model: SkyModel }) {
     const fade = geometry.getAttribute('aFade') as THREE.InstancedBufferAttribute;
     let k = 0;
     const p = model.layout.positions;
+    const deepBorn = st.deep?.history?.born;
+    const unborn = (i: number) => deepBorn !== undefined && momentOf(deepBorn[i]) > deepClock.epoch;
     for (const { i, d } of found.current) {
-      if (i === resolved) continue;
+      if (i === resolved || unborn(i)) continue;
       const f = 1 - THREE.MathUtils.smoothstep(d, NEAR * 0.55, NEAR);
       if (f <= 0.01) continue;
       // True to scale against the gaps between stars: a small, intensely bright core whose
@@ -145,7 +148,7 @@ export function NearStars({ model }: { model: SkyModel }) {
     let slot = 0;
     for (const { i, d } of found.current) {
       if (slot >= MAX_LABELS || heroOpen) break;
-      if (i === resolved) continue;
+      if (i === resolved || unborn(i)) continue;
       v.set(p[i * 3], p[i * 3 + 1], p[i * 3 + 2]).project(camera);
       if (v.z >= 1 || Math.abs(v.x) > 0.95 || Math.abs(v.y) > 0.9) continue;
       const el = nearLabels.els[slot];

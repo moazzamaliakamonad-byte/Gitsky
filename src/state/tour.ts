@@ -1,3 +1,4 @@
+import { closeDeepTime } from './deepActions';
 import { START } from '../render/timeline';
 import { timelineClock } from '../render/timelineClock';
 import { focusGalaxy } from '../ui/focus';
@@ -39,6 +40,7 @@ function apply(a: TourAction) {
 
 /** Start the guided tour of the current repo (from the galaxy view). */
 export function startTour() {
+  if (useStore.getState().deep) closeDeepTime();
   const s = useStore.getState();
   if (!s.model) return;
   stopTour();

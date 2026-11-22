@@ -1050,3 +1050,79 @@
     flex: 1;
   }
 }
+
+/* ---------- deep time ------------------------------------------------------------- */
+
+.deep .timeline__head {
+  gap: 12px;
+}
+
+.deep__when {
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  min-width: 7.5em;
+}
+
+.deep__count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--haze);
+}
+
+.deep__close {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--haze);
+  font-size: 18px;
+  line-height: 1;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.deep__close:hover,
+.deep__close:focus-visible {
+  color: var(--starlight);
+  border-color: var(--tele-dim);
+}
+
+.deep .timeline__ticks span {
+  color: var(--tele);
+}
+
+.deep .timeline__ticks span:last-child {
+  color: var(--arcturus);
+}
+
+.deep__ends {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--dim);
+}
+
+.deep__progress {
+  height: 3px;
+  margin: 6px 0 4px;
+  background: var(--tele-faint);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.deep__progress span {
+  display: block;
+  height: 100%;
+  background: var(--tele);
+  box-shadow: 0 0 10px var(--tele);
+  transition: width 0.4s ease;
+}
+
+/* In deep time a folder's file count would be today's, not the moment's: leave it out. */
+.app--deep .flabel__count {
+  display: none;
+}
