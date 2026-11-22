@@ -22,6 +22,7 @@ const ICONS = {
   collide: 'M2.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0M8.5 10a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0',
   overview: 'M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4M10 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5',
   tour: 'M10 2.8a7.2 7.2 0 1 0 0.01 0M8.3 7v6l5-3z',
+  people: 'M3.5 14.5 7 8l4.5 3.5L16.5 5M3.5 14.5h.01M7 8h.01M11.5 11.5h.01M16.5 5h.01',
   drift: 'M2.5 12.5c2.4-3.4 5-3.4 7.5 0s5.1 3.4 7.5 0M5 6.2h.01M10.5 4.2h.01M15.5 7h.01',
   universe:
     'M10 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M4 5.5a1.2 1.2 0 1 0 0.01 0M16 4.5a1.2 1.2 0 1 0 0.01 0M15.5 15.5a1.2 1.2 0 1 0 0.01 0M4.5 15a1.2 1.2 0 1 0 0.01 0M8.4 8.6 5 6.3M11.6 8.6 15 5.4M11.7 11.3l3 3.3M8.3 11.4 5.4 14',
@@ -271,7 +272,7 @@ export function Hud() {
   const inUniverse = useStore((s) => s.universe !== null);
   const model = useStore((s) => s.model);
   const panel = useStore((s) => s.panel);
-  const toggle = (p: 'insights' | 'list') =>
+  const toggle = (p: 'insights' | 'people' | 'list') =>
     useStore.getState().set({ panel: panel === p ? 'none' : p });
   const meta = model?.data.meta;
   const spectrum = useMemo(() => (model ? spectrumOf(model.data.files) : []), [model]);
@@ -315,6 +316,12 @@ export function Hud() {
           label="Universe"
           aria-pressed={inUniverse}
           onClick={() => (inUniverse ? closeUniverse() : void openUniverse())}
+        />
+        <HudButton
+          icon="people"
+          label="People"
+          aria-pressed={panel === 'people'}
+          onClick={() => toggle('people')}
         />
         <HudButton
           icon="insights"

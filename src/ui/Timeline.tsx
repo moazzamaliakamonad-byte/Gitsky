@@ -1,3 +1,4 @@
+import { showPerson } from '../state/people';
 import { useEffect, useMemo, useRef } from 'react';
 import { authorColor } from '../render/cometMath';
 import { ARRIVE } from '../render/timeline';
@@ -127,7 +128,13 @@ export function Timeline() {
               {current.message}
             </a>
             <span className="timeline__meta">
-              <span className="mono">{current.author}</span>
+              <button
+                type="button"
+                className="timeline__author mono"
+                onClick={() => showPerson(current.author)}
+              >
+                {current.author}
+              </button>
               <span>{relativeTime(current.date)}</span>
               <span>
                 {current.changedCount} file{current.changedCount === 1 ? '' : 's'}

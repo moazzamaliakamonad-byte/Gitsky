@@ -42,6 +42,8 @@ export interface Highlight {
   reason: 'search' | 'folder' | 'language' | 'author' | 'insight';
   label: string;
   indices: number[];
+  /** An author highlight drawn as that person's constellation. */
+  person?: string;
 }
 
 export interface AppError {
@@ -93,7 +95,7 @@ export interface AppState {
   commitIndex: number;
   playing: boolean;
 
-  panel: 'none' | 'insights' | 'list' | 'token' | 'share';
+  panel: 'none' | 'insights' | 'people' | 'list' | 'token' | 'share';
   hasToken: boolean;
 
   /** The folder being viewed up close as a solar system, or null for the galaxy. */

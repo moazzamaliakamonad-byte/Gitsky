@@ -697,3 +697,137 @@
     opacity: 0.6;
   }
 }
+
+/* ---------- constellations: the People panel ---------------------------------------- */
+
+.people {
+  position: absolute;
+  left: var(--gutter);
+  top: calc(var(--gutter) + 58px);
+  max-height: calc(100% - 2 * var(--gutter) - 58px);
+  width: min(300px, calc(100vw - 2 * var(--gutter)));
+  padding: 16px 12px 12px;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  background: rgba(8, 12, 30, 0.82);
+}
+
+.people .insights__head {
+  padding-left: 4px;
+}
+
+.people__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.people__list button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 8px;
+  text-align: left;
+  color: var(--starlight);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.people__list button:hover,
+.people__list button:focus-visible {
+  background: var(--tele-faint);
+}
+
+.people__list button[aria-pressed='true'] {
+  border-color: var(--tele-dim);
+  background: rgba(94, 224, 200, 0.07);
+}
+
+.people__avatar {
+  grid-row: span 2;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid;
+  object-fit: cover;
+  background: var(--panel-solid);
+}
+
+.people__avatar--initial {
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.people__name {
+  overflow: hidden;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.people__meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--haze);
+}
+
+.people__line {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+.people__empty {
+  padding: 0 4px;
+  color: var(--haze);
+  font-size: 13px;
+}
+
+/* The person's name at the heart of their constellation. */
+.constellation-name {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  margin: -9px 0 0 14px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 12px rgba(4, 6, 13, 0.95),
+    0 0 3px rgba(4, 6, 13, 0.9);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.timeline__author {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 1px dotted var(--tele-dim);
+  cursor: pointer;
+}
+
+.timeline__author:hover,
+.timeline__author:focus-visible {
+  color: var(--tele);
+}

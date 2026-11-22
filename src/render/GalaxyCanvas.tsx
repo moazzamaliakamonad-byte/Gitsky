@@ -1,3 +1,4 @@
+import { Constellation } from './Constellation';
 import { DriftDriver } from './DriftDriver';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
@@ -105,6 +106,7 @@ export function GalaxyCanvas() {
             <FileOrbit model={model} />
             <NearStars model={model} />
             <Starfield model={model} />
+            <Constellation model={model} />
             {!reducedMotion && <Comets model={model} />}
             {!reducedMotion && model.supernova && (
               <Supernova plan={model.supernova} position={supernovaPosition(model)} />

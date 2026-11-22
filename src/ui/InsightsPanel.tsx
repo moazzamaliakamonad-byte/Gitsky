@@ -1,7 +1,7 @@
+import { flyToSet, showPerson } from '../state/people';
 import { useMemo } from 'react';
 import { authorColor } from '../render/cometMath';
 import { computeInsights } from '../layout/insights';
-import type { SkyModel } from '../state/model';
 import { selectFile, selectFolder, setHighlight } from '../state/selection';
 import { useStore } from '../state/store';
 import { formatBytes, splitPath } from './format';
@@ -17,30 +17,11 @@ function Bar({ value, max, color }: { value: number; max: number; color: string 
   );
 }
 
-/** Fly to the centre of a set of stars, far enough back to frame them. */
-function flyToSet(model: SkyModel, indices: number[]) {
-  if (indices.length === 0) return;
-  const p = model.layout.positions;
-  let x = 0;
-  let y = 0;
-  let z = 0;
-  for (const i of indices) {
-    x += p[i * 3];
-    y += p[i * 3 + 1];
-    z += p[i * 3 + 2];
-  }
-  const k = indices.length;
-  const c: [number, number, number] = [x / k, y / k, z / k];
-  let r = 0;
-  for (const i of indices) r = Math.max(r, Math.hypot(p[i * 3] - c[0], p[i * 3 + 2] - c[2]));
-  useStore.getState().fly(c, Math.max(18, Math.min(r * 1.6, model.layout.extent * 2.2)));
-}
-
 export function InsightsPanel() {
   const model = useStore((s) => s.model);
   const insights = useMemo(() => (model ? computeInsights(model) : null), [model]);
   if (!model || !insights) return null;
-  const { files, commits } = model.data;
+  const { files } = model.data;
   const { tree } = model.layout;
   const close = () => useStore.getState().set({ panel: 'none' });
 
@@ -51,14 +32,7 @@ export function InsightsPanel() {
     setHighlight({ reason: 'language', label: `${name} files`, indices });
     flyToSet(model, indices);
   };
-  const highlightAuthor = (name: string) => {
-    const set = new Set<number>();
-    for (const c of commits) if (c.author === name) for (const i of c.files) set.add(i);
-    const indices = [...set];
-    useStore.getState().set({ selection: null });
-    setHighlight({ reason: 'author', label: `Touched by ${name}`, indices });
-    flyToSet(model, indices);
-  };
+  const highlightAuthor = (name: string) => showPerson(name);
 
   return (
     <aside className="insights panel" aria-labelledby="insights-title">

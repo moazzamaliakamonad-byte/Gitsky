@@ -1,3 +1,5 @@
+import { PeoplePanel } from './PeoplePanel';
+import { constellationLabel } from '../render/constellationLabel';
 import { useEffect } from 'react';
 import { GalaxyCanvas } from '../render/GalaxyCanvas';
 import { boot } from '../state/actions';
@@ -62,7 +64,7 @@ function useEscape() {
       if (s.panel === 'list' || s.panel === 'token' || s.panel === 'share' || s.error) return; // dialogs handle Escape
       if (s.selection) clearSelection();
       else if (s.highlight) setHighlight(null);
-      else if (s.panel === 'insights') s.set({ panel: 'none' });
+      else if (s.panel === 'insights' || s.panel === 'people') s.set({ panel: 'none' });
       else if (s.universe) closeUniverse();
       else if (s.system !== null) warpUp();
       else if (s.collision) endCollision();
@@ -108,11 +110,23 @@ export function App() {
       <SystemLabels />
       <ViewportFrame />
       {heroOpen ? <Hero /> : <Hud />}
-      {!heroOpen && galaxyUi && panel !== 'insights' && !hasContent && <Legend />}
+      {!heroOpen && galaxyUi && panel !== 'insights' && panel !== 'people' && !hasContent && (
+        <Legend />
+      )}
       {!heroOpen && galaxyUi && panel !== 'insights' && hasContent && <CodePanel />}
       {galaxyUi && <OrbitLabels />}
       {galaxyUi && <NearLabels />}
       {!heroOpen && panel === 'insights' && <InsightsPanel />}
+      {!heroOpen && galaxyUi && panel === 'people' && <PeoplePanel />}
+      {galaxyUi && (
+        <span
+          className="constellation-name mono"
+          aria-hidden="true"
+          ref={(el) => {
+            constellationLabel.el = el;
+          }}
+        />
+      )}
       {!heroOpen && galaxyUi && <HighlightChip />}
       {!heroOpen && galaxyUi && !warping && <Timeline />}
       {!heroOpen && colliding && <CollisionHud />}
