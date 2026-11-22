@@ -37,7 +37,7 @@ function sectorAt(x: number, y: number, z: number): string {
 /**
  * The viewfinder around the sky: corner brackets, edge rulers, and a telemetry readout
  * of real values: the sector (nearest folder to where you're looking), range from the
- * galactic core, heading and elevation of the camera, and frame rate. Pointer-transparent.
+ * galactic core, and the camera's heading and elevation. Pointer-transparent.
  */
 export function ViewportFrame() {
   const heroOpen = useStore((st) => st.heroOpen);
@@ -46,16 +46,12 @@ export function ViewportFrame() {
   const sector = useRef<HTMLSpanElement>(null);
   const range = useRef<HTMLSpanElement>(null);
   const heading = useRef<HTMLSpanElement>(null);
-  const fps = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     let raf = 0;
     let lastSector = 0;
-    let frames = 0;
-    let lastFps = performance.now();
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
-      frames++;
       const controls = controlsRef.current;
       const s = useStore.getState();
       if (!controls || !s.model) return;
@@ -82,11 +78,6 @@ export function ViewportFrame() {
         sector.current.textContent = mode;
         sector.current.title = mode;
       }
-      if (now - lastFps > 1000 && fps.current) {
-        fps.current.textContent = `FPS ${Math.round((frames * 1000) / (now - lastFps))}  DPR ${s.dpr.toFixed(2)}`;
-        frames = 0;
-        lastFps = now;
-      }
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
@@ -107,7 +98,6 @@ export function ViewportFrame() {
         <span ref={sector} className="telemetry__sector" />
         <span ref={range} />
         <span ref={heading} />
-        <span ref={fps} />
       </div>
     </div>
   );

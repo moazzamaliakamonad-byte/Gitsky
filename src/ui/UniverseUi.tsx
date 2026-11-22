@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { expansionCost } from '../data/universeData';
 import { colorForLanguageName } from '../layout/color';
 import { universeLabels } from '../render/universeLabels';
 import { chartGalaxy, closeUniverse, expandFocus, toggleLanguage } from '../state/universeActions';
@@ -72,7 +71,6 @@ function useLanguages() {
 /** The panel at the bottom of the universe: what you're looking at and what you can do. */
 export function UniverseHud() {
   const u = useStore((s) => s.universe);
-  const hasToken = useStore((s) => s.hasToken);
   const langs = useLanguages();
   if (!u) return null;
 
@@ -80,11 +78,6 @@ export function UniverseHud() {
     return (
       <section className="universe-hud panel" aria-live="polite">
         <p className="universe-hud__title">Mapping the universe around {u.label}…</p>
-        <p className="universe-hud__facts">
-          {u.total > 0
-            ? `Asked GitHub ${u.done} of ${u.total} questions: who builds it, and what else they build.`
-            : 'Finding the people who build it.'}
-        </p>
         <div className="universe-hud__bar">
           <span style={{ transform: `scaleX(${u.total ? u.done / u.total : 0.05})` }} />
         </div>
@@ -101,18 +94,12 @@ export function UniverseHud() {
   const f = u.focus;
   const g = f?.kind === 'galaxy' ? data.galaxies[f.index] : null;
   const p = f?.kind === 'person' ? data.people[f.index] : null;
-  const bridges = data.people.filter((x) => x.bridge).length;
   const owned = p ? data.links.filter((l) => l.kind === 'owns' && l.person === f!.index).length : 0;
   const works = p
     ? data.links
         .filter((l) => l.kind === 'contributes' && l.person === f!.index)
         .map((l) => data.galaxies[l.galaxy].fullName)
     : [];
-  const cost = g
-    ? expansionCost('repo', g.fullName, hasToken)
-    : p
-      ? expansionCost('user', p.login, hasToken)
-      : 0;
   const canExpand = g ? !g.expanded : p ? !p.expanded : false;
 
   return (
@@ -125,22 +112,12 @@ export function UniverseHud() {
           Back to the galaxy
         </button>
       </div>
-      <p className="universe-hud__facts">
-        {data.galaxies.length} {data.galaxies.length === 1 ? 'project' : 'projects'} and{' '}
-        {data.people.length} {data.people.length === 1 ? 'person' : 'people'}
-        {bridges > 0
-          ? `; ${bridges} ${bridges === 1 ? 'person bridges' : 'people bridge'} several projects (gold)`
-          : ''}
-        . Size is stars, colour is language, brightness is how recently it was pushed.
-      </p>
       {(u.missing ?? 0) > 0 && (
         <p className="universe-hud__warn" role="status">
-          GitHub’s hourly request limit ran out, so {u.missing}{' '}
-          {u.missing === 1 ? 'branch' : 'branches'} couldn’t be loaded
+          Some of this universe couldn’t load
           {u.resetAt
-            ? `. More after ${new Date(u.resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`
-            : ''}
-          , or add a token in Settings for 5,000 an hour.
+            ? `. Try again after ${new Date(u.resetAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}.`
+            : '.'}
         </p>
       )}
       {langs.length > 1 && (
@@ -180,7 +157,6 @@ export function UniverseHud() {
                 className="btn btn--ghost"
                 disabled={u.busy}
                 onClick={() => void expandFocus()}
-                title={cost ? `Uses up to ${cost} GitHub requests` : 'Already cached: free'}
               >
                 {u.busy ? `Expanding ${u.done}/${u.total}` : 'Who builds it?'}
               </button>
@@ -232,7 +208,6 @@ export function UniverseHud() {
                 className="btn btn--ghost"
                 disabled={u.busy}
                 onClick={() => void expandFocus()}
-                title={cost ? `Uses up to ${cost} GitHub requests` : 'Already cached: free'}
               >
                 {u.busy ? `Expanding ${u.done}/${u.total}` : 'Their projects'}
               </button>

@@ -75,15 +75,6 @@ export function SystemHud() {
   const folders = model.layout.tree.folders;
   const f = folders[system];
   const parent = f.parent > 0 ? folders[f.parent] : null;
-  const parts = [
-    sys.planets.length === 0
-      ? 'No files sit directly in this folder, so the sun has no planets'
-      : `${sys.planets.length} ${sys.planets.length === 1 ? 'file orbits' : 'files orbit'} the sun`,
-    sys.giants.length > 0 &&
-      `${sys.giants.length} sub-folder${sys.giants.length === 1 ? ' is a gas giant' : 's are gas giants'}`,
-    sys.belt && `${sys.belt.files.length.toLocaleString()} more files form the asteroid belt`,
-    sys.hiddenFolders > 0 && `${sys.hiddenFolders} smaller sub-folders aren't drawn`,
-  ].filter(Boolean);
 
   return (
     <section className="system-hud panel" aria-label={`Solar system of ${f.path}/`}>
@@ -100,11 +91,6 @@ export function SystemHud() {
           </button>
         </div>
       </div>
-      <p className="system-hud__facts">{parts.join('. ')}.</p>
-      <p className="system-hud__key">
-        Planet size is bytes and colour is language. The most-changed files orbit closest and busy
-        files glow on their night side. Click a gas giant to warp into it.
-      </p>
     </section>
   );
 }

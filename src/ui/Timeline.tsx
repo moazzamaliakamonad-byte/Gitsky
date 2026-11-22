@@ -51,7 +51,6 @@ export function Timeline() {
     // With motion, restart the commit so its comets fly again; without, show it landed.
     timelineClock.playhead = reducedMotion ? k + ARRIVE + 0.05 : k + 0.001;
   };
-  const sampleNote = model.data.sampling.withToken ? '' : ' (no token)';
 
   return (
     <section className="timeline panel" aria-label="Commit timeline">
@@ -73,13 +72,7 @@ export function Timeline() {
             </svg>
           )}
         </button>
-        <p className="timeline__title">
-          Last {n} commits
-          <span className="timeline__note">
-            sampled from the latest {model.data.sampling.listed}
-            {sampleNote}
-          </span>
-        </p>
+        <p className="timeline__title">Last {n} commits</p>
         {current && (
           <span className="timeline__pos mono">
             {commitIndex + 1}/{n}

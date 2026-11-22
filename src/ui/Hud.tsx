@@ -8,6 +8,7 @@ import { RepoInput } from './RepoInput';
 import { SearchBox } from './SearchBox';
 import { Spectrum } from './Spectrum';
 import { Wordmark } from './Wordmark';
+import { Credit } from './Credit';
 import { focusGalaxy } from './focus';
 import { closeUniverse, openUniverse } from '../state/universeActions';
 import { startTour } from '../state/tour';
@@ -183,7 +184,6 @@ function Settings() {
   const [open, setOpen] = useState(false);
   const quality = useStore((s) => s.quality);
   const hasToken = useStore((s) => s.hasToken);
-  const dpr = useStore((s) => s.dpr);
   const ref = useRef<HTMLDivElement>(null);
   const setQuality = (q: Quality) => useStore.getState().set({ quality: q, qualityLocked: true });
 
@@ -219,13 +219,7 @@ function Settings() {
       {open && (
         <div className="open-repo__pop settings panel" id="settings-pop">
           <div className="settings__row">
-            <span>
-              Render quality
-              <span className="settings__hint">
-                High adds bloom. Gitsky lowers it on its own if frames drop. Now at {dpr}× pixel
-                density.
-              </span>
-            </span>
+            <span>Quality</span>
             <div className="segmented" role="group" aria-label="Render quality">
               {(['low', 'high'] as const).map((q) => (
                 <button
@@ -240,14 +234,7 @@ function Settings() {
             </div>
           </div>
           <div className="settings__row">
-            <span>
-              GitHub token
-              <span className="settings__hint">
-                {hasToken
-                  ? 'Added for this tab: up to 300 commits per repo.'
-                  : 'Optional. Raises the limit from 60 to 5,000 requests an hour.'}
-              </span>
-            </span>
+            <span>GitHub token</span>
             <button
               type="button"
               className="btn btn--ghost"
@@ -266,21 +253,13 @@ function Settings() {
             <span>
               <kbd>Home</kbd> whole galaxy
             </span>
-            <span>Drag to orbit, scroll to zoom, double-click a star to fly to it</span>
           </div>
+          <Credit />
         </div>
       )}
     </div>
   );
 }
-
-const SOURCE_LABEL = {
-  bundled: 'Bundled snapshot',
-  network: 'Live from GitHub',
-  cache: 'Saved copy, under an hour old',
-  'stale-cache': 'Saved copy (GitHub unreachable)',
-  synthetic: 'Synthetic stress test, not a real repo',
-} as const;
 
 /** Compact chrome once the hero is dismissed: brand, current repo, search, controls. */
 export function Hud() {
@@ -313,9 +292,6 @@ export function Hud() {
             <span className="repo-tag__stats">
               <span>{model.data.files.length.toLocaleString()} files</span>
               <span>{meta.stars.toLocaleString()} stars on GitHub</span>
-              <span title={`Fetched ${new Date(model.data.fetchedAt).toLocaleString()}`}>
-                {SOURCE_LABEL[model.source]}
-              </span>
             </span>
           </div>
         )}
@@ -326,22 +302,11 @@ export function Hud() {
       </div>
 
       <div className="hud__actions">
-        <HudButton
-          icon="overview"
-          label="Whole galaxy"
-          title="Whole galaxy (Home)"
-          onClick={focusGalaxy}
-        />
-        <HudButton
-          icon="tour"
-          label="Tour"
-          title="Guided tour of this repo (about 40 seconds)"
-          onClick={startTour}
-        />
+        <HudButton icon="overview" label="Whole galaxy" onClick={focusGalaxy} />
+        <HudButton icon="tour" label="Tour" onClick={startTour} />
         <HudButton
           icon="universe"
           label="Universe"
-          title="Universe: related projects and people (uses about 13 GitHub requests, cached for a day)"
           aria-pressed={inUniverse}
           onClick={() => (inUniverse ? closeUniverse() : void openUniverse())}
         />

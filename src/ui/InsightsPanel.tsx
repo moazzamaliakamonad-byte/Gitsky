@@ -42,7 +42,6 @@ export function InsightsPanel() {
   if (!model || !insights) return null;
   const { files, commits } = model.data;
   const { tree } = model.layout;
-  const k = commits.length;
   const close = () => useStore.getState().set({ panel: 'none' });
 
   const highlightLanguage = (id: number, name: string) => {
@@ -78,9 +77,7 @@ export function InsightsPanel() {
 
       {insights.hottest.length > 0 && (
         <section className="insights__block">
-          <h3>
-            Hottest files <span>changes in the last {k} commits</span>
-          </h3>
+          <h3>Hottest files</h3>
           <ul className="irows">
             {insights.hottest.map((h) => (
               <li key={h.index}>
@@ -98,9 +95,7 @@ export function InsightsPanel() {
       )}
 
       <section className="insights__block">
-        <h3>
-          Largest files <span>in bytes, not lines</span>
-        </h3>
+        <h3>Largest files</h3>
         <ul className="irows">
           {insights.largest.map((l) => (
             <li key={l.index}>
@@ -117,9 +112,7 @@ export function InsightsPanel() {
       </section>
 
       <section className="insights__block">
-        <h3>
-          Languages <span>share of bytes</span>
-        </h3>
+        <h3>Languages</h3>
         <span className="ilangbar" aria-hidden="true">
           {insights.languages.map((l) => (
             <span key={l.id} style={{ flexGrow: l.share, background: l.color }} />
@@ -142,9 +135,7 @@ export function InsightsPanel() {
 
       {insights.quiet.length > 0 && (
         <section className="insights__block">
-          <h3>
-            Quiet zones <span>big folders unchanged in the last {k} commits</span>
-          </h3>
+          <h3>Quiet folders</h3>
           <ul className="irows">
             {insights.quiet.map((q) => (
               <li key={q.folder}>
@@ -160,9 +151,7 @@ export function InsightsPanel() {
 
       {insights.contributors.length > 0 && (
         <section className="insights__block">
-          <h3>
-            Contributors <span>commits in the sample</span>
-          </h3>
+          <h3>Contributors</h3>
           <ul className="irows">
             {insights.contributors.map((c) => (
               <li key={c.name}>
@@ -184,15 +173,6 @@ export function InsightsPanel() {
           </ul>
         </section>
       )}
-
-      <p className="insights__foot">
-        Based on {files.length.toLocaleString()} files
-        {model.data.capped
-          ? ` (a sample of ${model.data.capped.originalFileCount.toLocaleString()})`
-          : ''}
-        {k > 0 ? ` and the last ${k} of ${model.data.sampling.listed} listed commits` : ''}. Click
-        anything to find it in the sky.
-      </p>
     </aside>
   );
 }

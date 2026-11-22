@@ -6,7 +6,7 @@
 
 **Paste any public GitHub repo and explore it as a living 3D galaxy.**
 
-### [→ Open Gitsky](https://YOUR-GITHUB-USERNAME.github.io/Gitsky/)
+### [→ Open Gitsky](https://moazzamaliakamonad-byte.github.io/Gitsky/)
 
 <!-- HERO GIF: replace this line with the 6-second clip described in docs/RECORDING.md -->
 <!-- ![Gitsky: a repo forming as a spiral galaxy, comets streaking in](docs/hero.gif) -->
@@ -87,7 +87,7 @@ truncated by GitHub. The full, honest list is in [LIMITATIONS.md](LIMITATIONS.md
 ## Run it locally
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/Gitsky.git
+git clone https://github.com/moazzamaliakamonad-byte/Gitsky.git
 cd Gitsky
 npm install
 npm run dev        # http://localhost:5173
@@ -113,6 +113,10 @@ bugs we hit along the way. Start at [learn/README.md](learn/README.md).
 
 Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md), and
 [docs/IDEAS.md](docs/IDEAS.md) for good first issues.
+
+## Author
+
+Built by [@moazzamaliakamonad-byte](https://github.com/moazzamaliakamonad-byte).
 
 ## License
 

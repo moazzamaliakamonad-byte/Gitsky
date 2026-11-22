@@ -10,8 +10,8 @@ const PAGE = 200;
 const COLUMNS: { key: SortKey; label: string; numeric?: boolean; defaultDir: SortDir }[] = [
   { key: 'path', label: 'File', defaultDir: 'asc' },
   { key: 'language', label: 'Language', defaultDir: 'asc' },
-  { key: 'size', label: 'Size (bytes)', numeric: true, defaultDir: 'desc' },
-  { key: 'churn', label: 'Changes in sample', numeric: true, defaultDir: 'desc' },
+  { key: 'size', label: 'Size', numeric: true, defaultDir: 'desc' },
+  { key: 'churn', label: 'Changes', numeric: true, defaultDir: 'desc' },
 ];
 
 /**
@@ -39,7 +39,6 @@ export function ListView() {
   }, []);
 
   if (!model) return null;
-  const sampled = model.data.commits.length;
 
   const sortBy = (k: SortKey, d: SortDir) => {
     if (k === key) setDir(dir === 'asc' ? 'desc' : 'asc');
@@ -91,9 +90,6 @@ export function ListView() {
         </header>
         <p className="listview__note">
           {rows.length.toLocaleString()} of {model.data.files.length.toLocaleString()} files.
-          {sampled > 0
-            ? ` Changes are counted in the last ${sampled} sampled commits.`
-            : ' No commits were sampled.'}
         </p>
         <div className="listview__scroll">
           <table>

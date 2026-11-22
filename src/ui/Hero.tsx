@@ -3,6 +3,7 @@ import { useStore } from '../state/store';
 import { RepoInput } from './RepoInput';
 import { Spectrum } from './Spectrum';
 import { Wordmark } from './Wordmark';
+import { Credit } from './Credit';
 import { startTour } from '../state/tour';
 
 /** The caption for the sky behind the hero, written like an astronomical plate's. */
@@ -81,6 +82,7 @@ export function Hero() {
         </div>
       </section>
       <PlateCaption />
+      <Credit className="credit--hero" />
     </>
   );
 }

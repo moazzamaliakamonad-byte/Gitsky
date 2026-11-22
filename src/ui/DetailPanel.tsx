@@ -53,9 +53,7 @@ function FileView({ model, index }: { model: SkyModel; index: number }) {
         <p className="detail__phenomenon">
           <span className="detail__glyph detail__glyph--nova" aria-hidden="true" />
           <span>
-            <strong>Supernova.</strong> The most-changed file in the sample (
-            {model.supernova.touches} of {commits.length} commits). It explodes when the first of
-            those comets lands.
+            <strong>Supernova:</strong> the most-changed file.
           </span>
         </p>
       )}
@@ -209,7 +207,7 @@ function FolderView({ model, index }: { model: SkyModel; index: number }) {
 
       {stats.authors.length > 0 && (
         <section className="detail__section">
-          <h3>Who worked here, in the sample</h3>
+          <h3>Who worked here</h3>
           <p className="authors">
             {stats.authors.map((a) => (
               <span key={a.name}>

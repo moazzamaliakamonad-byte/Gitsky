@@ -111,7 +111,6 @@ export function CodePanel() {
   if (!model || !content) return null;
   const file = model.data.files[content.file];
   const { name } = splitPath(file.path);
-  const ref = (model.data.headSha || model.data.branch).slice(0, 7);
 
   return (
     <aside className="code-panel panel" aria-label={`Contents of ${name}`}>
@@ -119,7 +118,7 @@ export function CodePanel() {
         <h2 className="code-panel__title mono">{name}</h2>
         <p className="code-panel__meta">
           {content.status === 'ready'
-            ? `${lines.length.toLocaleString()} lines, ${outline.length} ${outline.length === 1 ? 'symbol' : 'symbols'} in orbit`
+            ? `${lines.length.toLocaleString()} lines`
             : content.status === 'loading'
               ? 'Opening the file…'
               : ' '}
@@ -164,11 +163,6 @@ export function CodePanel() {
       {(content.status === 'too-big' ||
         content.status === 'unavailable' ||
         content.status === 'error') && <p className="code-panel__note">{content.message}</p>}
-
-      <footer className="code-panel__foot">
-        Read from raw.githubusercontent.com at commit <span className="mono">{ref}</span>. This
-        doesn’t use your GitHub API requests.
-      </footer>
     </aside>
   );
 }

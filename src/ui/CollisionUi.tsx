@@ -1,5 +1,4 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { sharedPaths } from '../layout/collision';
 import { spectrumOf } from '../layout/color';
 import { formatBytes } from '../layout/size';
 import { collisionClock } from '../render/collisionClock';
@@ -113,17 +112,7 @@ export function CollisionHud() {
   const model = useStore((s) => s.model);
   const other = useStore((s) => s.collision);
   const { phase, progress, playing } = usePhase();
-  const shared = useMemo(
-    () => (model && other ? sharedPaths(model.data.files, other.data.files, 5000) : []),
-    [model, other],
-  );
   if (!model || !other) return null;
-  const a = model.data.files.length;
-  const b = other.data.files.length;
-  const ratio = a >= b ? a / Math.max(1, b) : b / Math.max(1, a);
-  const bigger = a >= b ? model : other;
-  const smaller = a >= b ? other : model;
-  const sample = shared.slice(0, 3).map(([i]) => model.data.files[i].path);
 
   return (
     <section className="collide-hud panel" aria-label="Galaxy collision">
@@ -132,14 +121,6 @@ export function CollisionHud() {
         <span className="collide-hud__vs" aria-hidden="true" />
         <Side m={other} i={1} />
       </div>
-      <p className="collide-hud__story">
-        {ratio >= 1.15
-          ? `${bigger.data.meta.fullName} has ${ratio.toFixed(ratio < 10 ? 1 : 0)}× the files of ${smaller.data.meta.fullName}, so it has more pull.`
-          : 'Evenly matched: both pull about equally.'}{' '}
-        {shared.length > 0
-          ? `They share ${shared.length.toLocaleString()} file ${shared.length === 1 ? 'path' : 'paths'} (${sample.join(', ')}${shared.length > 3 ? '…' : ''}), linked by threads of light as they pass.`
-          : 'They share no file paths.'}
-      </p>
       <div className="collide-hud__bar">
         <button
           type="button"
@@ -170,9 +151,6 @@ export function CollisionHud() {
           End collision
         </button>
       </div>
-      <p className="collide-hud__note">
-        A gravity simulation: mass comes from file count, and the motion is physics, not data.
-      </p>
     </section>
   );
 }

@@ -25,11 +25,6 @@ export function Legend() {
               <span className="legend__count mono">{l.count.toLocaleString()}</span>
             </li>
           ))}
-          <li className="legend__note">
-            Size is file size in bytes. Brightness is how often a file changed in the sampled
-            commits.
-            {model.supernova && ' The most-changed file goes supernova during playback.'}
-          </li>
         </ul>
       )}
     </aside>

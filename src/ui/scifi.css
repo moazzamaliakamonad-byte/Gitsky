@@ -498,3 +498,42 @@
   opacity: 0;
   transition: opacity 0.2s ease;
 }
+
+/* ---------- credit ------------------------------------------------------------------- */
+
+.credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--haze);
+  font-size: 11.5px;
+  text-decoration: none;
+}
+
+.credit svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+.credit .mono {
+  color: var(--starlight);
+}
+
+.credit:hover,
+.credit:hover .mono {
+  color: var(--tele);
+}
+
+.credit--hero {
+  position: absolute;
+  right: 28px;
+  bottom: 22px;
+  z-index: 3;
+}
+
+.settings .credit {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--hairline);
+}

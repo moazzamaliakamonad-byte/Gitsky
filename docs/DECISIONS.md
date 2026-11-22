@@ -87,3 +87,5 @@ Longer write-ups for the important ones live in `learn/decisions/`.
 | 80 | `@username` / `?user=` opens a person's universe (their projects + collaborators on their top 3). | The most shareable view: "my GitHub as a universe". |
 | 81 | Galaxy brightness, pulse and colour temperature encode last push (activity); language chips filter. | Shows at a glance which parts of the neighbourhood are alive. |
 | 82 | Every GitHub response is cached for a day; expansions report how many branches the budget cut, on the panel, with the reset time. | Expansions stay cheap; a half-loaded universe must say so rather than look complete. |
+| 83 | Interface copy is names and data only: no explanations where a label says enough, no technical detail (request counts, sampling, data sources, pixel density, fps) in front of users. Explanations live in the README and learn/. | The owner's direction; the sky and its labels carry the meaning. |
+| 84 | Credit to the author (moazzamaliakamonad-byte, linked to GitHub) on the landing page, in Settings, in the README and in the page metadata. | The owner's request. |
