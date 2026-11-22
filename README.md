@@ -15,8 +15,6 @@ Folders are star systems, files are stars, commits are comets.
 <sub>Deep time: vite's galaxy forming from its first commit in 2020 to today.</sub>
 
 [![View in Gitsky](public/badge.svg)](https://moazzamaliakamonad-byte.github.io/Gitsky/?repo=moazzamaliakamonad-byte/Gitsky)
-&nbsp;
-[![MIT license](https://img.shields.io/badge/license-MIT-0a1129?style=flat)](LICENSE)
 
 </div>
 
