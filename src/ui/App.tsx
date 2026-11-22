@@ -21,6 +21,8 @@ import { HighlightChip } from './HighlightChip';
 import { ShareDialog } from './ShareDialog';
 import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
 import { CollisionHud, CollisionLabels } from './CollisionUi';
+import { CodePanel, NearLabels, OrbitLabels } from './CodePanel';
+import { watchSelection } from '../state/contentActions';
 import { warpUp } from '../state/systemActions';
 import { endCollision } from '../state/collisionActions';
 
@@ -49,11 +51,13 @@ export function App() {
   const warping = useStore((s) => s.warping);
   const colliding = useStore((s) => s.collision !== null);
   const galaxyUi = !inSystem && !colliding;
+  const hasContent = useStore((s) => s.content !== null);
   useEscape();
 
   useEffect(() => {
     void boot();
   }, []);
+  useEffect(() => watchSelection(), []);
 
   return (
     <div className="app">
@@ -73,7 +77,10 @@ export function App() {
       <CollisionLabels />
       <SystemLabels />
       {heroOpen ? <Hero /> : <Hud />}
-      {!heroOpen && galaxyUi && panel !== 'insights' && <Legend />}
+      {!heroOpen && galaxyUi && panel !== 'insights' && !hasContent && <Legend />}
+      {!heroOpen && galaxyUi && panel !== 'insights' && hasContent && <CodePanel />}
+      {galaxyUi && <OrbitLabels />}
+      {galaxyUi && <NearLabels />}
       {!heroOpen && panel === 'insights' && <InsightsPanel />}
       {!heroOpen && galaxyUi && <HighlightChip />}
       {!heroOpen && galaxyUi && !warping && <Timeline />}

@@ -1,0 +1,284 @@
+/* ---------- code panel: a selected file's outline and source ------------------ */
+
+.code-panel {
+  position: absolute;
+  left: var(--gutter);
+  top: 84px;
+  bottom: var(--gutter);
+  width: min(420px, 31vw);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  z-index: 4;
+}
+
+.code-panel__head {
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.code-panel__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--starlight);
+  overflow-wrap: anywhere;
+}
+
+.code-panel__meta {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--haze);
+}
+
+.code-panel__note {
+  margin: 14px;
+  color: var(--haze);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.code-panel__foot {
+  padding: 8px 14px 10px;
+  border-top: 1px solid var(--hairline);
+  color: var(--dim);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.outline {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 34%;
+  overflow: auto;
+  border-bottom: 1px solid var(--hairline);
+  flex: none;
+}
+
+.outline button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--starlight);
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.outline button:hover {
+  background: rgba(157, 182, 255, 0.07);
+}
+
+.outline button.is-on {
+  background: rgba(94, 224, 200, 0.1);
+  box-shadow: inset 2px 0 0 #5ee0c8;
+}
+
+.outline button:focus-visible {
+  outline: 2px solid var(--arcturus);
+  outline-offset: -2px;
+}
+
+.outline__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.outline__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outline__kind {
+  flex: none;
+  color: var(--dim);
+  font-size: 11px;
+}
+
+.code {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: #c9d3f2;
+  tab-size: 2;
+}
+
+.code:focus-visible {
+  outline: 2px solid var(--arcturus);
+  outline-offset: -2px;
+}
+
+.code__line {
+  display: flex;
+  white-space: pre;
+  padding-right: 14px;
+}
+
+.code__line.is-on {
+  background: rgba(94, 224, 200, 0.07);
+}
+
+.code__num {
+  flex: none;
+  width: 48px;
+  padding-right: 12px;
+  text-align: right;
+  color: #45507a;
+  user-select: none;
+}
+
+.code__line.is-on .code__num {
+  color: #5ee0c8;
+}
+
+.code__text {
+  min-width: 0;
+}
+
+.t-c {
+  color: #6a769e;
+  font-style: italic;
+}
+.t-s {
+  color: #c7e07a;
+}
+.t-n {
+  color: #ffb3a1;
+}
+.t-k {
+  color: #b48cff;
+}
+
+.code__more {
+  display: block;
+  margin: 6px 14px;
+  padding: 4px 10px;
+  border: 1px dashed var(--hairline-strong);
+  border-radius: 6px;
+  background: none;
+  color: var(--haze);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.code--loading {
+  display: grid;
+  gap: 9px;
+  padding: 14px;
+}
+
+.code--loading span {
+  height: 9px;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    rgba(157, 182, 255, 0.06),
+    rgba(157, 182, 255, 0.14),
+    rgba(157, 182, 255, 0.06)
+  );
+  background-size: 200% 100%;
+  animation: code-shimmer 1.4s linear infinite;
+}
+
+@keyframes code-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* Planet names in the sky. */
+.orbit-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: 10px -50%;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(4, 6, 13, 0.7);
+  border-left: 2px solid #5ee0c8;
+  color: var(--starlight);
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.orbit-label[data-kind='class'] {
+  border-left-color: #b48cff;
+}
+.orbit-label[data-kind='type'] {
+  border-left-color: #6aa8ff;
+}
+.orbit-label[data-kind='const'] {
+  border-left-color: #c7e07a;
+}
+.orbit-label[data-kind='heading'],
+.orbit-label[data-kind='key'] {
+  border-left-color: #e9edff;
+}
+
+@media (max-width: 1240px) {
+  .code-panel {
+    bottom: 168px;
+  }
+}
+
+@media (max-width: 760px) {
+  .code-panel {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: 8px;
+    width: auto;
+    height: 46vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code--loading span {
+    animation: none;
+  }
+}
+
+/* File names on the stars nearest the camera. */
+.near-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: 9px -50%;
+  padding: 1px 6px;
+  border: 0;
+  border-radius: 3px;
+  background: rgba(4, 6, 13, 0.55);
+  color: var(--starlight);
+  font-size: 10.5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  cursor: pointer;
+}
+
+.near-label:hover {
+  background: rgba(10, 17, 41, 0.9);
+  color: #fff;
+}

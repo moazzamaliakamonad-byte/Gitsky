@@ -5,6 +5,7 @@ import type { SkyModel } from '../state/model';
 import { buildGlow, CAP } from './glow';
 import { useStore } from '../state/store';
 import { formClock } from './formClock';
+import { NEAR } from './nearConfig';
 import { densityExposure } from './exposure';
 import { glowFragment, glowVertex } from './shaders';
 
@@ -37,6 +38,8 @@ export function StarGlow({ model }: { model: SkyModel }) {
           uScale: { value: 1 },
           uPixelRatio: { value: 1 },
           uGain: { value: 0.1 },
+          uCamPos: { value: new THREE.Vector3() },
+          uNear: { value: NEAR },
         },
       }),
     [],
@@ -66,8 +69,9 @@ export function StarGlow({ model }: { model: SkyModel }) {
     material.uniforms.uPixelRatio.value = dpr;
   }, [size.height, camera, dpr, material]);
 
-  useFrame(() => {
+  useFrame((state) => {
     material.uniforms.uForm.value = formClock.value;
+    material.uniforms.uCamPos.value.copy(state.camera.position);
   });
 
   return <points geometry={geometry.g} material={material} frustumCulled={false} />;

@@ -127,6 +127,7 @@ void main() {
 
 export const planetFragment = /* glsl */ `
 uniform float uIntro;
+uniform vec3 uSun;         // where the light comes from (the system's sun)
 varying vec3 vN;
 varying vec3 vWorld;
 varying vec3 vLocal;
@@ -137,7 +138,7 @@ varying float vHeat;
 ${noise3}
 void main() {
   vec3 n = normalize(vN);
-  vec3 L = normalize(-vWorld);
+  vec3 L = normalize(uSun - vWorld);
   vec3 V = normalize(cameraPosition - vWorld);
   float ndl = dot(n, L);
   float day = smoothstep(-0.12, 0.3, ndl);
@@ -159,7 +160,8 @@ void main() {
     surface = mix(sea, ground, land);
     surface = mix(surface, vec3(0.92, 0.95, 1.0), smoothstep(0.82, 0.92, abs(p.y)) * 0.8);
   }
-  vec3 col = surface * (0.035 + 1.1 * max(ndl, 0.0) * day);
+  // A little ambient starlight, so night sides read as worlds, not holes.
+  vec3 col = surface * (0.14 + 1.05 * max(ndl, 0.0) * day);
   // Night side: busy files glow, like a planet's cities seen from orbit.
   float lights = smoothstep(0.62, 0.8, noise3(p * 26.0 + o)) * (1.0 - day) * vHeat;
   col += vec3(1.0, 0.72, 0.38) * lights * 1.4;
@@ -341,5 +343,54 @@ void main() {
   // Brightest at both ends (the files), dimmer in the middle of the span.
   float ends = 0.35 + 0.65 * pow(abs(vEnd * 2.0 - 1.0), 2.0);
   gl_FragColor = vec4(vec3(0.45, 0.95, 0.88) * ends * uOpacity, 1.0);
+}
+`;
+
+/**
+ * Nearby stars resolved into little suns (instanced spheres): boiling granulation, limb
+ * darkening, a white-hot centre and a glowing rim in the language colour. The star's
+ * glow sprite fades out over the same distance, so up close you see a body, not a blur.
+ */
+export const starBodyVertex = /* glsl */ `
+attribute vec3 aColor;
+attribute float aSeed;
+attribute float aFade;
+varying vec3 vN;
+varying vec3 vP;
+varying vec3 vWorld;
+varying vec3 vColor;
+varying float vSeed;
+varying float vFade;
+void main() {
+  vP = position;
+  vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.0);
+  vWorld = w.xyz;
+  vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
+  vColor = aColor;
+  vSeed = aSeed;
+  vFade = aFade;
+  gl_Position = projectionMatrix * viewMatrix * w;
+}
+`;
+
+export const starBodyFragment = /* glsl */ `
+uniform float uTime;
+varying vec3 vN;
+varying vec3 vP;
+varying vec3 vWorld;
+varying vec3 vColor;
+varying float vSeed;
+varying float vFade;
+${noise3}
+void main() {
+  vec3 p = normalize(vP);
+  vec3 o = vec3(vSeed * 37.0, vSeed * 11.0, vSeed * 23.0);
+  float cells = fbm3(p * 4.5 + o + vec3(0.0, uTime * 0.06, 0.0));
+  float mu = max(dot(normalize(vN), normalize(cameraPosition - vWorld)), 0.0);
+  float limb = pow(mu, 0.5);
+  vec3 hot = mix(vColor, vec3(1.0, 0.97, 0.92), 0.45);
+  vec3 col = mix(vColor * 0.9, hot, limb) * (0.7 + 0.6 * cells);
+  col += vColor * pow(1.0 - mu, 2.5) * 0.9;   // glowing rim in the language colour
+  gl_FragColor = vec4(col * 1.5 * vFade, 1.0);
 }
 `;

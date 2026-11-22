@@ -10,6 +10,8 @@ import { Starfield } from './Starfield';
 import { Nebulae } from './Nebulae';
 import { GalaxyHaze } from './GalaxyHaze';
 import { StarGlow } from './StarGlow';
+import { FileOrbit } from './FileOrbit';
+import { NearStars } from './NearStars';
 import { Supernova } from './Supernova';
 import { SystemView } from './SystemView';
 import { CollisionView } from './CollisionView';
@@ -97,6 +99,8 @@ export function GalaxyCanvas() {
             <GalaxyHaze model={model} />
             <Nebulae model={model} />
             <StarGlow model={model} />
+            <FileOrbit model={model} />
+            <NearStars model={model} />
             <Starfield model={model} />
             {!reducedMotion && <Comets model={model} />}
             {!reducedMotion && model.supernova && (

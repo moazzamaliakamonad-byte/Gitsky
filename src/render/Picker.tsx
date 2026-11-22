@@ -5,6 +5,7 @@ import { clearSelection, selectFile } from '../state/selection';
 import { useStore } from '../state/store';
 import { formClock } from './formClock';
 import { pickNearest } from './picking';
+import { fileOrbitState } from './fileOrbitState';
 
 const vp = new THREE.Matrix4();
 const lastCam = new THREE.Matrix4();
@@ -74,6 +75,10 @@ export function Picker() {
       const p = local(e);
       const moved = Math.hypot(p.x - down.current.x, p.y - down.current.y);
       if (moved > 5 || performance.now() - down.current.t > 400) return;
+      if (fileOrbitState.hover >= 0) {
+        useStore.getState().set({ symbol: fileOrbitState.hover });
+        return;
+      }
       const i = pickRef.current(p.x, p.y, e.pointerType === 'touch' ? 24 : 12);
       if (i >= 0) selectFile(i);
       else clearSelection();
@@ -109,9 +114,10 @@ export function Picker() {
     if (!p.dirty && !camMoved) return;
     lastCam.copy(camera.matrixWorld);
     p.dirty = false;
-    const i = p.inside && !isTouch ? pickAt(p.x, p.y, 12) : -1;
+    // A planet of the selected file under the pointer wins over the stars behind it.
+    const i = p.inside && !isTouch && fileOrbitState.hover < 0 ? pickAt(p.x, p.y, 12) : -1;
     if (i !== useStore.getState().hovered) useStore.getState().set({ hovered: i });
-    gl.domElement.style.cursor = i >= 0 ? 'pointer' : '';
+    gl.domElement.style.cursor = i >= 0 || fileOrbitState.hover >= 0 ? 'pointer' : '';
   });
 
   return null;

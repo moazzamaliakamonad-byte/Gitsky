@@ -2,6 +2,15 @@ import { create } from 'zustand';
 import type { GitHubErrorKind } from '../data/github';
 import type { BundledEntry, Progress } from '../data/types';
 import type { SkyModel } from './model';
+import type { FileSymbol } from '../layout/outline';
+
+export interface ContentState {
+  file: number;
+  status: 'loading' | 'ready' | 'binary' | 'too-big' | 'unavailable' | 'error';
+  text?: string;
+  outline?: FileSymbol[];
+  message?: string;
+}
 
 export type Quality = 'low' | 'high';
 
@@ -72,6 +81,10 @@ export interface AppState {
   warping: boolean;
   /** The other galaxy in a collision, or null. */
   collision: SkyModel | null;
+  /** The selected file's text and outline (its planet system), or null. */
+  content: ContentState | null;
+  /** Index into content.outline of the symbol in focus (a planet), or -1. */
+  symbol: number;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -112,6 +125,8 @@ export const useStore = create<AppState>((set) => ({
   system: null,
   warping: false,
   collision: null,
+  content: null,
+  symbol: -1,
 
   set: (p) => set(p),
   setModel: (m) =>
@@ -129,6 +144,8 @@ export const useStore = create<AppState>((set) => ({
       system: null,
       warping: false,
       collision: null,
+      content: null,
+      symbol: -1,
     })),
   fly: (target, distance) => set({ flyTo: { target, distance, id: ++flyId } }),
 }));

@@ -199,7 +199,7 @@ export function SystemView({ model, folder }: { model: SkyModel; folder: number 
     const planet = new THREE.ShaderMaterial({
       vertexShader: planetVertex,
       fragmentShader: planetFragment,
-      uniforms: { uTime: { value: 0 }, uIntro: { value: 0 } },
+      uniforms: { uTime: { value: 0 }, uIntro: { value: 0 }, uSun: { value: new THREE.Vector3() } },
     });
     const orbit = additive(orbitVertex, orbitFragment, { uIntro: { value: 0 } });
     const belt = additive(beltVertex, beltFragment, {

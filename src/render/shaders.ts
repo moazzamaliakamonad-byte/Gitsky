@@ -34,6 +34,8 @@ uniform float uTwinkle;     // 0 with reduced motion
 uniform float uPlayhead;    // fractional commit index
 uniform float uArrive;      // when, within a commit's slot, comets reach their stars
 uniform float uExposure;    // < 1 for dense repos, so additive light doesn't burn to white
+uniform vec3 uCamPos;
+uniform float uNear;        // within this distance a star is drawn as a body (NearStars)
 
 attribute vec3 aColor;
 attribute float aSize;
@@ -63,7 +65,8 @@ void main() {
   float tw = 1.0 + uTwinkle * (0.10 + 0.38 * hot) *
              sin(uTime * (0.9 + aSeed * 2.2) + aSeed * 6.2831);
 
-  float hl = aHighlight < 0.5 ? 0.1 : (aHighlight < 1.5 ? 1.0 : 1.8 + 0.6 * sin(uTime * 5.0));
+  // 0 dimmed, 1 normal, 2 emphasised (pulses), 3 resolved into a sun (FileOrbit draws it).
+  float hl = aHighlight < 0.5 ? 0.1 : (aHighlight < 1.5 ? 1.0 : (aHighlight < 2.5 ? 1.8 + 0.6 * sin(uTime * 5.0) : 0.0));
 
   // Comet flash: bright right after its comet lands, fading over ~1.5 commit slots.
   float age = uPlayhead - (aTouch + uArrive);
@@ -75,7 +78,7 @@ void main() {
   vCore = hot + flash;
 
   // Diffraction spikes, like a telescope photo: the hottest and the very largest files.
-  vSpike = max(aSpike, flash * 0.8) * step(0.5, aHighlight) * p;
+  vSpike = max(aSpike, flash * 0.8) * step(0.5, aHighlight) * step(aHighlight, 2.5) * p;
   vSpriteScale = 1.0 + 2.2 * vSpike;
 
   // --- size --------------------------------------------------------------------------
@@ -85,9 +88,14 @@ void main() {
   // smallest smooth footprint but dimmer by the area it lost. Distance reads as faintness,
   // the way a telescope sees it, instead of every far star becoming the same blocky dot.
   float minPx = 3.2 * uPixelRatio;
-  float fit = clamp(want, minPx, 72.0 * uPixelRatio);
+  float fit = clamp(want, minPx, 28.0 * uPixelRatio);
   vAlpha *= pow(want / fit, 1.4);
   vSharp = 1.0 - smoothstep(6.0, 40.0, fit / uPixelRatio);
+  // Close to the camera the star becomes a body (NearStars): its glow shrinks and fades
+  // instead of swelling into a blur.
+  float near = 1.0 - smoothstep(uNear * 0.55, uNear, length(pos - uCamPos));
+  vAlpha *= 1.0 - 0.9 * near;
+  fit = mix(fit, min(fit, 10.0 * uPixelRatio), near);
   gl_PointSize = fit * vSpriteScale;
 }
 `;
@@ -426,6 +434,8 @@ uniform float uRadius;
 uniform float uScale;
 uniform float uPixelRatio;
 uniform float uGain;
+uniform vec3 uCamPos;
+uniform float uNear;
 attribute vec3 aColor;
 attribute float aSize;
 attribute float aBright;
@@ -441,7 +451,8 @@ void main() {
   gl_Position = projectionMatrix * mv;
   float want = aSize * uScale / max(-mv.z, 0.001) * uPixelRatio;
   float fit = clamp(want, 2.4 * uPixelRatio, 28.0 * uPixelRatio);
-  vAlpha = aBright * uGain * pow(want / fit, 1.2) * smoothstep(0.2, 0.7, p);
+  vAlpha = aBright * uGain * pow(want / fit, 1.2) * smoothstep(0.2, 0.7, p)
+         * smoothstep(uNear * 0.4, uNear * 1.2, length(pos - uCamPos));
   vColor = aColor;
   gl_PointSize = fit;
 }

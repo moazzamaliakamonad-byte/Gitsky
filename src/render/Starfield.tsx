@@ -8,6 +8,7 @@ import { starFragment, starVertex } from './shaders';
 import { starsRef } from './sceneRefs';
 import { formClock } from './formClock';
 import { densityExposure } from './exposure';
+import { NEAR } from './nearConfig';
 
 const FORM_SECONDS = 2.6;
 
@@ -63,6 +64,8 @@ export function Starfield({ model }: { model: SkyModel }) {
           uArrive: { value: ARRIVE },
           uHalo: { value: 0 },
           uExposure: { value: 1 },
+          uCamPos: { value: new THREE.Vector3() },
+          uNear: { value: NEAR },
         },
       }),
     [],
@@ -82,12 +85,22 @@ export function Starfield({ model }: { model: SkyModel }) {
         const v = highlight.reason === 'folder' ? 1 : 2;
         for (const i of highlight.indices) arr[i] = v;
       }
-      if (selection?.kind === 'file') arr[selection.index] = 2;
+      if (selection?.kind === 'file') {
+        // A selected file with an outline has resolved into a sun with planets.
+        const resolved =
+          s.content?.file === selection.index && (s.content.outline?.length ?? 0) > 0;
+        arr[selection.index] = resolved ? 3 : 2;
+      }
       attr.needsUpdate = true;
     };
     apply(useStore.getState());
     return useStore.subscribe((s, prev) => {
-      if (s.highlight !== prev.highlight || s.selection !== prev.selection) apply(s);
+      if (
+        s.highlight !== prev.highlight ||
+        s.selection !== prev.selection ||
+        s.content !== prev.content
+      )
+        apply(s);
     });
   }, [geometry]);
   useEffect(() => () => material.dispose(), [material]);
@@ -114,6 +127,7 @@ export function Starfield({ model }: { model: SkyModel }) {
   useFrame((state) => {
     const t = state.clock.elapsedTime;
     material.uniforms.uTime.value = t;
+    material.uniforms.uCamPos.value.copy(state.camera.position);
     if (formStart.current === null) formStart.current = t;
     const form = reducedMotion ? 1 : Math.min(1, (t - formStart.current) / FORM_SECONDS);
     material.uniforms.uForm.value = form;
