@@ -28,9 +28,9 @@ function buildGrid(positions: Float32Array, n: number) {
 }
 
 /**
- * Close up, a star stops being a soft point of light and resolves into a small sun with
- * a surface (its glow sprite fades over the same distance in the star shader). The
- * nearest ones get their file names, crisp, as clickable labels.
+ * Close up, a star resolves into a small sun with a surface, sitting inside its own glare
+ * (the star sprite, which dims only a little). The nearest ones get their file names,
+ * crisp, as clickable labels.
  */
 export function NearStars({ model }: { model: SkyModel }) {
   const { size } = useThree();
@@ -125,7 +125,9 @@ export function NearStars({ model }: { model: SkyModel }) {
       if (i === resolved) continue;
       const f = 1 - THREE.MathUtils.smoothstep(d, NEAR * 0.55, NEAR);
       if (f <= 0.01) continue;
-      s3.setScalar(0.1 + model.sizes[i] * 0.045);
+      // True to scale against the gaps between stars: a small, intensely bright core whose
+      // glare (the star sprite) carries most of its light, not a ball crowding its neighbours.
+      s3.setScalar(0.02 + model.sizes[i] * 0.008);
       m4.compose(v.set(p[i * 3], p[i * 3 + 1], p[i * 3 + 2]), q, s3);
       im.setMatrixAt(k, m4);
       color.setXYZ(k, model.colors[i * 3], model.colors[i * 3 + 1], model.colors[i * 3 + 2]);

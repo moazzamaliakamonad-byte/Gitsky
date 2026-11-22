@@ -390,6 +390,6 @@ void main() {
   vec3 hot = mix(vColor, vec3(1.0, 0.97, 0.92), 0.45);
   vec3 col = mix(vColor * 0.9, hot, limb) * (0.7 + 0.6 * cells);
   col += vColor * pow(1.0 - mu, 2.5) * 0.9;   // glowing rim in the language colour
-  gl_FragColor = vec4(col * 1.5 * vFade, 1.0);
+  gl_FragColor = vec4(col * 2.2 * vFade, 1.0);
 }
 `;

@@ -11,6 +11,19 @@
  * everything starts collapsed in the core, swirled 2.6 rad back, and unwinds outward,
  * inner regions first. Returns the animated position; progress (0..1) goes to `p`.
  */
+/**
+ * Stars are point sources. Coming closer makes a real star brighter (light falls with the
+ * square of distance), never wider: its disc stays far below one pixel. What does widen is
+ * the glare around it, and only with the logarithm of its brightness. `linearPx` is the
+ * size a solid ball would cover on screen; its square is the light we receive.
+ */
+const pointSourceChunk = /* glsl */ `
+float glarePx(float linearPx, float minPx) {
+  float flux = max(linearPx / minPx, 1.0);
+  return minPx * (1.0 + 0.3 * log2(flux * flux));
+}
+`;
+
 const formChunk = /* glsl */ `
 vec3 formPosition(vec3 position, float uForm, float uRadius, out float p) {
   float rNorm = clamp(length(position.xz) / uRadius, 0.0, 1.0);
@@ -53,6 +66,7 @@ varying float vSpriteScale; // how much bigger the sprite is than the star's glo
 varying float vSharp;       // 0 for big close stars … 1 for pinpoints
 
 ${formChunk}
+${pointSourceChunk}
 
 void main() {
   float p;
@@ -87,15 +101,16 @@ void main() {
   // Energy-conserving sprites: a star too small to draw a smooth profile is drawn at the
   // smallest smooth footprint but dimmer by the area it lost. Distance reads as faintness,
   // the way a telescope sees it, instead of every far star becoming the same blocky dot.
+  // Closer stars stay pinpoints: the extra light goes into brightness (capped, so the
+  // film shoulder can roll it to white) and a slowly widening glare.
   float minPx = 3.2 * uPixelRatio;
-  float fit = clamp(want, minPx, 28.0 * uPixelRatio);
-  vAlpha *= pow(want / fit, 1.4);
+  float fit = min(glarePx(want, minPx), 20.0 * uPixelRatio);
+  vAlpha *= want < minPx ? pow(want / minPx, 1.4) : min(pow(want / fit, 1.1), 3.0);
   vSharp = 1.0 - smoothstep(6.0, 40.0, fit / uPixelRatio);
-  // Close to the camera the star becomes a body (NearStars): its glow shrinks and fades
-  // instead of swelling into a blur.
-  float near = 1.0 - smoothstep(uNear * 0.55, uNear, length(pos - uCamPos));
-  vAlpha *= 1.0 - 0.9 * near;
-  fit = mix(fit, min(fit, 10.0 * uPixelRatio), near);
+  // Very close, a small body (NearStars) appears inside the sprite; the sprite stays on
+  // as its glare, a little dimmer so the surface shows through.
+  float near = 1.0 - smoothstep(uNear * 0.1, uNear * 0.45, length(pos - uCamPos));
+  vAlpha *= 1.0 - 0.7 * near;
   gl_PointSize = fit * vSpriteScale;
 }
 `;
@@ -443,6 +458,7 @@ varying vec3 vColor;
 varying float vAlpha;
 
 ${formChunk}
+${pointSourceChunk}
 
 void main() {
   float p;
@@ -450,8 +466,10 @@ void main() {
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
   gl_Position = projectionMatrix * mv;
   float want = aSize * uScale / max(-mv.z, 0.001) * uPixelRatio;
-  float fit = clamp(want, 2.4 * uPixelRatio, 28.0 * uPixelRatio);
-  vAlpha = aBright * uGain * pow(want / fit, 1.2) * smoothstep(0.2, 0.7, p)
+  float minPx = 2.4 * uPixelRatio;
+  float fit = min(glarePx(want, minPx), 18.0 * uPixelRatio);
+  float gain = want < minPx ? pow(want / minPx, 1.2) : min(pow(want / fit, 1.0), 2.0);
+  vAlpha = aBright * uGain * gain * smoothstep(0.2, 0.7, p)
          * smoothstep(uNear * 0.4, uNear * 1.2, length(pos - uCamPos));
   vColor = aColor;
   gl_PointSize = fit;
