@@ -321,8 +321,6 @@
   flex-direction: column;
   gap: 12px;
   background: rgba(8, 12, 30, 0.8);
-  scrollbar-width: thin;
-  scrollbar-color: var(--hairline-strong) transparent;
 }
 
 .detail__close {

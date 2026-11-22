@@ -537,3 +537,46 @@
   padding-top: 10px;
   border-top: 1px solid var(--hairline);
 }
+
+/* ---------- scrollbars: a thin telemetry rail ---------------------------------- */
+
+/* Chromium and Safari: a slim cyan thumb in a faint track, brighter on hover. */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-track:vertical {
+  background: linear-gradient(90deg, transparent 3px, var(--tele-faint) 3px 5px, transparent 5px);
+}
+::-webkit-scrollbar-track:horizontal {
+  background: linear-gradient(180deg, transparent 3px, var(--tele-faint) 3px 5px, transparent 5px);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--tele-dim);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 1px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(94, 224, 200, 0.5);
+  box-shadow: 0 0 8px rgba(94, 224, 200, 0.45);
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--tele);
+}
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-button {
+  display: none;
+  background: transparent;
+}
+
+/* Firefox: the standard properties (setting them in Chromium would switch off the rules above). */
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tele-dim) transparent;
+  }
+}

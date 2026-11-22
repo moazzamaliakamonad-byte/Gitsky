@@ -12,8 +12,6 @@
   align-content: start;
   gap: 16px;
   background: rgba(8, 12, 30, 0.82);
-  scrollbar-width: thin;
-  scrollbar-color: var(--hairline-strong) transparent;
 }
 
 .insights__head {
@@ -248,8 +246,6 @@
   overflow: auto;
   margin: 0 -18px;
   padding: 0 18px 18px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--hairline-strong) transparent;
 }
 
 .listview table {
