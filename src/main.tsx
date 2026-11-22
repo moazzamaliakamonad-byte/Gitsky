@@ -7,6 +7,7 @@ import './ui/timeline.css';
 import './ui/insights.css';
 import './ui/system.css';
 import './ui/code.css';
+import './ui/scifi.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('Missing #root element');

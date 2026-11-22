@@ -1,0 +1,407 @@
+/* ==========================================================================
+   Console theme: the interface as a starship navigation console.
+   Cyan ("telemetry") draws the instruments; amber stays reserved for actions.
+   Loaded last, so it restyles the panels and buttons defined elsewhere.
+   ========================================================================== */
+
+:root {
+  --tele: #5ee0c8;
+  --tele-dim: rgba(94, 224, 200, 0.22);
+  --tele-faint: rgba(94, 224, 200, 0.1);
+  --chamfer: 12px;
+}
+
+/* ---------- panels: chamfered instrument plates -------------------------------- */
+
+.panel {
+  border-radius: 3px;
+  border-color: var(--tele-dim);
+  background-color: rgba(6, 11, 28, 0.74);
+  background-image:
+    /* faint scanlines */
+    repeating-linear-gradient(0deg, rgba(94, 224, 200, 0.022) 0 1px, transparent 1px 3px),
+    /* a soft light falling from the top edge */
+      linear-gradient(180deg, rgba(94, 224, 200, 0.06), transparent 38%);
+  box-shadow:
+    inset 0 1px 0 rgba(94, 224, 200, 0.16),
+    inset 0 0 24px rgba(94, 224, 200, 0.035);
+  clip-path: polygon(
+    var(--chamfer) 0,
+    100% 0,
+    100% calc(100% - var(--chamfer)),
+    calc(100% - var(--chamfer)) 100%,
+    0 100%,
+    0 var(--chamfer)
+  );
+}
+
+/* The cut corners glow; the two square corners carry small brackets. */
+.panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+        135deg,
+        transparent calc(var(--chamfer) * 0.7 - 1px),
+        var(--tele) calc(var(--chamfer) * 0.7),
+        transparent calc(var(--chamfer) * 0.7 + 1px)
+      )
+      left top / var(--chamfer) var(--chamfer) no-repeat,
+    linear-gradient(
+        315deg,
+        transparent calc(var(--chamfer) * 0.7 - 1px),
+        var(--tele) calc(var(--chamfer) * 0.7),
+        transparent calc(var(--chamfer) * 0.7 + 1px)
+      )
+      right bottom / var(--chamfer) var(--chamfer) no-repeat,
+    linear-gradient(var(--tele), var(--tele)) right top / 10px 1px no-repeat,
+    linear-gradient(var(--tele), var(--tele)) right top / 1px 10px no-repeat,
+    linear-gradient(var(--tele), var(--tele)) left bottom / 10px 1px no-repeat,
+    linear-gradient(var(--tele), var(--tele)) left bottom / 1px 10px no-repeat;
+  opacity: 0.75;
+  z-index: 1;
+}
+
+/* Dialogs laid out by their overlay need a containing block for the decoration. */
+.error-card,
+.listview,
+.share,
+.token-dialog {
+  position: relative;
+}
+
+/* ---------- buttons ------------------------------------------------------------ */
+
+.btn {
+  border-radius: 2px;
+  letter-spacing: 0.01em;
+}
+
+.btn--ghost {
+  border-color: var(--tele-dim);
+  background: rgba(94, 224, 200, 0.03);
+}
+
+.btn--ghost:hover,
+.btn--ghost[aria-pressed='true'] {
+  border-color: var(--tele);
+  color: var(--tele);
+  box-shadow:
+    0 0 0 1px rgba(94, 224, 200, 0.25),
+    0 0 18px rgba(94, 224, 200, 0.18),
+    inset 0 0 12px rgba(94, 224, 200, 0.08);
+}
+
+.btn--accent {
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.btn--accent:not(:disabled):hover {
+  box-shadow:
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    0 0 22px rgba(255, 179, 92, 0.45);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--tele);
+  outline-offset: 2px;
+}
+
+/* ---------- viewfinder: corners, rulers, telemetry ------------------------------ */
+
+.viewfinder {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.viewfinder__corner {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-color: rgba(94, 224, 200, 0.55);
+  border-style: solid;
+  border-width: 0;
+  animation: vf-corner 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.viewfinder__corner--tl {
+  left: 8px;
+  top: 8px;
+  border-left-width: 1px;
+  border-top-width: 1px;
+  --vf-from: translate(40vw, 40vh);
+}
+.viewfinder__corner--tr {
+  right: 8px;
+  top: 8px;
+  border-right-width: 1px;
+  border-top-width: 1px;
+  --vf-from: translate(-40vw, 40vh);
+}
+.viewfinder__corner--bl {
+  left: 8px;
+  bottom: 8px;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+  --vf-from: translate(40vw, -40vh);
+}
+.viewfinder__corner--br {
+  right: 8px;
+  bottom: 8px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  --vf-from: translate(-40vw, -40vh);
+}
+
+@keyframes vf-corner {
+  from {
+    transform: var(--vf-from);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+}
+
+/* Graduated rulers down both edges: a short tick every 8px, a long one every 40px. */
+.viewfinder__ruler {
+  position: absolute;
+  top: 22%;
+  bottom: 22%;
+  width: 10px;
+  background:
+    repeating-linear-gradient(180deg, rgba(94, 224, 200, 0.4) 0 1px, transparent 1px 40px) left /
+      10px 100% no-repeat,
+    repeating-linear-gradient(180deg, rgba(94, 224, 200, 0.22) 0 1px, transparent 1px 8px) left /
+      5px 100% no-repeat;
+  animation: vf-fade 1.4s 0.4s ease both;
+}
+
+.viewfinder__ruler--l {
+  left: 6px;
+}
+
+.viewfinder__ruler--r {
+  right: 6px;
+  transform: scaleX(-1);
+}
+
+@keyframes vf-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.telemetry {
+  position: absolute;
+  right: 26px;
+  bottom: 22px;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(94, 224, 200, 0.78);
+  text-shadow: 0 0 8px rgba(94, 224, 200, 0.35);
+}
+
+.telemetry span {
+  animation: vf-type 0.5s steps(6) both;
+}
+.telemetry span:nth-child(2) {
+  animation-delay: 0.6s;
+}
+.telemetry span:nth-child(3) {
+  animation-delay: 0.75s;
+}
+.telemetry span:nth-child(4) {
+  animation-delay: 0.9s;
+}
+.telemetry span:first-child {
+  animation-delay: 0.45s;
+}
+
+@keyframes vf-type {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.telemetry__sector {
+  max-width: 34vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #a8f3e4;
+}
+
+/* ---------- targeting reticle ---------------------------------------------------- */
+
+.reticle__ring {
+  position: absolute;
+  left: -30px;
+  top: -30px;
+  width: 60px;
+  height: 60px;
+  overflow: visible;
+  color: var(--tele);
+  animation: reticle-turn 14s linear infinite reverse;
+  filter: drop-shadow(0 0 3px rgba(94, 224, 200, 0.6));
+}
+
+.reticle__readout {
+  position: absolute;
+  left: 34px;
+  top: -24px;
+  padding: 2px 7px 2px 9px;
+  border-left: 1px solid var(--tele);
+  background: linear-gradient(90deg, rgba(6, 11, 28, 0.82), rgba(6, 11, 28, 0.4));
+  color: #c9fbf1;
+  font-style: normal;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.reticle__readout b {
+  display: block;
+  color: var(--tele);
+  font-weight: 400;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+/* ---------- smaller screens and reduced motion ------------------------------------ */
+
+@media (max-width: 760px) {
+  .viewfinder__ruler,
+  .telemetry {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewfinder__corner,
+  .viewfinder__ruler,
+  .telemetry span,
+  .reticle__ring {
+    animation: none;
+  }
+}
+
+/* ---------- fields: the repo input and search as console inputs -------------------- */
+
+.repo-input,
+.search {
+  border-radius: 2px;
+  border-color: var(--tele-dim);
+  background-color: rgba(4, 9, 24, 0.78);
+  background-image: linear-gradient(90deg, rgba(94, 224, 200, 0.06), transparent 30%);
+  clip-path: polygon(
+    10px 0,
+    100% 0,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    0 100%,
+    0 10px
+  );
+  box-shadow: inset 0 0 0 1px rgba(94, 224, 200, 0.05);
+}
+
+.repo-input:focus-within,
+.search:focus-within {
+  border-color: var(--tele);
+  box-shadow:
+    inset 0 0 0 1px rgba(94, 224, 200, 0.25),
+    inset 0 0 22px rgba(94, 224, 200, 0.1);
+}
+
+.repo-input input::placeholder {
+  color: rgba(94, 224, 200, 0.45);
+}
+
+/* A blinking block caret where you type, like a terminal prompt. */
+.repo-input--hero::before {
+  content: '>';
+  align-self: center;
+  padding-left: 12px;
+  color: var(--tele);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  animation: caret 1.1s steps(2) infinite;
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- example sky chips as instrument tabs ----------------------------------- */
+
+.chip {
+  border-radius: 2px;
+  border-color: var(--tele-faint);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+
+.chip:hover,
+.chip[aria-pressed='true'] {
+  border-color: var(--tele);
+  box-shadow: inset 0 0 16px rgba(94, 224, 200, 0.1);
+}
+
+/* ---------- the plate caption, as a data card ---------------------------------------- */
+
+.plate {
+  border-left-color: var(--tele);
+  box-shadow: -1px 0 10px rgba(94, 224, 200, 0.25);
+}
+
+.plate__no {
+  color: var(--tele);
+  letter-spacing: 0.08em;
+}
+
+/* ---------- the wordmark: a slow scan of light across it ----------------------------- */
+
+.hero .wordmark {
+  background: linear-gradient(100deg, currentColor 0 42%, #b8fff0 48%, currentColor 54% 100%) 0 0 /
+    300% 100% no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wordmark-scan 6s 1.2s ease-in-out infinite;
+}
+
+@keyframes wordmark-scan {
+  0% {
+    background-position: 100% 0;
+  }
+  45%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .repo-input--hero::before,
+  .hero .wordmark {
+    animation: none;
+  }
+}
+
+/* On the landing page the frame stays, the readout waits until you're flying. */
+.viewfinder.is-hero .telemetry {
+  display: none;
+}

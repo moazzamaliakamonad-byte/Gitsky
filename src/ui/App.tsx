@@ -22,6 +22,7 @@ import { ShareDialog } from './ShareDialog';
 import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
 import { CollisionHud, CollisionLabels } from './CollisionUi';
 import { CodePanel, NearLabels, OrbitLabels } from './CodePanel';
+import { ViewportFrame } from './ViewportFrame';
 import { UniverseHud, UniverseLabels } from './UniverseUi';
 import { closeUniverse } from '../state/universeActions';
 import { watchSelection } from '../state/contentActions';
@@ -88,6 +89,7 @@ export function App() {
       {galaxyUi && <Reticles />}
       <CollisionLabels />
       <SystemLabels />
+      <ViewportFrame />
       {heroOpen ? <Hero /> : <Hud />}
       {!heroOpen && galaxyUi && panel !== 'insights' && !hasContent && <Legend />}
       {!heroOpen && galaxyUi && panel !== 'insights' && hasContent && <CodePanel />}
