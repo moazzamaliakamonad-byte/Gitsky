@@ -10,7 +10,6 @@ import { Starfield } from './Starfield';
 import { Nebulae } from './Nebulae';
 import { GalaxyHaze } from './GalaxyHaze';
 import { StarGlow } from './StarGlow';
-import { BlackHoles } from './BlackHoles';
 import { Supernova } from './Supernova';
 import { SystemView } from './SystemView';
 import { CollisionView } from './CollisionView';
@@ -99,7 +98,6 @@ export function GalaxyCanvas() {
             <Nebulae model={model} />
             <StarGlow model={model} />
             <Starfield model={model} />
-            <BlackHoles model={model} />
             {!reducedMotion && <Comets model={model} />}
             {!reducedMotion && model.supernova && (
               <Supernova plan={model.supernova} position={supernovaPosition(model)} />

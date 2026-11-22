@@ -1,4 +1,3 @@
-import { HOLE_LABEL } from '../layout/blackHoles';
 import { enterSystem } from '../state/systemActions';
 import { useEffect, useMemo, useRef } from 'react';
 import { languageOf } from '../layout/color';
@@ -44,23 +43,12 @@ function FileView({ model, index }: { model: SkyModel; index: number }) {
   const { name } = splitPath(file.path);
   const commits = model.data.commits;
   const touched = useMemo(() => new Set(detail.touches), [detail]);
-  const hole = model.holes.find((h) => h.index === index);
   const isNova = model.supernova?.file === index;
 
   return (
     <>
       <Breadcrumb model={model} path={file.path} isFile />
       <h2 className="detail__title mono">{name}</h2>
-      {hole && (
-        <p className="detail__phenomenon">
-          <span className="detail__glyph detail__glyph--hole" aria-hidden="true" />
-          <span>
-            <strong>Black hole.</strong> This is {HOLE_LABEL[hole.kind]}, the heaviest file nobody
-            writes by hand, so it bends light and swallows the stars around it. The infalling stars
-            are an effect, coloured like the files nearby.
-          </span>
-        </p>
-      )}
       {isNova && model.supernova && (
         <p className="detail__phenomenon">
           <span className="detail__glyph detail__glyph--nova" aria-hidden="true" />
