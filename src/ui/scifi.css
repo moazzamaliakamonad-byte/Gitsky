@@ -607,3 +607,93 @@
   flex: none;
   scroll-snap-align: start;
 }
+
+/* ---------- share: the README badge ------------------------------------------------ */
+
+.share__badge {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--tele-faint);
+}
+
+.share__badge h3 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--haze);
+}
+
+/* ---------- drift mode -------------------------------------------------------------- */
+
+.app > * {
+  transition: opacity 0.9s ease;
+}
+
+.app--drift > :not(.canvas-wrap):not(.drift) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.drift {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  cursor: none;
+}
+
+.drift__hint {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  translate: -50% 0;
+  margin: 0;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--tele);
+  background: rgba(4, 6, 13, 0.6);
+  border: 1px solid var(--tele-faint);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.drift__hint.is-on {
+  opacity: 1;
+}
+
+.drift__name {
+  position: absolute;
+  left: 40px;
+  bottom: 34px;
+  display: grid;
+  gap: 4px;
+  font-size: 15px;
+  color: var(--starlight);
+  text-shadow: 0 0 18px rgba(4, 6, 13, 0.9);
+  animation: drift-name 9s ease forwards;
+}
+
+.drift__blurb {
+  font-size: 13px;
+  color: var(--haze);
+}
+
+@keyframes drift-name {
+  0% {
+    opacity: 0;
+  }
+  12%,
+  70% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift__name {
+    animation: none;
+    opacity: 0.6;
+  }
+}

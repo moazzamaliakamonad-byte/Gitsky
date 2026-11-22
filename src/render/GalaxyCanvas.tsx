@@ -1,3 +1,4 @@
+import { DriftDriver } from './DriftDriver';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import { useStore } from '../state/store';
@@ -116,6 +117,7 @@ export function GalaxyCanvas() {
         <WarpStreaks />
         <WarpDriver />
         <Controls />
+        <DriftDriver />
         {quality === 'high' && <Effects />}
         <TimelineDriver />
         <Picker />

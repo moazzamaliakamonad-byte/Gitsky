@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { renderShareCard } from '../share/renderCard';
 import { shareFileName, shareUrl } from '../share/shareLayout';
+import { badgeMarkdown, siteRoot } from '../share/badge';
 import { useStore } from '../state/store';
 
 type Status = { kind: 'idle' | 'ok' | 'error'; text: string };
@@ -80,6 +81,18 @@ export function ShareDialog() {
       setStatus({ kind: 'ok', text: 'Link copied.' });
     } catch {
       setStatus({ kind: 'error', text: 'Copy was blocked. Select the link above and copy it.' });
+    }
+  };
+  const badge = badgeMarkdown(
+    siteRoot(import.meta.env.VITE_SITE_URL, window.location.href, import.meta.env.BASE_URL),
+    model.data.meta.fullName,
+  );
+  const copyBadge = async () => {
+    try {
+      await navigator.clipboard.writeText(badge);
+      setStatus({ kind: 'ok', text: 'Badge copied. Paste it into your README.' });
+    } catch {
+      setStatus({ kind: 'error', text: 'Copy was blocked. Select the badge text and copy it.' });
     }
   };
   const copyImage = async () => {
@@ -172,10 +185,31 @@ export function ShareDialog() {
             {status.text}
           </span>
         </div>
-        <p className="share__note">
-          The image shows your current view, 1200&times;630, sized for link previews. The link opens
-          this repo directly.
-        </p>
+
+        <section className="share__badge" aria-labelledby="share-badge-title">
+          <h3 id="share-badge-title">README badge</h3>
+          <img
+            src={`${import.meta.env.BASE_URL}badge.svg`}
+            width={167}
+            height={20}
+            alt="View in Gitsky"
+          />
+          <div className="share__link">
+            <label htmlFor="share-badge" className="visually-hidden">
+              Badge Markdown
+            </label>
+            <input
+              id="share-badge"
+              className="mono"
+              readOnly
+              value={badge}
+              onFocus={(e) => e.target.select()}
+            />
+            <button type="button" className="btn btn--ghost" onClick={copyBadge}>
+              Copy badge
+            </button>
+          </div>
+        </section>
       </div>
     </div>
   );

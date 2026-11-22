@@ -30,6 +30,8 @@ import { watchSelection } from '../state/contentActions';
 import { warpUp } from '../state/systemActions';
 import { endCollision } from '../state/collisionActions';
 import { focusGalaxy } from './focus';
+import { DriftOverlay } from './DriftOverlay';
+import { startDrift } from '../state/drift';
 
 /** Escape peels back one layer at a time: dialog → selection → highlight → hero. */
 function useEscape() {
@@ -40,6 +42,19 @@ function useEscape() {
       if (e.key === 'Home' && !typing && !e.defaultPrevented) {
         e.preventDefault();
         focusGalaxy();
+        return;
+      }
+      if (
+        (e.key === 'd' || e.key === 'D') &&
+        !typing &&
+        !e.defaultPrevented &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        useStore.getState().model
+      ) {
+        e.preventDefault();
+        startDrift();
         return;
       }
       if (e.key !== 'Escape' || e.defaultPrevented) return;
@@ -66,6 +81,7 @@ export function App() {
   const inUniverse = useStore((s) => s.universe !== null);
   const galaxyUi = !inSystem && !colliding && !inUniverse;
   const hasContent = useStore((s) => s.content !== null);
+  const drift = useStore((s) => s.drift);
   useEscape();
 
   useEffect(() => {
@@ -74,7 +90,7 @@ export function App() {
   useEffect(() => watchSelection(), []);
 
   return (
-    <div className="app">
+    <div className={drift ? 'app app--drift' : 'app'}>
       <a
         href="#list"
         className="skip-link"
@@ -113,6 +129,7 @@ export function App() {
       {panel === 'token' && <TokenDialog />}
       {panel === 'list' && <ListView />}
       {panel === 'share' && <ShareDialog />}
+      {drift && <DriftOverlay />}
     </div>
   );
 }

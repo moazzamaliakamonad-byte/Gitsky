@@ -1,3 +1,4 @@
+import { AUTHOR, GITHUB_MARK } from './author';
 import { computeInsights } from '../layout/insights';
 import { captureRef } from '../render/sceneRefs';
 import type { SkyModel } from '../state/model';
@@ -197,6 +198,39 @@ export async function renderShareCard(
   ctx.beginPath();
   ctx.arc(X - 18, CARD_H - 48.5, 3.5, 0, Math.PI * 2);
   ctx.fill();
+
+  // Bottom right: who built Gitsky. A soft dark pool behind it keeps it legible over stars.
+  const right = CARD_W - 48;
+  const base = CARD_H - 44;
+  ctx.font = `400 14px ${MONO}`;
+  const nameW = ctx.measureText(AUTHOR).width;
+  ctx.font = `400 13px ${UI}`;
+  const byW = ctx.measureText('Built by ').width;
+  const left = right - nameW - byW - 24;
+  const pool = ctx.createRadialGradient(
+    right - (right - left) / 2,
+    base - 5,
+    0,
+    right - (right - left) / 2,
+    base - 5,
+    (right - left) * 0.75,
+  );
+  pool.addColorStop(0, 'rgba(4, 6, 13, 0.82)');
+  pool.addColorStop(1, 'rgba(4, 6, 13, 0)');
+  ctx.fillStyle = pool;
+  ctx.fillRect(left - 60, base - 50, right - left + 108, 80);
+  ctx.save();
+  ctx.translate(left, base - 13);
+
+  ctx.fillStyle = C.haze;
+  ctx.fill(new Path2D(GITHUB_MARK));
+  ctx.restore();
+  ctx.fillStyle = C.dim;
+  ctx.font = `400 13px ${UI}`;
+  ctx.fillText('Built by ', left + 24, base);
+  ctx.fillStyle = C.starlight;
+  ctx.font = `400 14px ${MONO}`;
+  ctx.fillText(AUTHOR, left + 24 + byW, base);
 
   return new Promise((resolve, reject) =>
     canvas.toBlob(

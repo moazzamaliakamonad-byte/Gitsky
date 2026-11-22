@@ -110,6 +110,8 @@ export interface AppState {
   universe: UniverseState | null;
   /** The guided tour in progress, or null. */
   tour: { step: number; total: number; caption: string; seconds: number } | null;
+  /** Drift mode: no interface, a slow camera, the featured skies one after another. */
+  drift: boolean;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -154,6 +156,7 @@ export const useStore = create<AppState>((set) => ({
   symbol: -1,
   universe: null,
   tour: null,
+  drift: false,
 
   set: (p) => set(p),
   setModel: (m) =>
