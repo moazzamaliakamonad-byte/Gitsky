@@ -10,9 +10,9 @@ Folders are star systems, files are stars, commits are comets.
 
 ### [Open Gitsky](https://moazzamaliakamonad-byte.github.io/Gitsky/)
 
-<img src="docs/media/deep-time.gif" width="720" alt="The vite repository's galaxy forming over its whole history: a few stars in April 2020 grow into a full spiral of 3,016 files by today." />
+<img src="docs/media/hero.jpg" width="800" alt="The ollama repository as a spiral galaxy: 1,727 files as stars, Go files glowing cyan along the arms around a warm core." />
 
-<sub>Deep time: vite's galaxy forming from its first commit in 2020 to today.</sub>
+<sub>ollama/ollama: 1,727 files, Go in cyan.</sub>
 
 [![View in Gitsky](public/badge.svg)](https://moazzamaliakamonad-byte.github.io/Gitsky/?repo=moazzamaliakamonad-byte/Gitsky)
 

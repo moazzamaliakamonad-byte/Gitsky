@@ -49,10 +49,9 @@ Dark, noisy space scenes compress poorly. If the GIF is too large, drop to `fps=
 (GitHub renders uploaded MP4s in issues and READMEs when dragged into the web editor).
 
 ## How the README's media were made
-The README's deep-time GIF and gallery stills come from the running app, not a screen
+The README's hero image and gallery stills come from the running app, not a screen
 recorder: `npx tsx scripts/capture-receiver.ts --minutes 30` listens locally, and the page
-posts canvas frames to it as `media/<name>.png|jpg`, which land in `docs/media/`. Frames
-are rendered on demand (camera and deep-time moment set per frame, film grain off so the
-GIF compresses), then assembled into a GIF with one shared palette. That gives perfectly
-smooth motion on any machine. A screen recording (above) is the way to show the interface
-itself.
+posts canvas frames to it as `media/<name>.png|jpg`, which land in `docs/media/`. Each
+frame is rendered on demand with the camera placed exactly (cancel the intro flight first,
+and pause the commit replay so no comets land in the shot), at full resolution. A screen
+recording (above) is the way to show the interface itself.
