@@ -2,6 +2,7 @@ import { findBundled, listBundled, loadBundled } from '../data/bundled';
 import { GitHubError } from '../data/github';
 import { loadRepo } from '../data/loadRepo';
 import { parseRepoInput } from '../data/parseRepoInput';
+import { routeFromPath } from '../data/pathRoute';
 import { getToken } from '../data/token';
 import type { BundledEntry, RepoRef } from '../data/types';
 import { syntheticRepo } from '../data/synthetic';
@@ -180,7 +181,29 @@ function fail(error: AppError) {
 }
 
 /** First load: show a bundled sky immediately, then honour ?repo= if present. */
+/**
+ * github.com/owner/repo with the domain swapped for ours: turn the path into the
+ * ?repo= / ?user= link the rest of the app reads, keeping any other parameters.
+ */
+function adoptPathRoute() {
+  const base = import.meta.env.BASE_URL;
+  const route = routeFromPath(window.location.pathname, base);
+  if (!route) return;
+  const params = new URLSearchParams(window.location.search);
+  params.delete('repo');
+  params.delete('user');
+  const head =
+    'user' in route ? `user=${route.user}` : `repo=${repoParam(route.repo, route.branch)}`;
+  const tail = params.toString();
+  window.history.replaceState(
+    null,
+    '',
+    `${base}?${head}${tail ? `&${tail}` : ''}${window.location.hash}`,
+  );
+}
+
 export async function boot() {
+  adoptPathRoute();
   let bundled: BundledEntry[] = [];
   try {
     bundled = await listBundled();

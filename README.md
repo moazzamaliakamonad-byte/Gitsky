@@ -22,6 +22,10 @@ touched anything in a while.
 
 ## Features
 
+- **Swap the domain.** On any GitHub page, replace `github.com` with
+  `moazzamaliakamonad-byte.github.io/Gitsky` and press Enter:
+  `github.com/pmndrs/zustand` becomes that repo's sky, and a profile URL opens that
+  person's universe.
 - **A guided tour.** One click and the camera flies itself through the repo, explaining what
   it finds, from the largest region to the busiest file to a warp into its folder.
 - **A galaxy per repo.** Top-level folders sit on logarithmic spiral arms, biggest near the
@@ -97,7 +101,7 @@ npm run build      # production build in dist/
 
 Useful extras:
 
-- `http://localhost:5173/?repo=pmndrs/zustand` opens a repo directly.
+- `http://localhost:5173/pmndrs/zustand` (or `?repo=pmndrs/zustand`) opens a repo directly.
 - `http://localhost:5173/?stress=50000` draws a labelled synthetic sky for performance testing.
 - `npm run snapshot -- owner/repo` fetches a repo into `public/snapshots/` (set
   `GITHUB_TOKEN` for deeper history), and `npm run snapshot:index` rebuilds the index
