@@ -1,5 +1,7 @@
 # Recording the hero GIF
 
+> Easiest take: open the site, press **Take the guided tour**, and record the first 20 seconds.
+
 The README's first screen needs one 6-second clip that makes people want to try it. This is
 the exact shot list.
 

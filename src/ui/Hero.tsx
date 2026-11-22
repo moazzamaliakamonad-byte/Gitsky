@@ -3,6 +3,7 @@ import { useStore } from '../state/store';
 import { RepoInput } from './RepoInput';
 import { Spectrum } from './Spectrum';
 import { Wordmark } from './Wordmark';
+import { startTour } from '../state/tour';
 
 /** The caption for the sky behind the hero, written like an astronomical plate's. */
 function PlateCaption() {
@@ -66,13 +67,18 @@ export function Hero() {
             ))}
           </ul>
         )}
-        <button
-          type="button"
-          className="hero__explore link"
-          onClick={() => useStore.getState().set({ heroOpen: false })}
-        >
-          Or explore the sky behind this text
-        </button>
+        <div className="hero__more">
+          <button type="button" className="btn btn--ghost hero__tour" onClick={startTour}>
+            Take the guided tour
+          </button>
+          <button
+            type="button"
+            className="hero__explore link"
+            onClick={() => useStore.getState().set({ heroOpen: false })}
+          >
+            Or explore it yourself
+          </button>
+        </div>
       </section>
       <PlateCaption />
     </>

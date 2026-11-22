@@ -23,6 +23,7 @@ import { SystemHud, SystemLabels, WarpFlash } from './SystemUi';
 import { CollisionHud, CollisionLabels } from './CollisionUi';
 import { CodePanel, NearLabels, OrbitLabels } from './CodePanel';
 import { ViewportFrame } from './ViewportFrame';
+import { TourCaption } from './TourCaption';
 import { UniverseHud, UniverseLabels } from './UniverseUi';
 import { closeUniverse } from '../state/universeActions';
 import { watchSelection } from '../state/contentActions';
@@ -105,6 +106,7 @@ export function App() {
       {!heroOpen && !colliding && !inUniverse && <DetailPanel />}
       <Tooltip />
       <WarpFlash />
+      {!heroOpen && <TourCaption />}
       <LoadingVeil />
       <ErrorCard />
       <Notice />

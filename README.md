@@ -22,6 +22,8 @@ touched anything in a while.
 
 ## Features
 
+- **A guided tour.** One click and the camera flies itself through the repo, explaining what
+  it finds, from the largest region to the busiest file to a warp into its folder.
 - **A galaxy per repo.** Top-level folders sit on logarithmic spiral arms, biggest near the
   core; nested folders cluster around them. The same repo always looks the same.
 - **Stars that mean something.** Colour is the language, size is the file's bytes (log

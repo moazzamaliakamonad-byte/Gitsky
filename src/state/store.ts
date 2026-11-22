@@ -98,6 +98,8 @@ export interface AppState {
   symbol: number;
   /** The universe of related projects and people, or null. */
   universe: UniverseState | null;
+  /** The guided tour in progress, or null. */
+  tour: { step: number; total: number; caption: string; seconds: number } | null;
 
   set: (p: Partial<AppState>) => void;
   setModel: (m: SkyModel) => void;
@@ -141,6 +143,7 @@ export const useStore = create<AppState>((set) => ({
   content: null,
   symbol: -1,
   universe: null,
+  tour: null,
 
   set: (p) => set(p),
   setModel: (m) =>

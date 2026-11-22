@@ -405,3 +405,91 @@
 .viewfinder.is-hero .telemetry {
   display: none;
 }
+
+/* ---------- the guided tour: an incoming transmission --------------------------------- */
+
+.tour {
+  position: absolute;
+  left: 50%;
+  top: 84px;
+  transform: translateX(-50%);
+  width: min(600px, calc(100vw - 2 * var(--gutter)));
+  padding: 10px 16px 12px;
+  z-index: 6;
+  animation: system-hud-in 0.35s ease both;
+}
+
+.tour__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--tele);
+}
+
+.tour__skip {
+  border: 0;
+  background: none;
+  color: var(--haze);
+  font: inherit;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.tour__skip:hover {
+  color: var(--tele);
+}
+
+.tour__text {
+  margin: 6px 0 8px;
+  min-height: 2.9em;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--starlight);
+}
+
+.tour__caret {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -2px;
+  background: var(--tele);
+  animation: caret 1s steps(2) infinite;
+}
+
+.tour__time {
+  display: block;
+  height: 2px;
+  background: var(--tele);
+  transform-origin: left;
+  animation-name: tour-time;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  box-shadow: 0 0 8px var(--tele);
+}
+
+@keyframes tour-time {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour__caret,
+  .tour__time {
+    animation: none;
+  }
+}
+
+.hero__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
